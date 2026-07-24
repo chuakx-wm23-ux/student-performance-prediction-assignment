@@ -18,7 +18,7 @@ st.set_page_config(
 st.markdown("""
 <style>
 :root {
-    --sidebar-width: 285px;
+    --sidebar-width: 235px;
     --navy: #0f172a;
     --navy-soft: #172554;
     --blue: #2563eb;
@@ -39,9 +39,9 @@ st.markdown("""
 }
 
 .block-container {
-    max-width: 1120px;
-    padding-top: 1.6rem;
-    padding-bottom: 3rem;
+    max-width: 980px;
+    padding-top: 1rem;
+    padding-bottom: 2rem;
 }
 
 /* Sidebar */
@@ -63,14 +63,14 @@ st.markdown("""
 }
 
 [data-testid="stSidebar"] h1 {
-    font-size: 2.0rem !important;
+    font-size: 1.65rem !important;
     font-weight: 800 !important;
     letter-spacing: -0.02em;
     margin-bottom: 1.35rem !important;
 }
 
 [data-testid="stSidebar"] [data-testid="stMarkdownContainer"] p {
-    font-size: 1.05rem !important;
+    font-size: 0.95rem !important;
     font-weight: 800 !important;
 }
 
@@ -84,7 +84,7 @@ st.markdown("""
     border-radius: 14px;
     padding: 0.72rem 0.85rem;
     transition: all 0.18s ease;
-    min-height: 52px;
+    min-height: 44px;
 }
 
 [data-testid="stSidebar"] div[role="radiogroup"] label:hover {
@@ -99,14 +99,14 @@ st.markdown("""
 }
 
 [data-testid="stSidebar"] div[role="radiogroup"] label p {
-    font-size: 1.08rem !important;
+    font-size: 0.98rem !important;
     font-weight: 700 !important;
     margin: 0 !important;
 }
 
 /* Main hero */
 .hero {
-    padding: 1.7rem 1.9rem;
+    padding: 1.2rem 1.4rem;
     border-radius: 24px;
     color: white;
     background:
@@ -130,7 +130,7 @@ st.markdown("""
 
 .hero h1 {
     margin: 0;
-    font-size: 2.1rem;
+    font-size: 1.75rem;
     font-weight: 850;
     letter-spacing: -0.035em;
     position: relative;
@@ -141,7 +141,7 @@ st.markdown("""
     margin-top: .65rem;
     margin-bottom: 0;
     color: #e0e7ff;
-    font-size: 1.02rem;
+    font-size: 0.90rem;
     position: relative;
     z-index: 1;
 }
@@ -188,7 +188,7 @@ div[data-testid="stButton"] button[kind="secondary"]:hover {
     background: rgba(255,255,255,0.92);
     border: 1px solid var(--border);
     border-radius: 18px;
-    padding: 1rem 1.1rem;
+    padding: 0.75rem 0.9rem;
     box-shadow: 0 10px 28px rgba(15,23,42,0.05);
 }
 
@@ -202,11 +202,27 @@ div[data-testid="stButton"] button[kind="secondary"]:hover {
     font-weight: 800 !important;
 }
 
+[data-testid="stMetricValue"] > div {
+    font-size: 1.85rem !important;
+}
+
+[data-testid="stMetricLabel"] p {
+    font-size: 0.88rem !important;
+}
+
+h2 {
+    font-size: 1.45rem !important;
+}
+
+h3 {
+    font-size: 1.15rem !important;
+}
+
 [data-testid="stForm"] {
     background: rgba(255,255,255,0.92);
     border: 1px solid var(--border);
     border-radius: 22px;
-    padding: 1.1rem 1.2rem 1.35rem 1.2rem;
+    padding: 0.85rem 1rem 1rem 1rem;
     box-shadow: 0 18px 44px rgba(15,23,42,0.06);
 }
 
@@ -220,7 +236,7 @@ div[data-testid="stButton"] button[kind="secondary"]:hover {
 /* CGPA guide */
 .cgpa-guide {
     background: rgba(255,255,255,0.95);
-    padding: 18px;
+    padding: 15px;
     border-radius: 16px;
     border: 1px solid var(--border);
     margin: 14px 0 20px 0;
@@ -230,11 +246,11 @@ div[data-testid="stButton"] button[kind="secondary"]:hover {
 .cgpa-grid {
     display: grid;
     grid-template-columns: repeat(4, 1fr);
-    gap: 12px;
+    gap: 10px;
 }
 
 .cgpa-card {
-    padding: 17px;
+    padding: 14px;
     border-radius: 14px;
     text-align: center;
     font-size: 0.95rem;
@@ -243,7 +259,7 @@ div[data-testid="stButton"] button[kind="secondary"]:hover {
 
 .cgpa-title {
     font-weight: 850;
-    font-size: 1.06rem;
+    font-size: 0.98rem;
     margin-bottom: 6px;
 }
 
@@ -380,7 +396,8 @@ if page == "Home":
         color="Metric",
         barmode="group",
         range_y=[0, 1],
-        title="Model Performance Comparison"
+        title="Model Performance Comparison",
+        height=420
     )
 
     st.plotly_chart(fig, use_container_width=True)
@@ -646,7 +663,7 @@ else:
     background: rgba(255,255,255,0.95);
     border: 1px solid #e2e8f0;
     border-radius: 16px;
-    padding: 18px;
+    padding: 15px;
     box-shadow: 0 14px 34px rgba(15,23,42,0.05);
     min-height: 315px;
 ">
@@ -685,7 +702,7 @@ else:
     background: rgba(255,255,255,0.95);
     border: 1px solid #e2e8f0;
     border-radius: 16px;
-    padding: 18px;
+    padding: 15px;
     box-shadow: 0 14px 34px rgba(15,23,42,0.05);
     min-height: 315px;
 ">
@@ -772,7 +789,7 @@ else:
     background: rgba(255,255,255,0.95);
     border: 1px solid #e2e8f0;
     border-radius: 16px;
-    padding: 18px;
+    padding: 15px;
     box-shadow: 0 14px 34px rgba(15,23,42,0.05);
     min-height: 210px;
 ">
@@ -795,7 +812,7 @@ else:
     background: linear-gradient(135deg,#fff7ed,#fffbeb);
     border: 1px solid #fed7aa;
     border-radius: 16px;
-    padding: 18px;
+    padding: 15px;
     box-shadow: 0 14px 34px rgba(15,23,42,0.05);
     min-height: 210px;
 ">
