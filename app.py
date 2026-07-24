@@ -39,7 +39,7 @@ st.markdown("""
 }
 
 .block-container {
-    max-width: 1250px;
+    max-width: 1120px;
     padding-top: 1.6rem;
     padding-bottom: 3rem;
 }
@@ -63,14 +63,14 @@ st.markdown("""
 }
 
 [data-testid="stSidebar"] h1 {
-    font-size: 2.35rem !important;
+    font-size: 2.0rem !important;
     font-weight: 800 !important;
     letter-spacing: -0.02em;
     margin-bottom: 1.35rem !important;
 }
 
 [data-testid="stSidebar"] [data-testid="stMarkdownContainer"] p {
-    font-size: 1.22rem !important;
+    font-size: 1.05rem !important;
     font-weight: 800 !important;
 }
 
@@ -84,7 +84,7 @@ st.markdown("""
     border-radius: 14px;
     padding: 0.72rem 0.85rem;
     transition: all 0.18s ease;
-    min-height: 60px;
+    min-height: 52px;
 }
 
 [data-testid="stSidebar"] div[role="radiogroup"] label:hover {
@@ -99,14 +99,14 @@ st.markdown("""
 }
 
 [data-testid="stSidebar"] div[role="radiogroup"] label p {
-    font-size: 1.25rem !important;
+    font-size: 1.08rem !important;
     font-weight: 700 !important;
     margin: 0 !important;
 }
 
 /* Main hero */
 .hero {
-    padding: 2.2rem 2.35rem;
+    padding: 1.7rem 1.9rem;
     border-radius: 24px;
     color: white;
     background:
@@ -130,7 +130,7 @@ st.markdown("""
 
 .hero h1 {
     margin: 0;
-    font-size: 2.5rem;
+    font-size: 2.1rem;
     font-weight: 850;
     letter-spacing: -0.035em;
     position: relative;
@@ -220,8 +220,8 @@ div[data-testid="stButton"] button[kind="secondary"]:hover {
 /* CGPA guide */
 .cgpa-guide {
     background: rgba(255,255,255,0.95);
-    padding: 22px;
-    border-radius: 20px;
+    padding: 18px;
+    border-radius: 16px;
     border: 1px solid var(--border);
     margin: 14px 0 20px 0;
     box-shadow: 0 14px 34px rgba(15,23,42,0.05);
@@ -645,8 +645,8 @@ else:
 <div style="
     background: rgba(255,255,255,0.95);
     border: 1px solid #e2e8f0;
-    border-radius: 20px;
-    padding: 22px;
+    border-radius: 16px;
+    padding: 18px;
     box-shadow: 0 14px 34px rgba(15,23,42,0.05);
     min-height: 315px;
 ">
@@ -684,8 +684,8 @@ else:
 <div style="
     background: rgba(255,255,255,0.95);
     border: 1px solid #e2e8f0;
-    border-radius: 20px;
-    padding: 22px;
+    border-radius: 16px;
+    padding: 18px;
     box-shadow: 0 14px 34px rgba(15,23,42,0.05);
     min-height: 315px;
 ">
@@ -771,8 +771,8 @@ else:
 <div style="
     background: rgba(255,255,255,0.95);
     border: 1px solid #e2e8f0;
-    border-radius: 20px;
-    padding: 22px;
+    border-radius: 16px;
+    padding: 18px;
     box-shadow: 0 14px 34px rgba(15,23,42,0.05);
     min-height: 210px;
 ">
@@ -794,8 +794,8 @@ else:
 <div style="
     background: linear-gradient(135deg,#fff7ed,#fffbeb);
     border: 1px solid #fed7aa;
-    border-radius: 20px;
-    padding: 22px;
+    border-radius: 16px;
+    padding: 18px;
     box-shadow: 0 14px 34px rgba(15,23,42,0.05);
     min-height: 210px;
 ">
