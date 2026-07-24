@@ -283,6 +283,113 @@ h1, h2, h3 {
         font-size: 2rem;
     }
 }
+
+/* About page */
+.about-hero {
+    background: linear-gradient(120deg, #eef2ff, #f5f3ff);
+    border: 1px solid #ddd6fe;
+    border-radius: 18px;
+    padding: 18px 20px;
+    margin-bottom: 14px;
+    box-shadow: 0 10px 28px rgba(79, 70, 229, 0.08);
+}
+
+.about-hero-title {
+    font-size: 1.35rem;
+    font-weight: 850;
+    color: #312e81;
+    margin-bottom: 6px;
+}
+
+.about-hero-subtitle {
+    color: #475569;
+    font-size: 0.92rem;
+}
+
+.about-card {
+    border-radius: 16px;
+    padding: 16px;
+    min-height: 165px;
+    border: 1px solid rgba(148, 163, 184, 0.25);
+    box-shadow: 0 10px 24px rgba(15, 23, 42, 0.05);
+}
+
+.about-blue {
+    background: linear-gradient(135deg, #eff6ff, #dbeafe);
+}
+
+.about-green {
+    background: linear-gradient(135deg, #f0fdf4, #dcfce7);
+}
+
+.about-purple {
+    background: linear-gradient(135deg, #faf5ff, #ede9fe);
+}
+
+.about-orange {
+    background: linear-gradient(135deg, #fff7ed, #ffedd5);
+}
+
+.about-yellow {
+    background: linear-gradient(135deg, #fffbeb, #fef3c7);
+}
+
+.about-red {
+    background: linear-gradient(135deg, #fff1f2, #fee2e2);
+}
+
+.about-card h4 {
+    margin: 0 0 10px 0;
+    font-size: 1.02rem;
+    color: #172033;
+}
+
+.about-list-item {
+    background: rgba(255,255,255,0.72);
+    border-radius: 10px;
+    padding: 8px 10px;
+    margin: 7px 0;
+    font-size: 0.88rem;
+}
+
+.about-model {
+    background: rgba(255,255,255,0.70);
+    border-radius: 10px;
+    padding: 9px 10px;
+    margin: 8px 0;
+    font-size: 0.88rem;
+}
+
+.about-target {
+    text-align: center;
+    border-radius: 14px;
+    padding: 14px 10px;
+    min-height: 92px;
+    border: 1px solid rgba(148,163,184,0.20);
+}
+
+.about-target-title {
+    font-size: 1rem;
+    font-weight: 850;
+    margin-bottom: 5px;
+}
+
+.about-target-range {
+    font-size: 0.82rem;
+    color: #475569;
+}
+
+/* Keep overview metric values readable and fully visible */
+[data-testid="stMetricValue"] > div {
+    font-size: 1.45rem !important;
+    line-height: 1.15 !important;
+    white-space: normal !important;
+}
+
+[data-testid="stMetricLabel"] p {
+    font-size: 0.78rem !important;
+}
+
 </style>
 """, unsafe_allow_html=True)
 
@@ -617,19 +724,24 @@ elif page == "Dataset":
 else:
     st.subheader("About This Assignment")
 
-    with st.container(border=True):
-        st.markdown("## 🎓 Student Performance Prediction")
-        st.write(
-            "This machine learning assignment applies supervised classification "
-            "to predict a student's overall academic performance."
-        )
+    st.markdown(
+        """
+<div class="about-hero">
+    <div class="about-hero-title">🎓 Student Performance Prediction</div>
+    <div class="about-hero-subtitle">
+        A supervised machine learning classification assignment for predicting overall student academic performance.
+    </div>
+</div>
+""",
+        unsafe_allow_html=True
+    )
 
     st.markdown("### 📋 Assignment Overview")
 
     overview_col1, overview_col2, overview_col3, overview_col4 = st.columns(4)
 
     with overview_col1:
-        st.metric("Assignment Type", "Supervised Learning")
+        st.metric("Assignment Type", "Supervised")
 
     with overview_col2:
         st.metric("Task", "Classification")
@@ -645,67 +757,113 @@ else:
     left_col, right_col = st.columns(2)
 
     with left_col:
-        with st.container(border=True):
-            st.markdown("#### Input Features")
-            st.write("1. Number of Subjects")
-            st.write("2. Average Score")
-            st.write("3. Attendance Rate")
-            st.write("4. Study Hours Per Day")
-            st.write("5. Previous CGPA")
+        st.markdown(
+            """
+<div class="about-card about-blue">
+    <h4>📋 Input Features</h4>
+    <div class="about-list-item">1. Number of Subjects</div>
+    <div class="about-list-item">2. Average Score</div>
+    <div class="about-list-item">3. Attendance Rate</div>
+    <div class="about-list-item">4. Study Hours Per Day</div>
+    <div class="about-list-item">5. Previous CGPA</div>
+</div>
+""",
+            unsafe_allow_html=True
+        )
 
     with right_col:
-        with st.container(border=True):
-            st.markdown("#### Machine Learning Models")
-            st.write("**KNN** — K-Nearest Neighbours")
-            st.write("**SVM** — Support Vector Machine")
-            st.write("**ANN** — Artificial Neural Network")
+        st.markdown(
+            """
+<div class="about-card about-green">
+    <h4>🤖 Machine Learning Models</h4>
+    <div class="about-model"><b>KNN</b> — K-Nearest Neighbours</div>
+    <div class="about-model"><b>SVM</b> — Support Vector Machine</div>
+    <div class="about-model"><b>ANN</b> — Artificial Neural Network</div>
+</div>
+""",
+            unsafe_allow_html=True
+        )
 
     st.markdown("### 🎯 Target Classes")
 
     target_col1, target_col2, target_col3, target_col4 = st.columns(4)
 
     with target_col1:
-        with st.container(border=True):
-            st.markdown("#### Excellent")
-            st.write("CGPA 3.50 – 4.00")
+        st.markdown(
+            """
+<div class="about-target about-green">
+    <div class="about-target-title">Excellent</div>
+    <div class="about-target-range">CGPA 3.50 – 4.00</div>
+</div>
+""",
+            unsafe_allow_html=True
+        )
 
     with target_col2:
-        with st.container(border=True):
-            st.markdown("#### Good")
-            st.write("CGPA 3.00 – 3.49")
+        st.markdown(
+            """
+<div class="about-target about-blue">
+    <div class="about-target-title">Good</div>
+    <div class="about-target-range">CGPA 3.00 – 3.49</div>
+</div>
+""",
+            unsafe_allow_html=True
+        )
 
     with target_col3:
-        with st.container(border=True):
-            st.markdown("#### Average")
-            st.write("CGPA 2.50 – 2.99")
+        st.markdown(
+            """
+<div class="about-target about-yellow">
+    <div class="about-target-title">Average</div>
+    <div class="about-target-range">CGPA 2.50 – 2.99</div>
+</div>
+""",
+            unsafe_allow_html=True
+        )
 
     with target_col4:
-        with st.container(border=True):
-            st.markdown("#### At Risk")
-            st.write("CGPA below 2.50")
+        st.markdown(
+            """
+<div class="about-target about-red">
+    <div class="about-target-title">At Risk</div>
+    <div class="about-target-range">CGPA below 2.50</div>
+</div>
+""",
+            unsafe_allow_html=True
+        )
 
     st.markdown("### 📚 Dataset Information")
 
     info_col1, info_col2 = st.columns(2)
 
     with info_col1:
-        with st.container(border=True):
-            st.markdown("#### Dataset Source")
-            st.write(
-                "University Student Performance & Habits Dataset from Kaggle."
-            )
-            st.markdown("#### Feature Engineering")
-            st.write("Number of Subjects")
-            st.write("Average Score")
+        st.markdown(
+            """
+<div class="about-card about-purple">
+    <h4>🗂️ Dataset Source</h4>
+    <div class="about-list-item">
+        University Student Performance & Habits Dataset from Kaggle
+    </div>
+    <h4 style="margin-top:14px;">🧩 Feature Engineering</h4>
+    <div class="about-list-item">Number of Subjects</div>
+    <div class="about-list-item">Average Score</div>
+</div>
+""",
+            unsafe_allow_html=True
+        )
 
     with info_col2:
-        with st.container(border=True):
-            st.markdown("#### ⚠️ Important Note")
-            st.write(
-                "Final CGPA is used only during model training to generate "
-                "the target class."
-            )
-            st.write(
-                "It is not included as a prediction input because that would "
-                "cause data leakage."
-            )
+        st.markdown(
+            """
+<div class="about-card about-orange">
+    <h4>⚠️ Important Note</h4>
+    <div class="about-list-item">
+        Final CGPA is used only during model training to generate the target class.
+    </div>
+    <div class="about-list-item">
+        It is not included as a prediction input because that would cause data leakage.
+    </div>
+</div>
+""",
+            unsafe_allow_html=True
+        )
