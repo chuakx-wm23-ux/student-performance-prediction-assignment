@@ -120,33 +120,38 @@ def load_models():
 
 
 def show_cgpa_guide():
-    st.markdown("""
-    <div class="cgpa-guide">
-        <h3 style="margin-top:0;">CGPA Classification Guide</h3>
+    st.markdown(
+        """
+<div class="cgpa-guide">
+<h3 style="margin-top:0;">CGPA Classification Guide</h3>
 
-        <div class="cgpa-grid">
-            <div class="cgpa-card excellent">
-                <div class="cgpa-title">Excellent</div>
-                CGPA 3.50 – 4.00
-            </div>
+<div class="cgpa-grid">
 
-            <div class="cgpa-card good">
-                <div class="cgpa-title">Good</div>
-                CGPA 3.00 – 3.49
-            </div>
+<div class="cgpa-card excellent">
+<div class="cgpa-title">Excellent</div>
+CGPA 3.50 – 4.00
+</div>
 
-            <div class="cgpa-card average">
-                <div class="cgpa-title">Average</div>
-                CGPA 2.50 – 2.99
-            </div>
+<div class="cgpa-card good">
+<div class="cgpa-title">Good</div>
+CGPA 3.00 – 3.49
+</div>
 
-            <div class="cgpa-card risk">
-                <div class="cgpa-title">At Risk</div>
-                CGPA below 2.50
-            </div>
-        </div>
-    </div>
-    """, unsafe_allow_html=True)
+<div class="cgpa-card average">
+<div class="cgpa-title">Average</div>
+CGPA 2.50 – 2.99
+</div>
+
+<div class="cgpa-card risk">
+<div class="cgpa-title">At Risk</div>
+CGPA below 2.50
+</div>
+
+</div>
+</div>
+""",
+        unsafe_allow_html=True
+    )
 
 
 df = load_data()
