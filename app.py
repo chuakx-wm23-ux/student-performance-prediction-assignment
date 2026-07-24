@@ -705,30 +705,76 @@ elif page == "Model Results":
     )
     st.plotly_chart(accuracy_fig, use_container_width=True)
 
-    selected = st.selectbox(
-        "Select a model to view its performance",
-        evaluation[model_column].astype(str).tolist()
-    )
+    st.markdown("### 🤖 Individual Model Performance")
 
-    selected_row = evaluation[
-        evaluation[model_column].astype(str) == selected
-    ].iloc[0]
+    model_order = ["KNN", "SVM", "ANN"]
+    model_tabs = st.tabs(model_order)
 
-    st.markdown(f"### 📌 {selected} Performance")
+    for tab, model_name in zip(model_tabs, model_order):
+        with tab:
+            model_row = evaluation[
+                evaluation[model_column].astype(str).str.upper() == model_name
+            ]
 
-    c1, c2, c3, c4 = st.columns(4)
+            if model_row.empty:
+                st.warning(f"No evaluation result was found for {model_name}.")
+                continue
 
-    with c1:
-        st.metric("Accuracy", f"{selected_row['Accuracy']:.2%}")
+            model_row = model_row.iloc[0]
 
-    with c2:
-        st.metric("Precision", f"{selected_row['Precision']:.2%}")
+            st.markdown(f"#### {model_name} Performance")
 
-    with c3:
-        st.metric("Recall", f"{selected_row['Recall']:.2%}")
+            c1, c2, c3, c4 = st.columns(4)
 
-    with c4:
-        st.metric("F1 Score", f"{selected_row['F1 Score']:.2%}")
+            with c1:
+                st.metric("Accuracy", f"{model_row['Accuracy']:.2%}")
+
+            with c2:
+                st.metric("Precision", f"{model_row['Precision']:.2%}")
+
+            with c3:
+                st.metric("Recall", f"{model_row['Recall']:.2%}")
+
+            with c4:
+                st.metric("F1 Score", f"{model_row['F1 Score']:.2%}")
+
+            single_model_data = pd.DataFrame({
+                "Metric": metric_columns,
+                "Score": [float(model_row[col]) for col in metric_columns]
+            })
+
+            model_fig = px.bar(
+                single_model_data,
+                x="Metric",
+                y="Score",
+                text=single_model_data["Score"].map(
+                    lambda value: f"{value:.1%}"
+                ),
+                title=f"{model_name} Evaluation Metrics",
+                labels={"Score": "Score", "Metric": "Metric"}
+            )
+            model_fig.update_traces(textposition="outside")
+            model_fig.update_yaxes(
+                tickformat=".0%",
+                range=[0, 1.05]
+            )
+            model_fig.update_layout(
+                title_x=0.5,
+                height=390,
+                margin=dict(l=20, r=20, t=70, b=20)
+            )
+            st.plotly_chart(model_fig, use_container_width=True)
+
+            if model_name == best_model.upper():
+                st.success(
+                    f"{model_name} achieved the highest accuracy and was "
+                    "selected as the best-performing model."
+                )
+            else:
+                st.info(
+                    f"{model_name} was evaluated using Accuracy, Precision, "
+                    "Recall and F1 Score."
+                )
 
     st.markdown("### 📋 Complete Model Comparison")
 
@@ -744,7 +790,7 @@ elif page == "Model Results":
 
     st.info(
         "Accuracy shows the overall percentage of correct predictions. "
-        "Precision measures how reliable positive predictions are. "
+        "Precision measures how reliable the model's predictions are. "
         "Recall measures how many actual cases were identified, while "
         "F1 Score balances precision and recall."
     )
