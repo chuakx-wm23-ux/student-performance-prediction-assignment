@@ -685,10 +685,18 @@ elif page == "Model Results":
 
     st.markdown("### 📊 Model Accuracy Comparison")
 
+    model_colors = {
+        "KNN": "#3B82F6",
+        "SVM": "#10B981",
+        "ANN": "#8B5CF6"
+    }
+
     accuracy_fig = px.bar(
         evaluation,
         x=model_column,
         y="Accuracy",
+        color=model_column,
+        color_discrete_map=model_colors,
         text=evaluation["Accuracy"].map(lambda value: f"{value:.1%}"),
         title="Accuracy of KNN, SVM and ANN",
         labels={"Accuracy": "Accuracy", model_column: "Model"}
@@ -751,7 +759,8 @@ elif page == "Model Results":
                     lambda value: f"{value:.1%}"
                 ),
                 title=f"{model_name} Evaluation Metrics",
-                labels={"Score": "Score", "Metric": "Metric"}
+                labels={"Score": "Score", "Metric": "Metric"},
+                color_discrete_sequence=[model_colors[model_name]]
             )
             model_fig.update_traces(textposition="outside")
             model_fig.update_yaxes(
