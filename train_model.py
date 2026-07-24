@@ -1,7 +1,6 @@
 from pathlib import Path
 import json
 import joblib
-import matplotlib.pyplot as plt
 import pandas as pd
 
 from sklearn.pipeline import Pipeline
@@ -11,8 +10,7 @@ from sklearn.metrics import (
     accuracy_score,
     precision_score,
     recall_score,
-    f1_score,
-    confusion_matrix
+    f1_score
 )
 from sklearn.neighbors import KNeighborsClassifier
 from sklearn.svm import SVC
