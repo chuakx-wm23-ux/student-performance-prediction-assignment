@@ -556,8 +556,7 @@ elif page == "Prediction":
                 st.rerun()
 
     else:
-        # These fields are outside the form so that changing the subject
-        # quantity immediately refreshes the number of score inputs.
+        # All inputs are outside st.form so that changes refresh immediately.
         name = st.text_input("Student Name", key="student_name")
         student_id = st.text_input("Student ID", key="student_id")
 
@@ -569,53 +568,56 @@ elif page == "Prediction":
             key="number_of_subjects"
         )
 
-        with st.form("prediction_form"):
-            scores = []
-            columns = st.columns(2)
+        scores = []
+        columns = st.columns(2)
 
-            for i in range(number_of_subjects):
-                with columns[i % 2]:
-                    score = st.number_input(
-                        f"Subject {i + 1} Score",
-                        min_value=0.0,
-                        max_value=100.0,
-                        value=75.0,
-                        step=1.0,
-                        key=f"subject_{i}"
-                    )
-                    scores.append(score)
+        for i in range(number_of_subjects):
+            with columns[i % 2]:
+                score = st.number_input(
+                    f"Subject {i + 1} Score",
+                    min_value=0.0,
+                    max_value=100.0,
+                    value=75.0,
+                    step=1.0,
+                    key=f"subject_{i}"
+                )
+                scores.append(score)
 
-            average_score = sum(scores) / len(scores)
-            st.info(f"Calculated Average Score: {average_score:.2f}")
+        average_score = sum(scores) / len(scores)
+        st.info(f"Calculated Average Score: {average_score:.2f}")
 
-            attendance = st.slider(
-                "Attendance Rate (%)",
-                min_value=0.0,
-                max_value=100.0,
-                value=85.0,
-                step=0.5
-            )
+        attendance = st.slider(
+            "Attendance Rate (%)",
+            min_value=0.0,
+            max_value=100.0,
+            value=85.0,
+            step=0.5,
+            key="attendance"
+        )
 
-            study_hours = st.slider(
-                "Study Hours Per Day",
-                min_value=0.0,
-                max_value=12.0,
-                value=3.0,
-                step=0.1
-            )
+        study_hours = st.slider(
+            "Study Hours Per Day",
+            min_value=0.0,
+            max_value=12.0,
+            value=3.0,
+            step=0.1,
+            key="study_hours"
+        )
 
-            previous_cgpa = st.slider(
-                "Previous CGPA",
-                min_value=0.0,
-                max_value=4.0,
-                value=3.0,
-                step=0.01
-            )
+        previous_cgpa = st.slider(
+            "Previous CGPA",
+            min_value=0.0,
+            max_value=4.0,
+            value=3.0,
+            step=0.01,
+            key="previous_cgpa"
+        )
 
-            submit = st.form_submit_button(
-                "Predict",
-                use_container_width=True
-            )
+        submit = st.button(
+            "Predict",
+            use_container_width=True,
+            type="primary"
+        )
 
         if submit:
             input_df = pd.DataFrame([{
