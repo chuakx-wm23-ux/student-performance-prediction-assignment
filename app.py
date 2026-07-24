@@ -556,17 +556,20 @@ elif page == "Prediction":
                 st.rerun()
 
     else:
+        # These fields are outside the form so that changing the subject
+        # quantity immediately refreshes the number of score inputs.
+        name = st.text_input("Student Name", key="student_name")
+        student_id = st.text_input("Student ID", key="student_id")
+
+        number_of_subjects = st.slider(
+            "Number of Subjects",
+            min_value=1,
+            max_value=12,
+            value=5,
+            key="number_of_subjects"
+        )
+
         with st.form("prediction_form"):
-            name = st.text_input("Student Name")
-            student_id = st.text_input("Student ID")
-
-            number_of_subjects = st.slider(
-                "Number of Subjects",
-                min_value=1,
-                max_value=12,
-                value=5
-            )
-
             scores = []
             columns = st.columns(2)
 
