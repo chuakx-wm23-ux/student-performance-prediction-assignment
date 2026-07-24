@@ -63,14 +63,15 @@ st.markdown("""
 }
 
 [data-testid="stSidebar"] h1 {
-    font-size: 1.55rem !important;
+    font-size: 2.35rem !important;
     font-weight: 800 !important;
     letter-spacing: -0.02em;
     margin-bottom: 1.35rem !important;
 }
 
 [data-testid="stSidebar"] [data-testid="stMarkdownContainer"] p {
-    font-size: 1rem;
+    font-size: 1.22rem !important;
+    font-weight: 800 !important;
 }
 
 [data-testid="stSidebar"] div[role="radiogroup"] {
@@ -83,7 +84,7 @@ st.markdown("""
     border-radius: 14px;
     padding: 0.72rem 0.85rem;
     transition: all 0.18s ease;
-    min-height: 48px;
+    min-height: 60px;
 }
 
 [data-testid="stSidebar"] div[role="radiogroup"] label:hover {
@@ -98,7 +99,7 @@ st.markdown("""
 }
 
 [data-testid="stSidebar"] div[role="radiogroup"] label p {
-    font-size: 1.02rem !important;
+    font-size: 1.25rem !important;
     font-weight: 700 !important;
     margin: 0 !important;
 }
