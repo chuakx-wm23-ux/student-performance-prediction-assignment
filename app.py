@@ -168,6 +168,21 @@ st.markdown("""
     box-shadow: 0 14px 30px rgba(37, 99, 235, 0.26);
 }
 
+/* High-end black style for Make Another Prediction only */
+div[data-testid="stButton"] button[kind="secondary"] {
+    background: linear-gradient(135deg, #111827 0%, #020617 100%) !important;
+    color: #ffffff !important;
+    border: 1px solid #374151 !important;
+    box-shadow: 0 10px 24px rgba(2, 6, 23, 0.28) !important;
+}
+
+div[data-testid="stButton"] button[kind="secondary"]:hover {
+    background: linear-gradient(135deg, #1f2937 0%, #111827 100%) !important;
+    border-color: #4b5563 !important;
+    transform: translateY(-2px);
+    box-shadow: 0 14px 30px rgba(2, 6, 23, 0.38) !important;
+}
+
 /* Inputs and cards */
 [data-testid="stMetric"] {
     background: rgba(255,255,255,0.92);
@@ -395,17 +410,26 @@ elif page == "Prediction":
             use_container_width=True
         )
 
-        st.download_button(
-            "Download Result",
-            saved["report_csv"],
-            "prediction_result.csv",
-            "text/csv",
-            use_container_width=True
-        )
+        button_col1, button_col2 = st.columns(2)
 
-        if st.button("Make Another Prediction", use_container_width=True):
-            del st.session_state["prediction_result"]
-            st.rerun()
+        with button_col1:
+            st.download_button(
+                "⬇️ Download Result",
+                saved["report_csv"],
+                "prediction_result.csv",
+                "text/csv",
+                use_container_width=True
+            )
+
+        with button_col2:
+            if st.button(
+                "↻ Make Another Prediction",
+                key="make_another_prediction",
+                type="secondary",
+                use_container_width=True
+            ):
+                del st.session_state["prediction_result"]
+                st.rerun()
 
     else:
         with st.form("prediction_form"):
