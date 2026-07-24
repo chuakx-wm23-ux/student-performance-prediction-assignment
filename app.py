@@ -181,8 +181,6 @@ if page == "Home":
     c3.metric("Best Model", best["Model"])
     c4.metric("Best Accuracy", f"{best['Accuracy']:.1%}")
 
-    show_cgpa_guide()
-
     chart = evaluation.melt(
         id_vars="Model",
         value_vars=["Accuracy", "Precision", "Recall", "F1 Score"],
@@ -350,7 +348,6 @@ elif page == "Model Results":
 
 elif page == "Dataset":
     st.subheader("Dataset Analysis")
-    show_cgpa_guide()
 
     c1, c2 = st.columns(2)
 
@@ -381,30 +378,43 @@ elif page == "Dataset":
 
 
 else:
-    st.subheader("About")
-    show_cgpa_guide()
+    st.subheader("About This Project")
 
     st.markdown("""
-This project predicts student academic performance using supervised machine learning.
+### Student Performance Prediction
 
-**Models used**
-- KNN
-- SVM
-- ANN
+This project applies **supervised machine learning classification** to predict a student's overall academic performance.
 
-**Input features**
+### Models Used
+
+- K-Nearest Neighbours (KNN)
+- Support Vector Machine (SVM)
+- Artificial Neural Network (ANN)
+
+### Input Features
+
 - Number of Subjects
 - Average Score
 - Attendance Rate
 - Study Hours Per Day
 - Previous CGPA
 
-**Target classes**
+### Target Classes
+
 - Excellent
 - Good
 - Average
 - At Risk
 
-The Final CGPA is used only to create the target class during model training.
-It is not entered on the Prediction page because including it would cause data leakage.
+### Important Note
+
+`Final_CGPA` is used only during model training to generate the target class.  
+It is not included as an input on the Prediction page because that would cause **data leakage**.
+
+### Dataset Source
+
+University Student Performance & Habits Dataset from Kaggle, with additional feature engineering for:
+
+- `Number_of_Subjects`
+- `Average_Score`
 """)
