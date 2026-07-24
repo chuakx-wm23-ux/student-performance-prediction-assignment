@@ -15,9 +15,20 @@ This project uses supervised machine learning classification with KNN, SVM and A
 - Average
 - At Risk
 
-## Dataset Source
-University Student Performance & Habits Dataset on Kaggle:
+##Dataset Source
+University Student Performance & Habits Dataset
+Author:
+Robiul Hasan Jisan
+Source:
 https://www.kaggle.com/datasets/robiulhasanjisan/university-student-performance-and-habits-dataset
+The original dataset was further processed using feature engineering by adding:
+• Number_of_Subjects
+• Average_Score
+The target variable (Final_CGPA) was converted into four performance classes:
+• Excellent
+• Good
+• Average
+• At Risk
 
 ## Feature Engineering Note
 The original Kaggle dataset does not contain individual subject marks.
