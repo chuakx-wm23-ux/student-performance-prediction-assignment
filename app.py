@@ -205,124 +205,150 @@ elif page == "Prediction":
     st.subheader("Student Prediction")
     show_cgpa_guide()
 
-    with st.form("prediction_form"):
-        name = st.text_input("Student Name")
-        student_id = st.text_input("Student ID")
+    # Show the latest result at the top of the page.
+    # This avoids making the user scroll down after pressing Predict.
+    if "prediction_result" in st.session_state:
+        saved = st.session_state["prediction_result"]
 
-        number_of_subjects = st.slider(
-            "Number of Subjects",
-            min_value=1,
-            max_value=12,
-            value=5
-        )
-
-        scores = []
-        columns = st.columns(2)
-
-        for i in range(number_of_subjects):
-            with columns[i % 2]:
-                score = st.number_input(
-                    f"Subject {i + 1} Score",
-                    min_value=0.0,
-                    max_value=100.0,
-                    value=75.0,
-                    step=1.0,
-                    key=f"subject_{i}"
-                )
-                scores.append(score)
-
-        average_score = sum(scores) / len(scores)
-
-        st.info(f"Calculated Average Score: {average_score:.2f}")
-
-        attendance = st.slider(
-            "Attendance Rate (%)",
-            min_value=0.0,
-            max_value=100.0,
-            value=85.0,
-            step=0.5
-        )
-
-        study_hours = st.slider(
-            "Study Hours Per Day",
-            min_value=0.0,
-            max_value=12.0,
-            value=3.0,
-            step=0.1
-        )
-
-        previous_cgpa = st.slider(
-            "Previous CGPA",
-            min_value=0.0,
-            max_value=4.0,
-            value=3.0,
-            step=0.01
-        )
-
-        submit = st.form_submit_button("Predict")
-
-    if submit:
-        input_df = pd.DataFrame([{
-            "Number_of_Subjects": number_of_subjects,
-            "Average_Score": average_score,
-            "Attendance_Pct": attendance,
-            "Study_Hours_Per_Day": study_hours,
-            "Previous_CGPA": previous_cgpa,
-        }])
-
-        predictions = []
-        best_name = evaluation.iloc[0]["Model"]
-
-        for model_name, bundle in models.items():
-            model = bundle["model"]
-            label_encoder = bundle["label_encoder"]
-
-            pred_code = int(model.predict(input_df)[0])
-            pred_label = label_encoder.inverse_transform([pred_code])[0]
-
-            probabilities = model.predict_proba(input_df)[0]
-            confidence = float(probabilities[pred_code])
-
-            predictions.append({
-                "Model": model_name,
-                "Prediction": pred_label,
-                "Confidence": confidence,
-            })
-
-        result_df = pd.DataFrame(predictions)
-        best_row = result_df[result_df["Model"] == best_name].iloc[0]
-
-        st.success(f"Predicted Performance: {best_row['Prediction']}")
-        st.metric("Confidence", f"{best_row['Confidence']:.1%}")
+        st.success(f"Predicted Performance: {saved['prediction']}")
+        result_col1, result_col2 = st.columns(2)
+        result_col1.metric("Confidence", f"{saved['confidence']:.1%}")
+        result_col2.metric("Best Model", saved["best_model"])
 
         st.dataframe(
-            result_df.assign(
-                Confidence=result_df["Confidence"].map(lambda x: f"{x:.1%}")
+            saved["result_df"].assign(
+                Confidence=saved["result_df"]["Confidence"].map(
+                    lambda x: f"{x:.1%}"
+                )
             ),
             hide_index=True,
             use_container_width=True
         )
 
-        report = pd.DataFrame([{
-            "Student Name": name,
-            "Student ID": student_id,
-            "Number of Subjects": number_of_subjects,
-            "Average Score": average_score,
-            "Attendance Rate": attendance,
-            "Study Hours Per Day": study_hours,
-            "Previous CGPA": previous_cgpa,
-            "Prediction": best_row["Prediction"],
-            "Best Model": best_name,
-            "Confidence": best_row["Confidence"],
-        }])
-
         st.download_button(
             "Download Result",
-            report.to_csv(index=False).encode("utf-8"),
+            saved["report_csv"],
             "prediction_result.csv",
-            "text/csv"
+            "text/csv",
+            use_container_width=True
         )
 
+        if st.button("Make Another Prediction", use_container_width=True):
+            del st.session_state["prediction_result"]
+            st.rerun()
+
+    else:
+        with st.form("prediction_form"):
+            name = st.text_input("Student Name")
+            student_id = st.text_input("Student ID")
+
+            number_of_subjects = st.slider(
+                "Number of Subjects",
+                min_value=1,
+                max_value=12,
+                value=5
+            )
+
+            scores = []
+            columns = st.columns(2)
+
+            for i in range(number_of_subjects):
+                with columns[i % 2]:
+                    score = st.number_input(
+                        f"Subject {i + 1} Score",
+                        min_value=0.0,
+                        max_value=100.0,
+                        value=75.0,
+                        step=1.0,
+                        key=f"subject_{i}"
+                    )
+                    scores.append(score)
+
+            average_score = sum(scores) / len(scores)
+            st.info(f"Calculated Average Score: {average_score:.2f}")
+
+            attendance = st.slider(
+                "Attendance Rate (%)",
+                min_value=0.0,
+                max_value=100.0,
+                value=85.0,
+                step=0.5
+            )
+
+            study_hours = st.slider(
+                "Study Hours Per Day",
+                min_value=0.0,
+                max_value=12.0,
+                value=3.0,
+                step=0.1
+            )
+
+            previous_cgpa = st.slider(
+                "Previous CGPA",
+                min_value=0.0,
+                max_value=4.0,
+                value=3.0,
+                step=0.01
+            )
+
+            submit = st.form_submit_button(
+                "Predict",
+                use_container_width=True
+            )
+
+        if submit:
+            input_df = pd.DataFrame([{
+                "Number_of_Subjects": number_of_subjects,
+                "Average_Score": average_score,
+                "Attendance_Pct": attendance,
+                "Study_Hours_Per_Day": study_hours,
+                "Previous_CGPA": previous_cgpa,
+            }])
+
+            predictions = []
+            best_name = evaluation.iloc[0]["Model"]
+
+            for model_name, bundle in models.items():
+                model = bundle["model"]
+                label_encoder = bundle["label_encoder"]
+
+                pred_code = int(model.predict(input_df)[0])
+                pred_label = label_encoder.inverse_transform([pred_code])[0]
+
+                probabilities = model.predict_proba(input_df)[0]
+                confidence = float(probabilities[pred_code])
+
+                predictions.append({
+                    "Model": model_name,
+                    "Prediction": pred_label,
+                    "Confidence": confidence,
+                })
+
+            result_df = pd.DataFrame(predictions)
+            best_row = result_df[result_df["Model"] == best_name].iloc[0]
+
+            report = pd.DataFrame([{
+                "Student Name": name,
+                "Student ID": student_id,
+                "Number of Subjects": number_of_subjects,
+                "Average Score": average_score,
+                "Attendance Rate": attendance,
+                "Study Hours Per Day": study_hours,
+                "Previous CGPA": previous_cgpa,
+                "Prediction": best_row["Prediction"],
+                "Best Model": best_name,
+                "Confidence": best_row["Confidence"],
+            }])
+
+            st.session_state["prediction_result"] = {
+                "prediction": best_row["Prediction"],
+                "confidence": float(best_row["Confidence"]),
+                "best_model": best_name,
+                "result_df": result_df,
+                "report_csv": report.to_csv(index=False).encode("utf-8"),
+            }
+
+            st.rerun()
 
 elif page == "Model Results":
     st.subheader("Model Evaluation")
