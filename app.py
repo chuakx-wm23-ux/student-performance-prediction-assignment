@@ -615,28 +615,16 @@ elif page == "Dataset":
 
 
 else:
-    st.markdown(
-        """
-<div style="
-    background: linear-gradient(120deg, #0f172a, #1d4ed8, #7c3aed);
-    color: white;
-    border-radius: 24px;
-    padding: 28px 30px;
-    margin-bottom: 22px;
-    box-shadow: 0 18px 45px rgba(37, 99, 235, 0.20);
-">
-    <div style="font-size: 2rem; font-weight: 900; margin-bottom: 8px;">
-        🎓 Student Performance Prediction
-    </div>
-    <div style="font-size: 1rem; color: #dbeafe;">
-        Machine Learning Assignment using supervised classification.
-    </div>
-</div>
-""",
-        unsafe_allow_html=True
-    )
+    st.subheader("About This Assignment")
 
-    st.markdown("## 📋 Assignment Overview")
+    with st.container(border=True):
+        st.markdown("## 🎓 Student Performance Prediction")
+        st.write(
+            "This machine learning assignment applies supervised classification "
+            "to predict a student's overall academic performance."
+        )
+
+    st.markdown("### 📋 Assignment Overview")
 
     overview_col1, overview_col2, overview_col3, overview_col4 = st.columns(4)
 
@@ -652,176 +640,72 @@ else:
     with overview_col4:
         st.metric("Features", "5")
 
-    st.write("")
+    st.markdown("### 📊 Input Features and Models")
 
     left_col, right_col = st.columns(2)
 
     with left_col:
-        st.markdown(
-            """
-<div style="
-    background: rgba(255,255,255,0.95);
-    border: 1px solid #e2e8f0;
-    border-radius: 16px;
-    padding: 15px;
-    box-shadow: 0 14px 34px rgba(15,23,42,0.05);
-    min-height: 315px;
-">
-    <h3 style="margin-top:0;">📊 Input Features</h3>
-
-    <div style="display:grid; gap:10px; margin-top:16px;">
-        <div style="background:#eff6ff; padding:12px 14px; border-radius:12px;">
-            <b>1. Number of Subjects</b>
-        </div>
-
-        <div style="background:#f0fdf4; padding:12px 14px; border-radius:12px;">
-            <b>2. Average Score</b>
-        </div>
-
-        <div style="background:#fffbeb; padding:12px 14px; border-radius:12px;">
-            <b>3. Attendance Rate</b>
-        </div>
-
-        <div style="background:#fff7ed; padding:12px 14px; border-radius:12px;">
-            <b>4. Study Hours Per Day</b>
-        </div>
-
-        <div style="background:#fdf2f8; padding:12px 14px; border-radius:12px;">
-            <b>5. Previous CGPA</b>
-        </div>
-    </div>
-</div>
-""",
-            unsafe_allow_html=True
-        )
+        with st.container(border=True):
+            st.markdown("#### Input Features")
+            st.write("1. Number of Subjects")
+            st.write("2. Average Score")
+            st.write("3. Attendance Rate")
+            st.write("4. Study Hours Per Day")
+            st.write("5. Previous CGPA")
 
     with right_col:
-        st.markdown(
-            """
-<div style="
-    background: rgba(255,255,255,0.95);
-    border: 1px solid #e2e8f0;
-    border-radius: 16px;
-    padding: 15px;
-    box-shadow: 0 14px 34px rgba(15,23,42,0.05);
-    min-height: 315px;
-">
-    <h3 style="margin-top:0;">🤖 Machine Learning Models</h3>
+        with st.container(border=True):
+            st.markdown("#### Machine Learning Models")
+            st.write("**KNN** — K-Nearest Neighbours")
+            st.write("**SVM** — Support Vector Machine")
+            st.write("**ANN** — Artificial Neural Network")
 
-    <div style="display:grid; gap:12px; margin-top:16px;">
-        <div style="background:linear-gradient(90deg,#dbeafe,#eff6ff); padding:15px; border-radius:13px;">
-            <b>K-Nearest Neighbours (KNN)</b><br>
-            <span style="color:#64748b;">Distance-based classification model</span>
-        </div>
-
-        <div style="background:linear-gradient(90deg,#ede9fe,#f5f3ff); padding:15px; border-radius:13px;">
-            <b>Support Vector Machine (SVM)</b><br>
-            <span style="color:#64748b;">Margin-based classification model</span>
-        </div>
-
-        <div style="background:linear-gradient(90deg,#dcfce7,#f0fdf4); padding:15px; border-radius:13px;">
-            <b>Artificial Neural Network (ANN)</b><br>
-            <span style="color:#64748b;">Multi-layer learning model</span>
-        </div>
-    </div>
-</div>
-""",
-            unsafe_allow_html=True
-        )
-
-    st.write("")
-    st.markdown("## 🎯 Target Classes")
+    st.markdown("### 🎯 Target Classes")
 
     target_col1, target_col2, target_col3, target_col4 = st.columns(4)
 
     with target_col1:
-        st.markdown(
-            """
-<div style="background:#dcfce7; padding:18px; border-radius:16px; text-align:center;">
-    <div style="font-size:1.1rem; font-weight:900;">Excellent</div>
-    <div style="margin-top:6px;">CGPA 3.50 – 4.00</div>
-</div>
-""",
-            unsafe_allow_html=True
-        )
+        with st.container(border=True):
+            st.markdown("#### Excellent")
+            st.write("CGPA 3.50 – 4.00")
 
     with target_col2:
-        st.markdown(
-            """
-<div style="background:#dbeafe; padding:18px; border-radius:16px; text-align:center;">
-    <div style="font-size:1.1rem; font-weight:900;">Good</div>
-    <div style="margin-top:6px;">CGPA 3.00 – 3.49</div>
-</div>
-""",
-            unsafe_allow_html=True
-        )
+        with st.container(border=True):
+            st.markdown("#### Good")
+            st.write("CGPA 3.00 – 3.49")
 
     with target_col3:
-        st.markdown(
-            """
-<div style="background:#fef3c7; padding:18px; border-radius:16px; text-align:center;">
-    <div style="font-size:1.1rem; font-weight:900;">Average</div>
-    <div style="margin-top:6px;">CGPA 2.50 – 2.99</div>
-</div>
-""",
-            unsafe_allow_html=True
-        )
+        with st.container(border=True):
+            st.markdown("#### Average")
+            st.write("CGPA 2.50 – 2.99")
 
     with target_col4:
-        st.markdown(
-            """
-<div style="background:#fee2e2; padding:18px; border-radius:16px; text-align:center;">
-    <div style="font-size:1.1rem; font-weight:900;">At Risk</div>
-    <div style="margin-top:6px;">CGPA below 2.50</div>
-</div>
-""",
-            unsafe_allow_html=True
-        )
+        with st.container(border=True):
+            st.markdown("#### At Risk")
+            st.write("CGPA below 2.50")
 
-    st.write("")
+    st.markdown("### 📚 Dataset Information")
 
     info_col1, info_col2 = st.columns(2)
 
     with info_col1:
-        st.markdown(
-            """
-<div style="
-    background: rgba(255,255,255,0.95);
-    border: 1px solid #e2e8f0;
-    border-radius: 16px;
-    padding: 15px;
-    box-shadow: 0 14px 34px rgba(15,23,42,0.05);
-    min-height: 210px;
-">
-    <h3 style="margin-top:0;">📚 Dataset Information</h3>
-
-    <p><b>Source</b><br>
-    University Student Performance & Habits Dataset from Kaggle.</p>
-
-    <p><b>Feature Engineering</b><br>
-    Number of Subjects and Average Score were added to support the project objectives.</p>
-</div>
-""",
-            unsafe_allow_html=True
-        )
+        with st.container(border=True):
+            st.markdown("#### Dataset Source")
+            st.write(
+                "University Student Performance & Habits Dataset from Kaggle."
+            )
+            st.markdown("#### Feature Engineering")
+            st.write("Number of Subjects")
+            st.write("Average Score")
 
     with info_col2:
-        st.markdown(
-            """
-<div style="
-    background: linear-gradient(135deg,#fff7ed,#fffbeb);
-    border: 1px solid #fed7aa;
-    border-radius: 16px;
-    padding: 15px;
-    box-shadow: 0 14px 34px rgba(15,23,42,0.05);
-    min-height: 210px;
-">
-    <h3 style="margin-top:0;">⚠️ Important Note</h3>
-
-    <p><b>Final CGPA</b> is used only during model training to create the target class.</p>
-
-    <p>It is not entered on the Prediction page because including it as an input would cause <b>data leakage</b>.</p>
-</div>
-""",
-            unsafe_allow_html=True
-        )
+        with st.container(border=True):
+            st.markdown("#### ⚠️ Important Note")
+            st.write(
+                "Final CGPA is used only during model training to generate "
+                "the target class."
+            )
+            st.write(
+                "It is not included as a prediction input because that would "
+                "cause data leakage."
+            )
