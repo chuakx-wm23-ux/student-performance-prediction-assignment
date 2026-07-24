@@ -669,24 +669,84 @@ elif page == "Prediction":
             st.rerun()
 
 elif page == "Model Results":
-    st.subheader("Model Evaluation")
+    st.subheader("Model Evaluation Dashboard")
 
-    show = evaluation.copy()
+    metric_columns = ["Accuracy", "Precision", "Recall", "F1 Score"]
+    model_column = "Model"
 
-    for col in ["Accuracy", "Precision", "Recall", "F1 Score"]:
-        show[col] = show[col].map(lambda x: f"{x:.2%}")
+    best_index = evaluation["Accuracy"].idxmax()
+    best_row = evaluation.loc[best_index]
+    best_model = str(best_row[model_column])
 
-    st.dataframe(show, hide_index=True, use_container_width=True)
-
-    selected = st.selectbox(
-        "Select Model",
-        ["ANN", "SVM", "KNN"]
+    st.success(
+        f"🏆 Best Model: {best_model} "
+        f"with {best_row['Accuracy']:.2%} accuracy"
     )
 
-    st.image(
-        RESULTS / f"{selected.lower()}_confusion_matrix.png",
-        caption=f"{selected} Confusion Matrix",
+    st.markdown("### 📊 Model Accuracy Comparison")
+
+    accuracy_fig = px.bar(
+        evaluation,
+        x=model_column,
+        y="Accuracy",
+        text=evaluation["Accuracy"].map(lambda value: f"{value:.1%}"),
+        title="Accuracy of KNN, SVM and ANN",
+        labels={"Accuracy": "Accuracy", model_column: "Model"}
+    )
+    accuracy_fig.update_traces(textposition="outside")
+    accuracy_fig.update_yaxes(
+        tickformat=".0%",
+        range=[0, min(1.0, float(evaluation["Accuracy"].max()) + 0.12)]
+    )
+    accuracy_fig.update_layout(
+        title_x=0.5,
+        height=420,
+        margin=dict(l=20, r=20, t=70, b=20)
+    )
+    st.plotly_chart(accuracy_fig, use_container_width=True)
+
+    selected = st.selectbox(
+        "Select a model to view its performance",
+        evaluation[model_column].astype(str).tolist()
+    )
+
+    selected_row = evaluation[
+        evaluation[model_column].astype(str) == selected
+    ].iloc[0]
+
+    st.markdown(f"### 📌 {selected} Performance")
+
+    c1, c2, c3, c4 = st.columns(4)
+
+    with c1:
+        st.metric("Accuracy", f"{selected_row['Accuracy']:.2%}")
+
+    with c2:
+        st.metric("Precision", f"{selected_row['Precision']:.2%}")
+
+    with c3:
+        st.metric("Recall", f"{selected_row['Recall']:.2%}")
+
+    with c4:
+        st.metric("F1 Score", f"{selected_row['F1 Score']:.2%}")
+
+    st.markdown("### 📋 Complete Model Comparison")
+
+    show = evaluation.copy()
+    for col in metric_columns:
+        show[col] = show[col].map(lambda value: f"{value:.2%}")
+
+    st.dataframe(
+        show,
+        hide_index=True,
         use_container_width=True
+    )
+
+    st.info(
+        "Accuracy shows the overall percentage of correct predictions. "
+        "Precision measures how reliable positive predictions are. "
+        "Recall measures how many actual cases were identified, while "
+        "F1 Score balances precision and recall."
     )
 
 
