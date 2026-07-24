@@ -17,50 +17,198 @@ st.set_page_config(
 
 st.markdown("""
 <style>
-.stApp { background: #f5f7fb; }
-.block-container { max-width: 1200px; padding-top: 1.5rem; }
-
-.hero {
-    padding: 2rem;
-    border-radius: 22px;
-    color: white;
-    background: linear-gradient(120deg, #1e3a8a, #2563eb, #7c3aed);
-    margin-bottom: 1.2rem;
+:root {
+    --sidebar-width: 285px;
+    --navy: #0f172a;
+    --navy-soft: #172554;
+    --blue: #2563eb;
+    --violet: #7c3aed;
+    --surface: #ffffff;
+    --surface-soft: #f8fafc;
+    --border: #e2e8f0;
+    --text: #172033;
+    --muted: #64748b;
 }
 
-.hero h1 {
-    margin: 0;
-    font-size: 2.3rem;
+.stApp {
+    background:
+        radial-gradient(circle at top right, rgba(124, 58, 237, 0.08), transparent 30%),
+        radial-gradient(circle at top left, rgba(37, 99, 235, 0.08), transparent 28%),
+        #f4f7fb;
+    color: var(--text);
 }
 
-.hero p {
-    margin-top: .5rem;
-    color: #e0e7ff;
+.block-container {
+    max-width: 1250px;
+    padding-top: 1.6rem;
+    padding-bottom: 3rem;
 }
 
+/* Sidebar */
 [data-testid="stSidebar"] {
-    background: #0f172a;
+    width: var(--sidebar-width) !important;
+    min-width: var(--sidebar-width) !important;
+    background:
+        linear-gradient(180deg, #0f172a 0%, #111c35 58%, #172554 100%);
+    border-right: 1px solid rgba(255,255,255,0.08);
+}
+
+[data-testid="stSidebar"] > div:first-child {
+    width: var(--sidebar-width) !important;
+    padding: 1.25rem 1rem 1.5rem 1rem;
 }
 
 [data-testid="stSidebar"] * {
     color: white;
 }
 
-.stButton > button {
-    width: 100%;
-    border: none;
-    border-radius: 12px;
-    font-weight: 700;
-    color: white;
-    background: linear-gradient(90deg, #2563eb, #7c3aed);
+[data-testid="stSidebar"] h1 {
+    font-size: 1.55rem !important;
+    font-weight: 800 !important;
+    letter-spacing: -0.02em;
+    margin-bottom: 1.35rem !important;
 }
 
-.cgpa-guide {
+[data-testid="stSidebar"] [data-testid="stMarkdownContainer"] p {
+    font-size: 1rem;
+}
+
+[data-testid="stSidebar"] div[role="radiogroup"] {
+    gap: 0.6rem;
+}
+
+[data-testid="stSidebar"] div[role="radiogroup"] label {
+    background: rgba(255,255,255,0.045);
+    border: 1px solid rgba(255,255,255,0.06);
+    border-radius: 14px;
+    padding: 0.72rem 0.85rem;
+    transition: all 0.18s ease;
+    min-height: 48px;
+}
+
+[data-testid="stSidebar"] div[role="radiogroup"] label:hover {
+    background: rgba(255,255,255,0.10);
+    transform: translateX(3px);
+}
+
+[data-testid="stSidebar"] div[role="radiogroup"] label:has(input:checked) {
+    background: linear-gradient(90deg, rgba(37,99,235,0.95), rgba(124,58,237,0.95));
+    border-color: rgba(255,255,255,0.18);
+    box-shadow: 0 10px 26px rgba(37,99,235,0.22);
+}
+
+[data-testid="stSidebar"] div[role="radiogroup"] label p {
+    font-size: 1.02rem !important;
+    font-weight: 700 !important;
+    margin: 0 !important;
+}
+
+/* Main hero */
+.hero {
+    padding: 2.2rem 2.35rem;
+    border-radius: 24px;
+    color: white;
+    background:
+        linear-gradient(120deg, rgba(30,58,138,0.98), rgba(37,99,235,0.96), rgba(124,58,237,0.96));
+    margin-bottom: 1.5rem;
+    box-shadow: 0 22px 55px rgba(37, 99, 235, 0.20);
+    position: relative;
+    overflow: hidden;
+}
+
+.hero:after {
+    content: "";
+    position: absolute;
+    width: 220px;
+    height: 220px;
+    border-radius: 50%;
+    right: -70px;
+    top: -95px;
+    background: rgba(255,255,255,0.12);
+}
+
+.hero h1 {
+    margin: 0;
+    font-size: 2.5rem;
+    font-weight: 850;
+    letter-spacing: -0.035em;
+    position: relative;
+    z-index: 1;
+}
+
+.hero p {
+    margin-top: .65rem;
+    margin-bottom: 0;
+    color: #e0e7ff;
+    font-size: 1.02rem;
+    position: relative;
+    z-index: 1;
+}
+
+/* Buttons */
+.stButton > button,
+.stDownloadButton > button,
+[data-testid="stFormSubmitButton"] > button {
+    width: 100%;
+    border: none;
+    border-radius: 14px;
+    font-weight: 800;
+    color: white;
+    min-height: 46px;
+    background: linear-gradient(90deg, #2563eb, #7c3aed);
+    box-shadow: 0 10px 24px rgba(37, 99, 235, 0.18);
+    transition: transform .18s ease, box-shadow .18s ease;
+}
+
+.stButton > button:hover,
+.stDownloadButton > button:hover,
+[data-testid="stFormSubmitButton"] > button:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 14px 30px rgba(37, 99, 235, 0.26);
+}
+
+/* Inputs and cards */
+[data-testid="stMetric"] {
+    background: rgba(255,255,255,0.92);
+    border: 1px solid var(--border);
+    border-radius: 18px;
+    padding: 1rem 1.1rem;
+    box-shadow: 0 10px 28px rgba(15,23,42,0.05);
+}
+
+[data-testid="stMetricLabel"] p {
+    color: var(--muted) !important;
+    font-weight: 700 !important;
+}
+
+[data-testid="stMetricValue"] {
+    color: var(--text) !important;
+    font-weight: 800 !important;
+}
+
+[data-testid="stForm"] {
+    background: rgba(255,255,255,0.92);
+    border: 1px solid var(--border);
+    border-radius: 22px;
+    padding: 1.1rem 1.2rem 1.35rem 1.2rem;
+    box-shadow: 0 18px 44px rgba(15,23,42,0.06);
+}
+
+[data-testid="stDataFrame"],
+[data-testid="stImage"],
+[data-testid="stPlotlyChart"] {
     background: white;
-    padding: 20px;
-    border-radius: 16px;
-    border: 1px solid #e5e7eb;
+    border-radius: 18px;
+}
+
+/* CGPA guide */
+.cgpa-guide {
+    background: rgba(255,255,255,0.95);
+    padding: 22px;
+    border-radius: 20px;
+    border: 1px solid var(--border);
     margin: 14px 0 20px 0;
+    box-shadow: 0 14px 34px rgba(15,23,42,0.05);
 }
 
 .cgpa-grid {
@@ -70,16 +218,17 @@ st.markdown("""
 }
 
 .cgpa-card {
-    padding: 16px;
-    border-radius: 12px;
+    padding: 17px;
+    border-radius: 14px;
     text-align: center;
     font-size: 0.95rem;
+    border: 1px solid rgba(15,23,42,0.04);
 }
 
 .cgpa-title {
-    font-weight: 800;
-    font-size: 1.05rem;
-    margin-bottom: 5px;
+    font-weight: 850;
+    font-size: 1.06rem;
+    margin-bottom: 6px;
 }
 
 .excellent { background: #dcfce7; }
@@ -87,9 +236,19 @@ st.markdown("""
 .average { background: #fef3c7; }
 .risk { background: #fee2e2; }
 
+/* Headings */
+h1, h2, h3 {
+    color: var(--text);
+    letter-spacing: -0.02em;
+}
+
 @media (max-width: 800px) {
     .cgpa-grid {
         grid-template-columns: repeat(2, 1fr);
+    }
+
+    .hero h1 {
+        font-size: 2rem;
     }
 }
 </style>
@@ -159,15 +318,25 @@ models = load_models()
 evaluation = pd.read_csv(RESULTS / "evaluation.csv")
 
 st.sidebar.title("🎓 Student AI")
+st.sidebar.markdown("### Navigation")
 page = st.sidebar.radio(
-    "Menu",
-    ["Home", "Prediction", "Model Results", "Dataset", "About"]
+    "Navigation Menu",
+    [
+        "🏠 Home",
+        "📝 Prediction",
+        "📊 Model Results",
+        "📈 Dataset",
+        "ℹ️ About"
+    ],
+    label_visibility="collapsed"
 )
+
+page = page.split(" ", 1)[1]
 
 st.markdown(
     '<div class="hero">'
     '<h1>Student Performance Prediction</h1>'
-    '<p>Supervised classification using KNN, SVM and ANN.</p>'
+    '<p>AI-powered academic performance analysis using KNN, SVM and ANN.</p>'
     '</div>',
     unsafe_allow_html=True
 )
