@@ -385,35 +385,27 @@ elif page == "Prediction":
         result_col1.metric("Confidence", f"{saved['confidence']:.1%}")
         result_col2.metric("Best Model", saved["best_model"])
 
-        button_col1, button_col2 = st.columns(2)
+        st.dataframe(
+            saved["result_df"].assign(
+                Confidence=saved["result_df"]["Confidence"].map(
+                    lambda x: f"{x:.1%}"
+                )
+            ),
+            hide_index=True,
+            use_container_width=True
+        )
 
-        with button_col1:
-            st.download_button(
-                "⬇️ Download Result",
-                saved["report_csv"],
-                "prediction_result.csv",
-                "text/csv",
-                use_container_width=True
-            )
+        st.download_button(
+            "Download Result",
+            saved["report_csv"],
+            "prediction_result.csv",
+            "text/csv",
+            use_container_width=True
+        )
 
-        with button_col2:
-            if st.button(
-                "🔄 Make Another Prediction",
-                use_container_width=True
-            ):
-                del st.session_state["prediction_result"]
-                st.rerun()
-
-        with st.expander("View All Model Predictions", expanded=False):
-            st.dataframe(
-                saved["result_df"].assign(
-                    Confidence=saved["result_df"]["Confidence"].map(
-                        lambda x: f"{x:.1%}"
-                    )
-                ),
-                hide_index=True,
-                use_container_width=True
-            )
+        if st.button("Make Another Prediction", use_container_width=True):
+            del st.session_state["prediction_result"]
+            st.rerun()
 
     else:
         with st.form("prediction_form"):
