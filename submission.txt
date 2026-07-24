@@ -1,0 +1,15 @@
+Project: Student Performance Prediction Using Machine Learning
+
+GitHub Link:
+PASTE_GITHUB_LINK_HERE
+
+Streamlit Link:
+PASTE_STREAMLIT_LINK_HERE
+
+Login:
+Not required
+
+Team Members:
+1. Name / Student ID / Model
+2. Name / Student ID / Model
+3. Name / Student ID / Model

@@ -1,0 +1,11 @@
+{
+  "features": [
+    "Number_of_Subjects",
+    "Average_Score",
+    "Attendance_Pct",
+    "Study_Hours_Per_Day",
+    "Previous_CGPA"
+  ],
+  "best_model": "ANN",
+  "best_accuracy": 0.805
+}
