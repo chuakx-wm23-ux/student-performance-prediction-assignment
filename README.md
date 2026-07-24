@@ -17,10 +17,13 @@ This project uses supervised machine learning classification with KNN, SVM and A
 
 ## Dataset Source
 University Student Performance & Habits Dataset
+
 Author:
 Robiul Hasan Jisan
+
 Source:
 https://www.kaggle.com/datasets/robiulhasanjisan/university-student-performance-and-habits-dataset
+
 The original dataset was further processed using feature engineering by adding:
 • Number_of_Subjects
 • Average_Score
