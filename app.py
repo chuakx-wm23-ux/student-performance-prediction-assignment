@@ -396,73 +396,175 @@ h1, h2, h3 {
 }
 
 /* Premium Prediction Hub */
-.prediction-welcome {
-    background: linear-gradient(135deg, rgba(15,23,42,.98), rgba(30,58,138,.96), rgba(91,33,182,.92));
-    border-radius: 24px;
-    padding: 1.6rem 1.7rem;
-    margin-bottom: 1.2rem;
-    color: white;
-    box-shadow: 0 22px 55px rgba(37,99,235,.18);
+.prediction-hub-shell {
+    background:
+        radial-gradient(circle at top right, rgba(124,58,237,.10), transparent 28%),
+        radial-gradient(circle at bottom left, rgba(37,99,235,.08), transparent 26%),
+        linear-gradient(180deg, #f8fbff 0%, #f4f7ff 100%);
+    border: 1px solid #e2e8f0;
+    border-radius: 28px;
+    padding: 1.25rem;
+    margin-bottom: 1.1rem;
 }
+
+.prediction-welcome {
+    background:
+        linear-gradient(135deg, rgba(15,23,42,.99), rgba(30,58,138,.97), rgba(91,33,182,.94));
+    border-radius: 24px;
+    padding: 1.55rem 1.7rem;
+    margin-bottom: 1.1rem;
+    color: white;
+    box-shadow: 0 24px 60px rgba(37,99,235,.20);
+    position: relative;
+    overflow: hidden;
+}
+
+.prediction-welcome:after {
+    content: "";
+    position: absolute;
+    width: 220px;
+    height: 220px;
+    border-radius: 50%;
+    right: -80px;
+    top: -100px;
+    background: rgba(255,255,255,.09);
+}
+
 .prediction-eyebrow {
-    font-size: .78rem;
-    font-weight: 800;
-    letter-spacing: .12em;
+    font-size: .76rem;
+    font-weight: 850;
+    letter-spacing: .14em;
     text-transform: uppercase;
     color: #c7d2fe;
-    margin-bottom: .65rem;
+    margin-bottom: .7rem;
+    position: relative;
+    z-index: 1;
 }
+
 .prediction-welcome h2 {
     color: white !important;
     margin: 0;
-    font-size: 1.8rem !important;
+    font-size: 1.82rem !important;
+    line-height: 1.18;
+    position: relative;
+    z-index: 1;
 }
+
 .prediction-welcome p {
     color: #e2e8f0;
-    margin: .8rem 0 0;
-    line-height: 1.75;
-    font-size: .95rem;
+    margin: .78rem 0 0;
+    line-height: 1.7;
+    font-size: .94rem;
+    max-width: 880px;
+    position: relative;
+    z-index: 1;
 }
+
 .prediction-mode-card {
-    background: rgba(255,255,255,.96);
+    background: rgba(255,255,255,.98);
     border: 1px solid #e2e8f0;
     border-radius: 22px;
-    padding: 1.25rem 1.25rem 1rem;
-    min-height: 270px;
+    padding: 1.25rem 1.25rem 1.05rem;
+    min-height: 292px;
     box-shadow: 0 16px 38px rgba(15,23,42,.07);
-    margin-bottom: .75rem;
+    margin-bottom: .8rem;
+    transition: transform .22s ease, box-shadow .22s ease, border-color .22s ease;
 }
+
+.prediction-mode-card:hover {
+    transform: translateY(-5px) scale(1.01);
+    box-shadow: 0 24px 55px rgba(37,99,235,.16);
+    border-color: #c7d2fe;
+}
+
 .prediction-mode-icon {
-    width: 48px;
-    height: 48px;
-    border-radius: 14px;
+    width: 52px;
+    height: 52px;
+    border-radius: 15px;
     display: flex;
     align-items: center;
     justify-content: center;
-    font-size: 1.55rem;
-    margin-bottom: .85rem;
+    font-size: 1.62rem;
+    margin-bottom: .95rem;
     background: linear-gradient(135deg, #dbeafe, #ede9fe);
+    box-shadow: 0 8px 18px rgba(99,102,241,.12);
+    transition: transform .22s ease;
 }
+
+.prediction-mode-card:hover .prediction-mode-icon {
+    transform: translateY(-3px) rotate(-2deg);
+}
+
 .prediction-mode-title {
-    font-size: 1.15rem;
+    font-size: 1.18rem;
     font-weight: 850;
     color: #172033;
-    margin-bottom: .45rem;
+    margin-bottom: .48rem;
 }
+
 .prediction-mode-desc {
     color: #64748b;
     font-size: .9rem;
-    line-height: 1.55;
-    min-height: 68px;
+    line-height: 1.58;
+    min-height: 72px;
 }
+
 .prediction-mode-feature {
     background: #f8fafc;
+    border: 1px solid #eef2f7;
     border-radius: 10px;
-    padding: .48rem .62rem;
+    padding: .5rem .65rem;
     margin-top: .48rem;
     color: #334155;
     font-size: .84rem;
     font-weight: 650;
+}
+
+.why-system {
+    background: rgba(255,255,255,.95);
+    border: 1px solid #e2e8f0;
+    border-radius: 22px;
+    padding: 1.1rem 1.2rem;
+    margin-top: 1.15rem;
+    box-shadow: 0 12px 30px rgba(15,23,42,.05);
+}
+
+.why-system-title {
+    font-size: 1.02rem;
+    font-weight: 850;
+    color: #172033;
+    margin-bottom: .8rem;
+}
+
+.why-grid {
+    display: grid;
+    grid-template-columns: repeat(5, 1fr);
+    gap: .65rem;
+}
+
+.why-item {
+    background: linear-gradient(135deg, #eff6ff, #f5f3ff);
+    border: 1px solid #dbeafe;
+    border-radius: 14px;
+    padding: .8rem .7rem;
+    text-align: center;
+    font-size: .82rem;
+    font-weight: 750;
+    color: #334155;
+}
+
+.system-footer {
+    text-align: center;
+    color: #64748b;
+    font-size: .78rem;
+    padding: 1.2rem 0 .2rem;
+    line-height: 1.7;
+}
+
+@media (max-width: 900px) {
+    .why-grid {
+        grid-template-columns: repeat(2, 1fr);
+    }
 }
 
 </style>
@@ -1672,13 +1774,14 @@ page = page.split(" ", 1)[1]
 if page != "Prediction":
     st.session_state.pop("prediction_mode", None)
 
-st.markdown(
-    '<div class="hero">'
-    '<h1>Student Performance Prediction</h1>'
-    '<p>AI-powered academic performance analysis using KNN, SVM and ANN.</p>'
-    '</div>',
-    unsafe_allow_html=True
-)
+if page != "Prediction":
+    st.markdown(
+        '<div class="hero">'
+        '<h1>Student Performance Prediction</h1>'
+        '<p>AI-powered academic performance analysis using KNN, SVM and ANN.</p>'
+        '</div>',
+        unsafe_allow_html=True
+    )
 
 if page == "Home":
     best = evaluation.iloc[0]
@@ -1713,31 +1816,30 @@ if page == "Home":
 elif page == "Prediction" and not st.session_state.get("prediction_mode"):
     best_row = evaluation.iloc[0]
 
+    st.markdown('<div class="prediction-hub-shell">', unsafe_allow_html=True)
+
     st.markdown(
         """
 <div class="prediction-welcome">
     <div class="prediction-eyebrow">AI-Powered Academic Decision Support</div>
-    <h2>Welcome to the Student Performance Prediction System</h2>
+    <h2>Student Performance Prediction System</h2>
     <p>
-        Transform educational data into actionable academic insights through
-        supervised machine learning. The platform analyses key academic indicators
-        using K-Nearest Neighbours, Support Vector Machine and Artificial Neural
-        Network.
+        This intelligent platform predicts students' academic performance using
+        KNN, SVM and ANN. It supports both individual and batch prediction,
+        enabling educators to identify at-risk students and make informed academic
+        decisions efficiently.
     </p>
-    <p>
-        Evaluate one student instantly or process an entire cohort through batch
-        prediction. Select the mode that best matches your current task to begin.
-    </p>
+    <p><b>Select a prediction mode below to begin.</b></p>
 </div>
 """,
         unsafe_allow_html=True,
     )
 
     stat_col1, stat_col2, stat_col3, stat_col4 = st.columns(4)
-    stat_col1.metric("Best Model", str(best_row["Model"]))
-    stat_col2.metric("Best Accuracy", f"{best_row['Accuracy']:.1%}")
-    stat_col3.metric("Input Features", "5")
-    stat_col4.metric("Algorithms", "3")
+    stat_col1.metric("🏆 Best Model", str(best_row["Model"]))
+    stat_col2.metric("🎯 Best Accuracy", f"{best_row['Accuracy']:.1%}")
+    stat_col3.metric("📚 Input Features", "5")
+    stat_col4.metric("🤖 ML Models", "3")
 
     card_col1, card_col2 = st.columns(2)
 
@@ -1748,18 +1850,18 @@ elif page == "Prediction" and not st.session_state.get("prediction_mode"):
     <div class="prediction-mode-icon">👤</div>
     <div class="prediction-mode-title">Individual Prediction</div>
     <div class="prediction-mode-desc">
-        Predict the performance of one student using manually entered academic
-        information and compare all three machine learning models.
+        Predict the academic performance of one student using manually entered
+        information and review the outputs generated by all three models.
     </div>
     <div class="prediction-mode-feature">✓ Real-time prediction</div>
     <div class="prediction-mode-feature">✓ KNN, SVM and ANN comparison</div>
-    <div class="prediction-mode-feature">✓ Professional Excel report</div>
+    <div class="prediction-mode-feature">✓ Downloadable Excel report</div>
 </div>
 """,
             unsafe_allow_html=True,
         )
         if st.button(
-            "Start Individual Prediction",
+            "🚀 Start Individual Prediction",
             key="start_individual_prediction",
             type="primary",
             use_container_width=True,
@@ -1779,19 +1881,41 @@ elif page == "Prediction" and not st.session_state.get("prediction_mode"):
     </div>
     <div class="prediction-mode-feature">✓ Excel and CSV upload</div>
     <div class="prediction-mode-feature">✓ Executive dashboard</div>
-    <div class="prediction-mode-feature">✓ At-risk identification</div>
+    <div class="prediction-mode-feature">✓ At-risk student identification</div>
 </div>
 """,
             unsafe_allow_html=True,
         )
         if st.button(
-            "Start Batch Prediction",
+            "📂 Start Batch Prediction",
             key="start_batch_prediction",
             type="primary",
             use_container_width=True,
         ):
             st.session_state["prediction_mode"] = "batch"
             st.rerun()
+
+    st.markdown(
+        """
+<div class="why-system">
+    <div class="why-system-title">Why Use This System?</div>
+    <div class="why-grid">
+        <div class="why-item">AI-Powered Prediction</div>
+        <div class="why-item">Real-Time Analysis</div>
+        <div class="why-item">Batch Processing</div>
+        <div class="why-item">Professional Excel Reports</div>
+        <div class="why-item">Early At-Risk Identification</div>
+    </div>
+</div>
+
+<div class="system-footer">
+    Student Performance Prediction System • Version 1.0<br>
+    Developed using Python, Streamlit and Scikit-learn • BMCS2003 Artificial Intelligence
+</div>
+</div>
+""",
+        unsafe_allow_html=True,
+    )
 
 
 elif page == "Prediction" and st.session_state.get("prediction_mode") == "individual":
