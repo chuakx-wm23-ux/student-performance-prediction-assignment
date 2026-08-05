@@ -130,6 +130,63 @@ st.markdown("""
     margin: 0 !important;
 }
 
+/* Sidebar footer */
+.sidebar-footer {
+    position: fixed;
+    left: 18px;
+    bottom: 18px;
+    width: calc(var(--sidebar-width) - 36px);
+    padding: 0.95rem 0.8rem 0.75rem;
+    border-top: 1px solid rgba(255,255,255,0.10);
+    text-align: center;
+    line-height: 1.55;
+    z-index: 1000;
+}
+
+.sidebar-footer .footer-brand {
+    color: #ffffff;
+    font-size: 0.98rem;
+    font-weight: 800;
+    letter-spacing: -0.01em;
+}
+
+.sidebar-footer .footer-subtitle {
+    color: #b8c7e8;
+    font-size: 0.68rem;
+    font-weight: 600;
+    margin-top: 0.12rem;
+}
+
+.sidebar-footer .footer-powered {
+    color: #8fa2c7;
+    font-size: 0.66rem;
+    margin-top: 0.28rem;
+}
+
+.sidebar-footer .footer-version {
+    color: #7e93ba;
+    font-size: 0.64rem;
+    margin-top: 0.65rem;
+}
+
+.sidebar-footer .footer-group {
+    color: #afc6ff;
+    font-size: 0.69rem;
+    font-weight: 700;
+    margin-top: 0.15rem;
+}
+
+.sidebar-footer .footer-copyright {
+    color: #6e82a8;
+    font-size: 0.61rem;
+    margin-top: 0.5rem;
+}
+
+/* Leave enough space so navigation never overlaps the footer */
+[data-testid="stSidebar"] > div:first-child {
+    padding-bottom: 12.5rem !important;
+}
+
 /* Main hero */
 .hero {
     padding: 1.1rem 1.35rem;
@@ -2359,6 +2416,20 @@ page = st.sidebar.radio(
         "ℹ️ About"
     ],
     label_visibility="collapsed"
+)
+
+st.sidebar.markdown(
+    """
+<div class="sidebar-footer">
+    <div class="footer-brand">🎓 Student AI</div>
+    <div class="footer-subtitle">Student Performance Prediction</div>
+    <div class="footer-powered">Powered by KNN • SVM • ANN</div>
+    <div class="footer-version">Version 1.0</div>
+    <div class="footer-group">Developed by RIS Group 5</div>
+    <div class="footer-copyright">© 2026 All Rights Reserved</div>
+</div>
+""",
+    unsafe_allow_html=True,
 )
 
 page = page.split(" ", 1)[1]
