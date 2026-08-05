@@ -1,4 +1,5 @@
 from pathlib import Path
+from io import BytesIO
 import joblib
 import pandas as pd
 import plotly.express as px
@@ -417,6 +418,113 @@ def load_models():
     }
 
 
+
+def make_excel_bytes(dataframe):
+    output = BytesIO()
+    with pd.ExcelWriter(output, engine="openpyxl") as writer:
+        dataframe.to_excel(writer, index=False, sheet_name="Prediction Results")
+        worksheet = writer.sheets["Prediction Results"]
+        for column_cells in worksheet.columns:
+            max_length = max(len(str(cell.value)) if cell.value is not None else 0 for cell in column_cells)
+            worksheet.column_dimensions[column_cells[0].column_letter].width = min(max(max_length + 2, 12), 32)
+        worksheet.freeze_panes = "A2"
+        worksheet.auto_filter.ref = worksheet.dimensions
+    output.seek(0)
+    return output.getvalue()
+
+
+def make_template_bytes():
+    template = pd.DataFrame([
+        {
+            "Student_ID": "ID0001",
+            "Student_Name": "Example Student",
+            "Number_of_Subjects": 5,
+            "Average_Score": 75.0,
+            "Attendance_Pct": 85.0,
+            "Study_Hours_Per_Day": 3.0,
+            "Previous_CGPA": 3.20,
+        },
+        {
+            "Student_ID": "ID0002",
+            "Student_Name": "Example Student 2",
+            "Number_of_Subjects": 6,
+            "Average_Score": 62.5,
+            "Attendance_Pct": 72.0,
+            "Study_Hours_Per_Day": 2.0,
+            "Previous_CGPA": 2.60,
+        },
+    ])
+    return make_excel_bytes(template)
+
+
+def validate_batch_data(batch_df):
+    required = [
+        "Number_of_Subjects",
+        "Average_Score",
+        "Attendance_Pct",
+        "Study_Hours_Per_Day",
+        "Previous_CGPA",
+    ]
+    errors = []
+    missing = [column for column in required if column not in batch_df.columns]
+    if missing:
+        return ["Missing required columns: " + ", ".join(missing)]
+    if batch_df.empty:
+        return ["The uploaded file does not contain any student records."]
+
+    ranges = {
+        "Number_of_Subjects": (1, 12),
+        "Average_Score": (0, 100),
+        "Attendance_Pct": (0, 100),
+        "Study_Hours_Per_Day": (0, 24),
+        "Previous_CGPA": (0, 4),
+    }
+
+    for column, (minimum, maximum) in ranges.items():
+        values = pd.to_numeric(batch_df[column], errors="coerce")
+        if values.isna().any():
+            rows = (values.isna()).to_numpy().nonzero()[0] + 2
+            errors.append(f"{column} contains missing or non-numeric values at Excel row(s): " + ", ".join(map(str, rows[:8])))
+            continue
+        invalid = ~values.between(minimum, maximum, inclusive="both")
+        if invalid.any():
+            rows = invalid.to_numpy().nonzero()[0] + 2
+            errors.append(f"{column} must be between {minimum} and {maximum}. Invalid Excel row(s): " + ", ".join(map(str, rows[:8])))
+
+    subjects = pd.to_numeric(batch_df["Number_of_Subjects"], errors="coerce")
+    non_integer = subjects.notna() & (subjects % 1 != 0)
+    if non_integer.any():
+        rows = non_integer.to_numpy().nonzero()[0] + 2
+        errors.append("Number_of_Subjects must contain whole numbers. Invalid Excel row(s): " + ", ".join(map(str, rows[:8])))
+    return errors
+
+
+def predict_batch(batch_df):
+    features = [
+        "Number_of_Subjects",
+        "Average_Score",
+        "Attendance_Pct",
+        "Study_Hours_Per_Day",
+        "Previous_CGPA",
+    ]
+    result = batch_df.copy()
+    best_name = str(evaluation.iloc[0]["Model"])
+
+    for model_name, bundle in models.items():
+        model = bundle["model"]
+        label_encoder = bundle["label_encoder"]
+        encoded = model.predict(batch_df[features]).astype(int)
+        labels = label_encoder.inverse_transform(encoded)
+        probabilities = model.predict_proba(batch_df[features])
+        confidence = probabilities.max(axis=1)
+        result[f"{model_name}_Prediction"] = labels
+        result[f"{model_name}_Confidence"] = confidence
+
+    result["Final_Prediction"] = result[f"{best_name}_Prediction"]
+    result["Final_Confidence"] = result[f"{best_name}_Confidence"]
+    result["Best_Model"] = best_name
+    return result
+
 def show_cgpa_guide():
     st.markdown(
         """
@@ -463,6 +571,7 @@ page = st.sidebar.radio(
     [
         "🏠 Home",
         "📝 Prediction",
+        "📚 Batch Prediction",
         "📊 Model Results",
         "📈 Dataset",
         "ℹ️ About"
@@ -672,6 +781,121 @@ elif page == "Prediction":
             }
 
             st.rerun()
+
+elif page == "Batch Prediction":
+    st.subheader("Batch Student Prediction")
+    st.markdown(
+        "Upload an Excel or CSV file containing multiple students. "
+        "The system will validate the data, predict all records using KNN, SVM and ANN, "
+        "and let you download a completed Excel file."
+    )
+
+    template_col, note_col = st.columns([1, 2])
+    with template_col:
+        st.download_button(
+            "⬇️ Download Excel Template",
+            data=make_template_bytes(),
+            file_name="student_batch_prediction_template.xlsx",
+            mime="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+            use_container_width=True,
+        )
+    with note_col:
+        st.info(
+            "Required columns: Number_of_Subjects, Average_Score, Attendance_Pct, "
+            "Study_Hours_Per_Day and Previous_CGPA. Student_ID and Student_Name are optional."
+        )
+
+    uploaded_file = st.file_uploader(
+        "Upload completed Excel or CSV file",
+        type=["xlsx", "xls", "csv"],
+    )
+
+    if uploaded_file is not None:
+        try:
+            if uploaded_file.name.lower().endswith(".csv"):
+                batch_df = pd.read_csv(uploaded_file)
+            else:
+                batch_df = pd.read_excel(uploaded_file)
+
+            errors = validate_batch_data(batch_df)
+            if errors:
+                st.error("The uploaded file cannot be processed.")
+                for error in errors:
+                    st.write(f"• {error}")
+            else:
+                required = [
+                    "Number_of_Subjects",
+                    "Average_Score",
+                    "Attendance_Pct",
+                    "Study_Hours_Per_Day",
+                    "Previous_CGPA",
+                ]
+                for column in required:
+                    batch_df[column] = pd.to_numeric(batch_df[column])
+
+                st.success(f"{len(batch_df):,} student records loaded successfully.")
+                c1, c2, c3 = st.columns(3)
+                c1.metric("Uploaded Students", f"{len(batch_df):,}")
+                c2.metric("Required Features", "5")
+                c3.metric("Final Model", str(evaluation.iloc[0]["Model"]))
+
+                st.markdown("#### Uploaded Data Preview")
+                st.dataframe(batch_df.head(50), hide_index=True, use_container_width=True)
+
+                if st.button("Predict All Students", type="primary", use_container_width=True):
+                    with st.spinner("Generating batch predictions..."):
+                        st.session_state["batch_prediction_result"] = predict_batch(batch_df)
+                    st.rerun()
+
+        except ImportError:
+            st.error("Excel support is unavailable. Add openpyxl to requirements.txt and redeploy.")
+        except Exception as error:
+            st.error(f"Unable to process the uploaded file: {error}")
+
+    if "batch_prediction_result" in st.session_state:
+        result_df = st.session_state["batch_prediction_result"]
+        st.success(f"Batch prediction completed for {len(result_df):,} students.")
+
+        order = ["At Risk", "Average", "Good", "Excellent"]
+        counts = result_df["Final_Prediction"].value_counts().reindex(order, fill_value=0)
+        summary_cols = st.columns(4)
+        for col, category in zip(summary_cols, order):
+            col.metric(category, int(counts[category]))
+
+        summary_df = counts.rename_axis("Performance Category").reset_index(name="Students")
+        fig = px.bar(
+            summary_df,
+            x="Performance Category",
+            y="Students",
+            text="Students",
+            title="Batch Prediction Distribution",
+            category_orders={"Performance Category": order},
+        )
+        fig.update_traces(textposition="outside")
+        fig.update_layout(title_x=0.5, height=390)
+        st.plotly_chart(fig, use_container_width=True)
+
+        display_df = result_df.copy()
+        for column in ["KNN_Confidence", "SVM_Confidence", "ANN_Confidence", "Final_Confidence"]:
+            display_df[column] = display_df[column].map(lambda value: f"{value:.1%}")
+
+        st.markdown("#### Complete Prediction Results")
+        st.dataframe(display_df, hide_index=True, use_container_width=True)
+
+        download_col, clear_col = st.columns(2)
+        with download_col:
+            st.download_button(
+                "⬇️ Download Predicted Excel",
+                data=make_excel_bytes(result_df),
+                file_name="student_batch_predictions.xlsx",
+                mime="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+                use_container_width=True,
+            )
+        with clear_col:
+            if st.button("↻ Upload Another File", type="secondary", use_container_width=True):
+                del st.session_state["batch_prediction_result"]
+                st.rerun()
+
 
 elif page == "Model Results":
     st.subheader("Model Evaluation Dashboard")
