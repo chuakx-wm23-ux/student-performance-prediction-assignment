@@ -1566,85 +1566,140 @@ def make_batch_excel_bytes(dataframe):
         )
 
         # Five aligned KPI cards.
-        # Only horizontal merges are used because WPS can hide vertically merged
-        # card content in some versions.
-        kpi_cards = [
-            ("A", "C", "TOTAL STUDENTS", total_students, "Students analysed", "E8EEFF", "1E3A8A"),
-            ("D", "F", "EXCELLENT", int(counts["Excellent"]), "High performance", "DCFCE7", "166534"),
-            ("G", "I", "GOOD", int(counts["Good"]), "Positive progress", "DBEAFE", "1D4ED8"),
-            ("J", "L", "AVERAGE", int(counts["Average"]), "Academic guidance", "FEF3C7", "B45309"),
-            ("M", "O", "AT RISK", int(counts["At Risk"]), "Early intervention", "FEE2E2", "B91C1C"),
+        # Rendered as one image to guarantee identical display in Excel and WPS.
+        kpi_buffer = BytesIO()
+
+        kpi_labels = [
+            "TOTAL STUDENTS",
+            "EXCELLENT",
+            "GOOD",
+            "AVERAGE",
+            "AT RISK",
+        ]
+        kpi_values = [
+            total_students,
+            int(counts["Excellent"]),
+            int(counts["Good"]),
+            int(counts["Average"]),
+            int(counts["At Risk"]),
+        ]
+        kpi_subtitles = [
+            "Students analysed",
+            "High performance",
+            "Positive progress",
+            "Academic guidance",
+            "Early intervention",
+        ]
+        kpi_backgrounds = [
+            "#E8EEFF",
+            "#DCFCE7",
+            "#DBEAFE",
+            "#FEF3C7",
+            "#FEE2E2",
+        ]
+        kpi_text_colours = [
+            "#1E3A8A",
+            "#166534",
+            "#1D4ED8",
+            "#B45309",
+            "#B91C1C",
         ]
 
-        for start_col, end_col, label, value, subtitle, fill_colour, font_colour in kpi_cards:
-            dashboard_sheet.merge_cells(f"{start_col}5:{end_col}5")
-            dashboard_sheet.merge_cells(f"{start_col}6:{end_col}7")
-            dashboard_sheet.merge_cells(f"{start_col}8:{end_col}8")
+        fig, axes = plt.subplots(
+            1,
+            5,
+            figsize=(15.4, 2.05),
+        )
+        fig.patch.set_facecolor("white")
 
-            dashboard_sheet[f"{start_col}5"] = label
-            dashboard_sheet[f"{start_col}6"] = value
-            dashboard_sheet[f"{start_col}8"] = subtitle
+        for axis, label, value, subtitle, background, text_colour in zip(
+            axes,
+            kpi_labels,
+            kpi_values,
+            kpi_subtitles,
+            kpi_backgrounds,
+            kpi_text_colours,
+        ):
+            axis.set_facecolor(background)
+            axis.set_xticks([])
+            axis.set_yticks([])
 
-            for row_number in range(5, 9):
-                for column_index in range(
-                    dashboard_sheet[f"{start_col}1"].column,
-                    dashboard_sheet[f"{end_col}1"].column + 1,
-                ):
-                    cell = dashboard_sheet.cell(
-                        row=row_number,
-                        column=column_index,
-                    )
-                    cell.fill = PatternFill(
-                        "solid",
-                        fgColor=fill_colour,
-                    )
-                    cell.border = Border(
-                        left=Side(style="thin", color=dashboard_border),
-                        right=Side(style="thin", color=dashboard_border),
-                        top=Side(style="thin", color=dashboard_border),
-                        bottom=Side(style="thin", color=dashboard_border),
-                    )
+            for spine in axis.spines.values():
+                spine.set_visible(True)
+                spine.set_color("#CBD5E1")
+                spine.set_linewidth(1.1)
 
-            dashboard_sheet[f"{start_col}5"].font = Font(
-                color=font_colour,
-                bold=True,
-                size=10,
+            axis.text(
+                0.5,
+                0.76,
+                label,
+                ha="center",
+                va="center",
+                fontsize=10,
+                fontweight="bold",
+                color=text_colour,
+                transform=axis.transAxes,
             )
-            dashboard_sheet[f"{start_col}6"].font = Font(
-                color=font_colour,
-                bold=True,
-                size=20,
+            axis.text(
+                0.5,
+                0.48,
+                f"{value:,}",
+                ha="center",
+                va="center",
+                fontsize=20,
+                fontweight="bold",
+                color=text_colour,
+                transform=axis.transAxes,
             )
-            dashboard_sheet[f"{start_col}8"].font = Font(
-                color=font_colour,
-                bold=True,
-                size=9,
+            axis.text(
+                0.5,
+                0.20,
+                subtitle,
+                ha="center",
+                va="center",
+                fontsize=8.5,
+                fontweight="bold",
+                color=text_colour,
+                transform=axis.transAxes,
             )
 
-            for cell_reference in [
-                f"{start_col}5",
-                f"{start_col}6",
-                f"{start_col}8",
-            ]:
-                dashboard_sheet[cell_reference].alignment = Alignment(
-                    horizontal="center",
-                    vertical="center",
-                    wrap_text=True,
-                )
+        plt.subplots_adjust(
+            left=0.01,
+            right=0.99,
+            top=0.95,
+            bottom=0.05,
+            wspace=0.045,
+        )
+        fig.savefig(
+            kpi_buffer,
+            format="png",
+            dpi=170,
+            bbox_inches="tight",
+            facecolor="white",
+        )
+        plt.close(fig)
+        kpi_buffer.seek(0)
 
-        # Force KPI rows to remain visible in Excel and WPS.
+        kpi_image = XLImage(kpi_buffer)
+        kpi_image.width = 1450
+        kpi_image.height = 175
+        dashboard_sheet.add_image(
+            kpi_image,
+            "A5",
+        )
+
+        # Reserve vertical space for the KPI image.
         for row_number, height in {
-            5: 22,
-            6: 24,
-            7: 24,
-            8: 22,
+            5: 30,
+            6: 30,
+            7: 30,
+            8: 30,
         }.items():
             dashboard_sheet.row_dimensions[row_number].hidden = False
-            dashboard_sheet.row_dimensions[row_number].collapsed = False
-            dashboard_sheet.row_dimensions[row_number].outlineLevel = 0
             dashboard_sheet.row_dimensions[row_number].height = height
 
         # Performance summary table.
+        dashboard_sheet.row_dimensions[9].height = 12
         dashboard_sheet.merge_cells("A10:E10")
         dashboard_sheet["A10"] = "Performance Summary"
         dashboard_sheet["A10"].fill = PatternFill(
