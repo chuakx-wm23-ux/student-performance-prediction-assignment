@@ -42,12 +42,28 @@ st.markdown("""
 
 .stApp {
     background:
-        radial-gradient(circle at 88% 10%, rgba(139, 92, 246, 0.24), transparent 30%),
-        radial-gradient(circle at 12% 22%, rgba(59, 130, 246, 0.22), transparent 32%),
-        radial-gradient(circle at 72% 78%, rgba(14, 165, 233, 0.14), transparent 34%),
-        linear-gradient(180deg, #eaf2ff 0%, #dfeaff 46%, #edf5ff 100%);
-    background-size: 160% 160%;
-    animation: ambientShift 18s ease-in-out infinite alternate;
+        radial-gradient(
+            circle at 50% 78%,
+            rgba(246, 190, 210, 0.30) 0%,
+            rgba(246, 190, 210, 0.14) 22%,
+            transparent 42%
+        ),
+        radial-gradient(
+            circle at 18% 14%,
+            rgba(132, 171, 235, 0.24) 0%,
+            rgba(132, 171, 235, 0.10) 28%,
+            transparent 48%
+        ),
+        linear-gradient(
+            180deg,
+            #c9d9f3 0%,
+            #d7e2f4 26%,
+            #dce4f3 50%,
+            #d9d8ea 74%,
+            #cfc4df 100%
+        );
+    background-size: cover;
+    background-attachment: fixed;
     color: var(--text);
 }
 
@@ -64,7 +80,7 @@ st.markdown("""
     max-width: 980px;
     padding-top: .55rem;
     padding-bottom: 2rem;
-    background: rgba(255,255,255,0.10);
+    background: rgba(255,255,255,0.06);
     border-radius: 28px;
 }
 
