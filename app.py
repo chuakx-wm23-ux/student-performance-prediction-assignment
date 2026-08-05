@@ -411,7 +411,7 @@ h1, h2, h3 {
     background:
         linear-gradient(135deg, rgba(15,23,42,.99), rgba(30,58,138,.97), rgba(91,33,182,.94));
     border-radius: 24px;
-    padding: 1.55rem 1.7rem;
+    padding: 1.05rem 1.35rem;
     margin-bottom: 1.1rem;
     color: white;
     box-shadow: 0 24px 60px rgba(37,99,235,.20);
@@ -444,7 +444,7 @@ h1, h2, h3 {
 .prediction-welcome h2 {
     color: white !important;
     margin: 0;
-    font-size: 1.82rem !important;
+    font-size: 1.48rem !important;
     line-height: 1.18;
     position: relative;
     z-index: 1;
@@ -452,9 +452,9 @@ h1, h2, h3 {
 
 .prediction-welcome p {
     color: #e2e8f0;
-    margin: .78rem 0 0;
-    line-height: 1.7;
-    font-size: .94rem;
+    margin: .5rem 0 0;
+    line-height: 1.5;
+    font-size: .88rem;
     max-width: 880px;
     position: relative;
     z-index: 1;
@@ -464,8 +464,8 @@ h1, h2, h3 {
     background: rgba(255,255,255,.98);
     border: 1px solid #e2e8f0;
     border-radius: 22px;
-    padding: 1.25rem 1.25rem 1.05rem;
-    min-height: 292px;
+    padding: 1rem 1.05rem .85rem;
+    min-height: 238px;
     box-shadow: 0 16px 38px rgba(15,23,42,.07);
     margin-bottom: .8rem;
     transition: transform .22s ease, box-shadow .22s ease, border-color .22s ease;
@@ -506,7 +506,7 @@ h1, h2, h3 {
     color: #64748b;
     font-size: .9rem;
     line-height: 1.58;
-    min-height: 72px;
+    min-height: 54px;
 }
 
 .prediction-mode-feature {
@@ -559,6 +559,40 @@ h1, h2, h3 {
     font-size: .78rem;
     padding: 1.2rem 0 .2rem;
     line-height: 1.7;
+}
+
+
+.mode-page-hero {
+    background:
+        radial-gradient(circle at top right, rgba(124,58,237,.10), transparent 30%),
+        linear-gradient(120deg, #eaf2ff 0%, #eef2ff 55%, #f5f3ff 100%);
+    border: 1px solid #dbeafe;
+    border-radius: 20px;
+    padding: .95rem 1.15rem;
+    margin-bottom: .8rem;
+    box-shadow: 0 12px 30px rgba(37,99,235,.08);
+}
+
+.mode-page-eyebrow {
+    font-size: .70rem;
+    font-weight: 850;
+    letter-spacing: .12em;
+    text-transform: uppercase;
+    color: #4338ca;
+    margin-bottom: .35rem;
+}
+
+.mode-page-hero h2 {
+    margin: 0;
+    color: #172033 !important;
+    font-size: 1.28rem !important;
+}
+
+.mode-page-hero p {
+    margin: .4rem 0 0;
+    color: #475569;
+    font-size: .86rem;
+    line-height: 1.5;
 }
 
 @media (max-width: 900px) {
@@ -1824,10 +1858,9 @@ elif page == "Prediction" and not st.session_state.get("prediction_mode"):
     <div class="prediction-eyebrow">AI-Powered Academic Decision Support</div>
     <h2>Student Performance Prediction System</h2>
     <p>
-        This intelligent platform predicts students' academic performance using
-        KNN, SVM and ANN. It supports both individual and batch prediction,
-        enabling educators to identify at-risk students and make informed academic
-        decisions efficiently.
+        Predict student academic performance using KNN, SVM and ANN.
+        Choose individual analysis or batch processing to identify at-risk
+        students and support faster academic decisions.
     </p>
     <p><b>Select a prediction mode below to begin.</b></p>
 </div>
@@ -1835,13 +1868,13 @@ elif page == "Prediction" and not st.session_state.get("prediction_mode"):
         unsafe_allow_html=True,
     )
 
-    stat_col1, stat_col2, stat_col3, stat_col4 = st.columns(4)
+    stat_col1, stat_col2, stat_col3, stat_col4 = st.columns(4, gap="small")
     stat_col1.metric("🏆 Best Model", str(best_row["Model"]))
     stat_col2.metric("🎯 Best Accuracy", f"{best_row['Accuracy']:.1%}")
     stat_col3.metric("📚 Input Features", "5")
     stat_col4.metric("🤖 ML Models", "3")
 
-    card_col1, card_col2 = st.columns(2)
+    card_col1, card_col2 = st.columns(2, gap="small")
 
     with card_col1:
         st.markdown(
@@ -1928,7 +1961,19 @@ elif page == "Prediction" and st.session_state.get("prediction_mode") == "indivi
         st.session_state.pop("prediction_result", None)
         st.rerun()
 
-    st.subheader("Individual Student Prediction")
+    st.markdown(
+        """
+<div class="mode-page-hero">
+    <div class="mode-page-eyebrow">Single-Student Analysis</div>
+    <h2>👤 Individual Prediction</h2>
+    <p>
+        Enter one student's academic information to generate real-time
+        predictions using KNN, SVM and ANN, then download a formatted Excel result.
+    </p>
+</div>
+""",
+        unsafe_allow_html=True,
+    )
     show_cgpa_guide()
 
     # Show the latest result at the top of the page.
@@ -2108,11 +2153,18 @@ elif page == "Prediction" and st.session_state.get("prediction_mode") == "batch"
         st.session_state.pop("batch_prediction_result", None)
         st.rerun()
 
-    st.subheader("Batch Student Prediction")
     st.markdown(
-        "Upload an Excel or CSV file containing multiple students. "
-        "The system will validate the data, predict all records using KNN, SVM and ANN, "
-        "and let you download a completed Excel file."
+        """
+<div class="mode-page-hero">
+    <div class="mode-page-eyebrow">Multi-Student Analysis</div>
+    <h2>📂 Batch Prediction</h2>
+    <p>
+        Upload an Excel or CSV file to predict multiple students simultaneously,
+        identify at-risk students and export a professional Excel dashboard.
+    </p>
+</div>
+""",
+        unsafe_allow_html=True,
     )
 
     template_col, note_col = st.columns([1, 2])
