@@ -1852,7 +1852,13 @@ def make_batch_excel_bytes(dataframe):
         pie_values = [int(counts[category]) for category in category_order]
         pie_colours = ["#22C55E", "#3B82F6", "#F59E0B", "#EF4444"]
 
-        fig, ax = plt.subplots(figsize=(6.2, 4.3))
+        fig, ax = plt.subplots(
+            figsize=(6.2, 4.3),
+            facecolor="white",
+        )
+        fig.patch.set_facecolor("white")
+        fig.patch.set_edgecolor("#C9D3E6")
+        fig.patch.set_linewidth(2.2)
         wedges, texts, autotexts = ax.pie(
             pie_values,
             labels=None,
@@ -1887,15 +1893,19 @@ def make_batch_excel_bytes(dataframe):
             autotext.set_fontweight("bold")
             autotext.set_color("white")
         ax.axis("equal")
-        fig.patch.set_facecolor("white")
         ax.set_facecolor("white")
+        for spine in ax.spines.values():
+            spine.set_visible(True)
+            spine.set_color("#D6DDEB")
+            spine.set_linewidth(1.1)
         plt.tight_layout(pad=0.8)
         fig.savefig(
             pie_buffer,
             format="png",
-            dpi=170,
+            dpi=190,
             bbox_inches="tight",
             facecolor="white",
+            edgecolor="#C9D3E6",
         )
         plt.close(fig)
         pie_buffer.seek(0)
@@ -1958,7 +1968,13 @@ def make_batch_excel_bytes(dataframe):
         bar_values = [int(counts[category]) for category in category_order]
         bar_colours = ["#22C55E", "#3B82F6", "#F59E0B", "#EF4444"]
 
-        fig, ax = plt.subplots(figsize=(11.8, 4.4))
+        fig, ax = plt.subplots(
+            figsize=(11.8, 4.4),
+            facecolor="white",
+        )
+        fig.patch.set_facecolor("white")
+        fig.patch.set_edgecolor("#C9D3E6")
+        fig.patch.set_linewidth(2.2)
         bars = ax.bar(
             category_order,
             bar_values,
@@ -1973,10 +1989,10 @@ def make_batch_excel_bytes(dataframe):
         )
         ax.set_ylabel("Number of Students", fontsize=10)
         ax.set_xlabel("Performance Category", fontsize=10)
-        ax.spines["top"].set_visible(False)
-        ax.spines["right"].set_visible(False)
-        ax.spines["left"].set_color("#CBD5E1")
-        ax.spines["bottom"].set_color("#CBD5E1")
+        for spine in ax.spines.values():
+            spine.set_visible(True)
+            spine.set_color("#D6DDEB")
+            spine.set_linewidth(1.1)
         ax.tick_params(axis="both", labelsize=9)
         ax.grid(False)
 
@@ -2000,9 +2016,10 @@ def make_batch_excel_bytes(dataframe):
         fig.savefig(
             bar_buffer,
             format="png",
-            dpi=170,
+            dpi=190,
             bbox_inches="tight",
             facecolor="white",
+            edgecolor="#C9D3E6",
         )
         plt.close(fig)
         bar_buffer.seek(0)
