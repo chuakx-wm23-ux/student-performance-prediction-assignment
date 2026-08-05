@@ -1475,21 +1475,21 @@ def make_batch_excel_bytes(dataframe):
 
         # Fixed column widths provide a predictable layout in Excel and WPS.
         dashboard_widths = {
-            "A": 14,
-            "B": 14,
-            "C": 14,
-            "D": 14,
-            "E": 14,
-            "F": 14,
-            "G": 14,
-            "H": 14,
-            "I": 14,
-            "J": 14,
-            "K": 14,
-            "L": 14,
-            "M": 14,
-            "N": 14,
-            "O": 14,
+            "A": 13,
+            "B": 13,
+            "C": 13,
+            "D": 13,
+            "E": 13,
+            "F": 13,
+            "G": 13,
+            "H": 13,
+            "I": 13,
+            "J": 13,
+            "K": 13,
+            "L": 13,
+            "M": 13,
+            "N": 13,
+            "O": 13,
         }
         for column_letter, width in dashboard_widths.items():
             dashboard_sheet.column_dimensions[column_letter].width = width
@@ -1681,8 +1681,8 @@ def make_batch_excel_bytes(dataframe):
         kpi_buffer.seek(0)
 
         kpi_image = XLImage(kpi_buffer)
-        kpi_image.width = 1450
-        kpi_image.height = 175
+        kpi_image.width = 1370
+        kpi_image.height = 165
         dashboard_sheet.add_image(
             kpi_image,
             "A5",
@@ -1889,7 +1889,7 @@ def make_batch_excel_bytes(dataframe):
         ax.axis("equal")
         fig.patch.set_facecolor("white")
         ax.set_facecolor("white")
-        plt.tight_layout()
+        plt.tight_layout(pad=0.8)
         fig.savefig(
             pie_buffer,
             format="png",
@@ -1901,15 +1901,15 @@ def make_batch_excel_bytes(dataframe):
         pie_buffer.seek(0)
 
         pie_image = XLImage(pie_buffer)
-        pie_image.width = 500
-        pie_image.height = 340
+        pie_image.width = 470
+        pie_image.height = 300
         dashboard_sheet.add_image(
             pie_image,
             "F10",
         )
 
         # Recommended-action panel on the right.
-        dashboard_sheet.merge_cells("K10:O16")
+        dashboard_sheet.merge_cells("K10:O17")
         at_risk_count = int(counts["At Risk"])
 
         if at_risk_count > 0:
@@ -1996,7 +1996,7 @@ def make_batch_excel_bytes(dataframe):
 
         fig.patch.set_facecolor("white")
         ax.set_facecolor("white")
-        plt.tight_layout()
+        plt.tight_layout(pad=0.8)
         fig.savefig(
             bar_buffer,
             format="png",
@@ -2008,7 +2008,7 @@ def make_batch_excel_bytes(dataframe):
         bar_buffer.seek(0)
 
         bar_image = XLImage(bar_buffer)
-        bar_image.width = 1000
+        bar_image.width = 1180
         bar_image.height = 360
         dashboard_sheet.add_image(
             bar_image,
@@ -2020,20 +2020,25 @@ def make_batch_excel_bytes(dataframe):
             1: 30,
             2: 18,
             3: 24,
-            5: 24,
-            6: 24,
-            7: 24,
-            8: 24,
-            10: 24,
-            11: 22,
-            12: 22,
-            13: 22,
-            14: 22,
-            15: 22,
-            16: 22,
+            5: 26,
+            6: 26,
+            7: 26,
+            8: 26,
+            9: 10,
+            10: 26,
+            11: 24,
+            12: 24,
+            13: 24,
+            14: 24,
+            15: 24,
+            16: 24,
+            17: 24,
         }
         for row_number, height in row_heights.items():
             dashboard_sheet.row_dimensions[row_number].height = height
+
+        for row_number in range(19, 37):
+            dashboard_sheet.row_dimensions[row_number].height = 23
 
         dashboard_sheet.freeze_panes = "A5"
         dashboard_sheet.page_setup.orientation = "landscape"
@@ -2041,7 +2046,7 @@ def make_batch_excel_bytes(dataframe):
         dashboard_sheet.page_setup.fitToHeight = 1
         dashboard_sheet.sheet_properties.pageSetUpPr.fitToPage = True
         dashboard_sheet.print_area = "A1:O36"
-        dashboard_sheet.sheet_view.zoomScale = 90
+        dashboard_sheet.sheet_view.zoomScale = 85
 
         # Sheet 4: executive summary.
         summary_sheet = workbook.create_sheet("Summary")
