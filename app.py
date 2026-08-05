@@ -1,16 +1,9 @@
 from pathlib import Path
 from io import BytesIO
-from datetime import datetime
 import joblib
 import pandas as pd
 import plotly.express as px
 import streamlit as st
-from reportlab.lib import colors
-from reportlab.lib.enums import TA_CENTER
-from reportlab.lib.pagesizes import A4, landscape
-from reportlab.lib.styles import getSampleStyleSheet, ParagraphStyle
-from reportlab.lib.units import mm
-from reportlab.platypus import SimpleDocTemplate, Paragraph, Spacer, Table, TableStyle, PageBreak
 
 ROOT = Path(__file__).resolve().parent
 DATA = ROOT / "dataset" / "Student_data.csv"
@@ -400,139 +393,6 @@ h1, h2, h3 {
 
 </style>
 """, unsafe_allow_html=True)
-
-
-def make_batch_pdf_bytes(result_df, best_model):
-    output = BytesIO()
-    document = SimpleDocTemplate(
-        output,
-        pagesize=landscape(A4),
-        rightMargin=12 * mm,
-        leftMargin=12 * mm,
-        topMargin=12 * mm,
-        bottomMargin=12 * mm,
-        title="Student Batch Prediction Report",
-        author="Student Performance Prediction System",
-    )
-
-    styles = getSampleStyleSheet()
-    title_style = ParagraphStyle(
-        "ReportTitle",
-        parent=styles["Title"],
-        alignment=TA_CENTER,
-        fontSize=18,
-        leading=22,
-        spaceAfter=10,
-    )
-    subtitle_style = ParagraphStyle(
-        "ReportSubtitle",
-        parent=styles["Normal"],
-        alignment=TA_CENTER,
-        fontSize=9,
-        textColor=colors.HexColor("#475569"),
-        spaceAfter=12,
-    )
-
-    story = [
-        Paragraph("Student Batch Prediction Report", title_style),
-        Paragraph(
-            f"Generated: {datetime.now().strftime('%d %B %Y, %I:%M %p')} | "
-            f"Final model: {best_model} | Total students: {len(result_df):,}",
-            subtitle_style,
-        ),
-    ]
-
-    category_order = ["At Risk", "Average", "Good", "Excellent"]
-    counts = result_df["Final_Prediction"].value_counts().reindex(
-        category_order,
-        fill_value=0,
-    )
-
-    summary_data = [
-        ["Performance Category", "Number of Students"],
-        *[[category, int(counts[category])] for category in category_order],
-    ]
-
-    summary_table = Table(summary_data, colWidths=[70 * mm, 45 * mm])
-    summary_table.setStyle(TableStyle([
-        ("BACKGROUND", (0, 0), (-1, 0), colors.HexColor("#0f172a")),
-        ("TEXTCOLOR", (0, 0), (-1, 0), colors.white),
-        ("FONTNAME", (0, 0), (-1, 0), "Helvetica-Bold"),
-        ("ALIGN", (1, 1), (1, -1), "CENTER"),
-        ("GRID", (0, 0), (-1, -1), 0.5, colors.HexColor("#cbd5e1")),
-        ("ROWBACKGROUNDS", (0, 1), (-1, -1), [
-            colors.HexColor("#ffffff"),
-            colors.HexColor("#f8fafc"),
-        ]),
-        ("TOPPADDING", (0, 0), (-1, -1), 6),
-        ("BOTTOMPADDING", (0, 0), (-1, -1), 6),
-    ]))
-
-    story.extend([
-        Paragraph("Prediction Summary", styles["Heading2"]),
-        summary_table,
-        Spacer(1, 8 * mm),
-        Paragraph("Detailed Prediction Results", styles["Heading2"]),
-    ])
-
-    preferred_columns = [
-        "Student_ID",
-        "Student_Name",
-        "Number_of_Subjects",
-        "Average_Score",
-        "Attendance_Pct",
-        "Study_Hours_Per_Day",
-        "Previous_CGPA",
-        "KNN_Prediction",
-        "SVM_Prediction",
-        "ANN_Prediction",
-        "Final_Prediction",
-        "Final_Confidence",
-    ]
-    report_columns = [column for column in preferred_columns if column in result_df.columns]
-    pdf_df = result_df[report_columns].copy()
-
-    if "Final_Confidence" in pdf_df.columns:
-        pdf_df["Final_Confidence"] = pdf_df["Final_Confidence"].map(
-            lambda value: f"{value:.1%}"
-        )
-
-    rows_per_page = 24
-    for start in range(0, len(pdf_df), rows_per_page):
-        page_df = pdf_df.iloc[start:start + rows_per_page]
-        table_data = [report_columns] + page_df.astype(str).values.tolist()
-
-        available_width = landscape(A4)[0] - 24 * mm
-        column_width = available_width / max(len(report_columns), 1)
-
-        detail_table = Table(
-            table_data,
-            repeatRows=1,
-            colWidths=[column_width] * len(report_columns),
-        )
-        detail_table.setStyle(TableStyle([
-            ("BACKGROUND", (0, 0), (-1, 0), colors.HexColor("#1e3a8a")),
-            ("TEXTCOLOR", (0, 0), (-1, 0), colors.white),
-            ("FONTNAME", (0, 0), (-1, 0), "Helvetica-Bold"),
-            ("FONTSIZE", (0, 0), (-1, -1), 6.5),
-            ("ALIGN", (0, 0), (-1, -1), "CENTER"),
-            ("VALIGN", (0, 0), (-1, -1), "MIDDLE"),
-            ("GRID", (0, 0), (-1, -1), 0.35, colors.HexColor("#cbd5e1")),
-            ("ROWBACKGROUNDS", (0, 1), (-1, -1), [
-                colors.white,
-                colors.HexColor("#f8fafc"),
-            ]),
-            ("TOPPADDING", (0, 0), (-1, -1), 4),
-            ("BOTTOMPADDING", (0, 0), (-1, -1), 4),
-        ]))
-        story.append(detail_table)
-
-        if start + rows_per_page < len(pdf_df):
-            story.append(PageBreak())
-
-    document.build(story)
-    output.seek(0)
-    return output.getvalue()
 
 
 @st.cache_data
@@ -1019,6 +879,92 @@ elif page == "Batch Prediction":
         for column in ["KNN_Confidence", "SVM_Confidence", "ANN_Confidence", "Final_Confidence"]:
             display_df[column] = display_df[column].map(lambda value: f"{value:.1%}")
 
+        st.markdown("#### Batch Prediction Insights")
+
+        insight_col1, insight_col2 = st.columns(2)
+
+        with insight_col1:
+            bar_fig = px.bar(
+                summary_df,
+                x="Performance Category",
+                y="Students",
+                text="Students",
+                title="Students by Predicted Category",
+                category_orders={"Performance Category": order},
+            )
+            bar_fig.update_traces(textposition="outside")
+            bar_fig.update_layout(
+                title_x=0.5,
+                height=390,
+                margin=dict(l=20, r=20, t=65, b=20),
+            )
+            st.plotly_chart(bar_fig, use_container_width=True)
+
+        with insight_col2:
+            pie_fig = px.pie(
+                summary_df,
+                names="Performance Category",
+                values="Students",
+                title="Prediction Distribution",
+                hole=0.42,
+            )
+            pie_fig.update_layout(
+                title_x=0.5,
+                height=390,
+                margin=dict(l=20, r=20, t=65, b=20),
+            )
+            st.plotly_chart(pie_fig, use_container_width=True)
+
+        at_risk_df = result_df[
+            result_df["Final_Prediction"] == "At Risk"
+        ].copy()
+
+        st.markdown("#### ⚠️ At-Risk Student Dashboard")
+
+        risk_col1, risk_col2, risk_col3 = st.columns(3)
+        risk_col1.metric("Students Requiring Intervention", len(at_risk_df))
+        risk_col2.metric(
+            "At-Risk Percentage",
+            f"{(len(at_risk_df) / len(result_df)):.1%}" if len(result_df) else "0.0%",
+        )
+        risk_col3.metric("Recommended Action", "Early Support")
+
+        if at_risk_df.empty:
+            st.success("No students were classified as At Risk in this batch.")
+        else:
+            st.warning(
+                f"{len(at_risk_df):,} student(s) were classified as At Risk. "
+                "Early academic intervention is recommended."
+            )
+
+            risk_columns = [
+                column for column in [
+                    "Student_ID",
+                    "Student_Name",
+                    "Average_Score",
+                    "Attendance_Pct",
+                    "Study_Hours_Per_Day",
+                    "Previous_CGPA",
+                    "Final_Prediction",
+                    "Final_Confidence",
+                ]
+                if column in at_risk_df.columns
+            ]
+
+            at_risk_display = at_risk_df[risk_columns].copy()
+
+            if "Final_Confidence" in at_risk_display.columns:
+                at_risk_display["Final_Confidence"] = (
+                    at_risk_display["Final_Confidence"]
+                    .map(lambda value: f"{value:.1%}")
+                )
+
+            st.dataframe(
+                at_risk_display,
+                hide_index=True,
+                use_container_width=True,
+            )
+
         st.markdown("#### Complete Prediction Results")
 
         filter_col1, filter_col2 = st.columns([2, 1])
@@ -1033,7 +979,7 @@ elif page == "Batch Prediction":
         with filter_col2:
             category_filter = st.selectbox(
                 "Filter by Performance Category",
-                ["All Categories", "At Risk", "Average", "Good", "Excellent"],
+                ["All Categories"] + order,
                 key="batch_category_filter",
             )
 
@@ -1044,14 +990,19 @@ elif page == "Batch Prediction":
                 column for column in ["Student_ID", "Student_Name"]
                 if column in filtered_df.columns
             ]
+
             if searchable_columns:
                 search_mask = pd.Series(False, index=filtered_df.index)
+
                 for column in searchable_columns:
-                    search_mask = search_mask | filtered_df[column].astype(str).str.contains(
+                    search_mask = search_mask | filtered_df[
+                        column
+                    ].astype(str).str.contains(
                         search_text.strip(),
                         case=False,
                         na=False,
                     )
+
                 filtered_df = filtered_df[search_mask]
 
         if category_filter != "All Categories":
@@ -1062,20 +1013,26 @@ elif page == "Batch Prediction":
         st.caption(
             f"Showing {len(filtered_df):,} of {len(display_df):,} predicted records."
         )
-        st.dataframe(filtered_df, hide_index=True, use_container_width=True)
+
+        st.dataframe(
+            filtered_df,
+            hide_index=True,
+            use_container_width=True,
+        )
 
         low_confidence_count = int(
             (result_df["Final_Confidence"] < 0.60).sum()
         )
+
         if low_confidence_count > 0:
-            st.warning(
+            st.info(
                 f"{low_confidence_count:,} prediction(s) have confidence below 60%. "
                 "These records may require lecturer review."
             )
 
-        excel_col, pdf_col, clear_col = st.columns(3)
+        download_col, clear_col = st.columns(2)
 
-        with excel_col:
+        with download_col:
             st.download_button(
                 "⬇️ Download Predicted Excel",
                 data=make_excel_bytes(result_df),
@@ -1084,20 +1041,12 @@ elif page == "Batch Prediction":
                 use_container_width=True,
             )
 
-        with pdf_col:
-            st.download_button(
-                "📄 Download PDF Report",
-                data=make_batch_pdf_bytes(
-                    result_df,
-                    str(evaluation.iloc[0]["Model"]),
-                ),
-                file_name="student_batch_prediction_report.pdf",
-                mime="application/pdf",
-                use_container_width=True,
-            )
-
         with clear_col:
-            if st.button("↻ Upload Another File", type="secondary", use_container_width=True):
+            if st.button(
+                "↻ Upload Another File",
+                type="secondary",
+                use_container_width=True,
+            ):
                 del st.session_state["batch_prediction_result"]
                 st.rerun()
 
