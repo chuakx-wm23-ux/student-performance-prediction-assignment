@@ -37,11 +37,11 @@ st.markdown("""
 
 .stApp {
     background:
-        radial-gradient(circle at 92% 8%, rgba(124, 58, 237, 0.20), transparent 28%),
-        radial-gradient(circle at 8% 88%, rgba(59, 130, 246, 0.16), transparent 30%),
-        radial-gradient(circle at 45% 38%, rgba(14, 165, 233, 0.08), transparent 34%),
-        linear-gradient(180deg, #f9fbff 0%, #eef4ff 48%, #f8fafc 100%);
-    background-size: 150% 150%;
+        radial-gradient(circle at 88% 10%, rgba(139, 92, 246, 0.24), transparent 30%),
+        radial-gradient(circle at 12% 22%, rgba(59, 130, 246, 0.22), transparent 32%),
+        radial-gradient(circle at 72% 78%, rgba(14, 165, 233, 0.14), transparent 34%),
+        linear-gradient(180deg, #eaf2ff 0%, #dfeaff 46%, #edf5ff 100%);
+    background-size: 160% 160%;
     animation: ambientShift 18s ease-in-out infinite alternate;
     color: var(--text);
 }
@@ -59,6 +59,8 @@ st.markdown("""
     max-width: 980px;
     padding-top: .55rem;
     padding-bottom: 2rem;
+    background: rgba(255,255,255,0.10);
+    border-radius: 28px;
 }
 
 /* Sidebar */
@@ -130,7 +132,7 @@ st.markdown("""
     color: white;
     background:
         radial-gradient(circle at 92% 12%, rgba(255,255,255,0.18), transparent 24%),
-        linear-gradient(135deg, #2563eb 0%, #4f46e5 52%, #7c3aed 100%);
+        linear-gradient(135deg, #3b82f6 0%, #6366f1 52%, #8b5cf6 100%);
     margin-bottom: 1.15rem;
     box-shadow:
         0 24px 55px rgba(79, 70, 229, 0.26),
@@ -583,7 +585,7 @@ h1, h2, h3 {
 .mode-page-hero {
     background:
         radial-gradient(circle at top right, rgba(124,58,237,.10), transparent 30%),
-        linear-gradient(120deg, #eaf2ff 0%, #eef2ff 55%, #f5f3ff 100%);
+        linear-gradient(120deg, #dcecff 0%, #e7edff 52%, #efe7ff 100%);
     border: 1px solid #dbeafe;
     border-radius: 20px;
     padding: .95rem 1.15rem;
@@ -656,13 +658,14 @@ h1, h2, h3 {
 .batch-card,
 .why-system,
 .prediction-mode-card {
-    background: rgba(255,255,255,0.82) !important;
-    backdrop-filter: blur(16px);
-    -webkit-backdrop-filter: blur(16px);
-    border: 1px solid rgba(255,255,255,0.72) !important;
+    background:
+        linear-gradient(145deg, rgba(255,255,255,0.88), rgba(244,248,255,0.78)) !important;
+    backdrop-filter: blur(18px);
+    -webkit-backdrop-filter: blur(18px);
+    border: 1px solid rgba(148,163,184,0.24) !important;
     box-shadow:
-        0 18px 42px rgba(15,23,42,0.08),
-        inset 0 1px 0 rgba(255,255,255,0.80);
+        0 20px 46px rgba(59,130,246,0.12),
+        inset 0 1px 0 rgba(255,255,255,0.90);
 }
 
 /* Inputs */
@@ -783,6 +786,26 @@ h1, h2, h3 {
     * {
         transition: none !important;
     }
+}
+
+[data-testid="stPlotlyChart"] {
+    background:
+        linear-gradient(145deg, rgba(247,250,255,0.92), rgba(235,243,255,0.82)) !important;
+    border: 1px solid rgba(96,165,250,0.18) !important;
+    box-shadow: 0 22px 48px rgba(59,130,246,0.12) !important;
+}
+
+[data-testid="stMetric"]:nth-of-type(4n+1) {
+    background: linear-gradient(145deg, rgba(239,246,255,0.96), rgba(219,234,254,0.86)) !important;
+}
+[data-testid="stMetric"]:nth-of-type(4n+2) {
+    background: linear-gradient(145deg, rgba(245,243,255,0.96), rgba(237,233,254,0.86)) !important;
+}
+[data-testid="stMetric"]:nth-of-type(4n+3) {
+    background: linear-gradient(145deg, rgba(236,254,255,0.96), rgba(207,250,254,0.82)) !important;
+}
+[data-testid="stMetric"]:nth-of-type(4n+4) {
+    background: linear-gradient(145deg, rgba(240,253,250,0.96), rgba(204,251,241,0.82)) !important;
 }
 
 </style>
