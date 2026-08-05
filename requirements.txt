@@ -1,6 +1,8 @@
 streamlit
 pandas
+plotly
 scikit-learn
 joblib
-plotly
 matplotlib
+openpyxl
+reportlab
