@@ -11,6 +11,8 @@ from openpyxl.chart import BarChart, PieChart, Reference
 from openpyxl.chart.label import DataLabelList
 from openpyxl.chart.marker import DataPoint
 from openpyxl.chart.shapes import GraphicalProperties
+from openpyxl.drawing.image import Image as XLImage
+import matplotlib.pyplot as plt
 
 ROOT = Path(__file__).resolve().parent
 DATA = ROOT / "dataset" / "Student_data.csv"
@@ -1564,51 +1566,83 @@ def make_batch_excel_bytes(dataframe):
         )
 
         # Five aligned KPI cards.
-        # A single merged cell is used for each card because WPS handles this
-        # more reliably than stacked merged ranges.
+        # Only horizontal merges are used because WPS can hide vertically merged
+        # card content in some versions.
         kpi_cards = [
-            ("A5:C8", "TOTAL STUDENTS", total_students, "Students analysed"),
-            ("D5:F8", "EXCELLENT", int(counts["Excellent"]), "High performance"),
-            ("G5:I8", "GOOD", int(counts["Good"]), "Positive progress"),
-            ("J5:L8", "AVERAGE", int(counts["Average"]), "Academic guidance"),
-            ("M5:O8", "AT RISK", int(counts["At Risk"]), "Early intervention"),
+            ("A", "C", "TOTAL STUDENTS", total_students, "Students analysed", "E8EEFF", "1E3A8A"),
+            ("D", "F", "EXCELLENT", int(counts["Excellent"]), "High performance", "DCFCE7", "166534"),
+            ("G", "I", "GOOD", int(counts["Good"]), "Positive progress", "DBEAFE", "1D4ED8"),
+            ("J", "L", "AVERAGE", int(counts["Average"]), "Academic guidance", "FEF3C7", "B45309"),
+            ("M", "O", "AT RISK", int(counts["At Risk"]), "Early intervention", "FEE2E2", "B91C1C"),
         ]
 
-        for cell_range, label, value, subtitle in kpi_cards:
-            dashboard_sheet.merge_cells(cell_range)
-            start_cell = cell_range.split(":")[0]
+        for start_col, end_col, label, value, subtitle, fill_colour, font_colour in kpi_cards:
+            dashboard_sheet.merge_cells(f"{start_col}5:{end_col}5")
+            dashboard_sheet.merge_cells(f"{start_col}6:{end_col}7")
+            dashboard_sheet.merge_cells(f"{start_col}8:{end_col}8")
 
-            style_key = (
-                "Total Students"
-                if label == "TOTAL STUDENTS"
-                else label.title()
-            )
-            fill = PatternFill(
-                "solid",
-                fgColor=card_styles[style_key]["fill"],
-            )
-            font_colour = card_styles[style_key]["font"]
+            dashboard_sheet[f"{start_col}5"] = label
+            dashboard_sheet[f"{start_col}6"] = value
+            dashboard_sheet[f"{start_col}8"] = subtitle
 
-            dashboard_sheet[start_cell] = (
-                f"{label}\n{value:,}\n{subtitle}"
-            )
-            dashboard_sheet[start_cell].fill = fill
-            dashboard_sheet[start_cell].font = Font(
+            for row_number in range(5, 9):
+                for column_index in range(
+                    dashboard_sheet[f"{start_col}1"].column,
+                    dashboard_sheet[f"{end_col}1"].column + 1,
+                ):
+                    cell = dashboard_sheet.cell(
+                        row=row_number,
+                        column=column_index,
+                    )
+                    cell.fill = PatternFill(
+                        "solid",
+                        fgColor=fill_colour,
+                    )
+                    cell.border = Border(
+                        left=Side(style="thin", color=dashboard_border),
+                        right=Side(style="thin", color=dashboard_border),
+                        top=Side(style="thin", color=dashboard_border),
+                        bottom=Side(style="thin", color=dashboard_border),
+                    )
+
+            dashboard_sheet[f"{start_col}5"].font = Font(
                 color=font_colour,
                 bold=True,
-                size=13,
+                size=10,
             )
-            dashboard_sheet[start_cell].alignment = Alignment(
-                horizontal="center",
-                vertical="center",
-                wrap_text=True,
+            dashboard_sheet[f"{start_col}6"].font = Font(
+                color=font_colour,
+                bold=True,
+                size=20,
             )
-            dashboard_sheet[start_cell].border = Border(
-                left=Side(style="medium", color=dashboard_border),
-                right=Side(style="medium", color=dashboard_border),
-                top=Side(style="medium", color=dashboard_border),
-                bottom=Side(style="medium", color=dashboard_border),
+            dashboard_sheet[f"{start_col}8"].font = Font(
+                color=font_colour,
+                bold=True,
+                size=9,
             )
+
+            for cell_reference in [
+                f"{start_col}5",
+                f"{start_col}6",
+                f"{start_col}8",
+            ]:
+                dashboard_sheet[cell_reference].alignment = Alignment(
+                    horizontal="center",
+                    vertical="center",
+                    wrap_text=True,
+                )
+
+        # Force KPI rows to remain visible in Excel and WPS.
+        for row_number, height in {
+            5: 22,
+            6: 24,
+            7: 24,
+            8: 22,
+        }.items():
+            dashboard_sheet.row_dimensions[row_number].hidden = False
+            dashboard_sheet.row_dimensions[row_number].collapsed = False
+            dashboard_sheet.row_dimensions[row_number].outlineLevel = 0
+            dashboard_sheet.row_dimensions[row_number].height = height
 
         # Performance summary table.
         dashboard_sheet.merge_cells("A10:E10")
@@ -1757,38 +1791,65 @@ def make_batch_excel_bytes(dataframe):
         # This is more compatible with WPS than referencing hidden columns.
 
         # Pie chart in the centre.
-        pie_chart = PieChart()
-        pie_chart.title = "Prediction Distribution"
-        pie_chart.height = 6.4
-        pie_chart.width = 8.8
-        pie_chart.legend.position = "r"
+        # A rendered image is embedded instead of a native Excel chart because
+        # WPS may add unwanted "Series1" labels to native chart data labels.
+        pie_buffer = BytesIO()
+        pie_values = [int(counts[category]) for category in category_order]
+        pie_colours = ["#22C55E", "#3B82F6", "#F59E0B", "#EF4444"]
 
-        pie_data = Reference(
-            dashboard_sheet,
-            min_col=4,
-            min_row=12,
-            max_row=15,
+        fig, ax = plt.subplots(figsize=(6.2, 4.3))
+        wedges, texts, autotexts = ax.pie(
+            pie_values,
+            labels=None,
+            autopct="%1.0f%%",
+            startangle=90,
+            colors=pie_colours,
+            pctdistance=0.70,
+            wedgeprops={
+                "linewidth": 1.2,
+                "edgecolor": "white",
+            },
         )
-        pie_categories = Reference(
-            dashboard_sheet,
-            min_col=1,
-            min_row=12,
-            max_row=15,
+        ax.set_title(
+            "Prediction Distribution",
+            fontsize=14,
+            fontweight="bold",
+            pad=14,
         )
-        pie_chart.add_data(
-            pie_data,
-            titles_from_data=False,
+        ax.legend(
+            wedges,
+            [
+                f"{category} ({int(counts[category])})"
+                for category in category_order
+            ],
+            loc="center left",
+            bbox_to_anchor=(1.00, 0.5),
+            frameon=False,
+            fontsize=9,
         )
-        pie_chart.set_categories(pie_categories)
-        pie_chart.dataLabels = DataLabelList()
-        pie_chart.dataLabels.showPercent = True
-        pie_chart.dataLabels.showCategoryName = False
-        pie_chart.dataLabels.showSeriesName = False
-        pie_chart.dataLabels.showVal = False
-        pie_chart.dataLabels.showLegendKey = False
-        pie_chart.dataLabels.showLeaderLines = True
-        dashboard_sheet.add_chart(
-            pie_chart,
+        for autotext in autotexts:
+            autotext.set_fontsize(9)
+            autotext.set_fontweight("bold")
+            autotext.set_color("white")
+        ax.axis("equal")
+        fig.patch.set_facecolor("white")
+        ax.set_facecolor("white")
+        plt.tight_layout()
+        fig.savefig(
+            pie_buffer,
+            format="png",
+            dpi=170,
+            bbox_inches="tight",
+            facecolor="white",
+        )
+        plt.close(fig)
+        pie_buffer.seek(0)
+
+        pie_image = XLImage(pie_buffer)
+        pie_image.width = 500
+        pie_image.height = 340
+        dashboard_sheet.add_image(
+            pie_image,
             "F10",
         )
 
@@ -1837,69 +1898,65 @@ def make_batch_excel_bytes(dataframe):
         )
 
         # Full-width bar chart below all summary content.
-        # Gridlines and automatic labels are removed because WPS may display
-        # repeated "Series1" text and heavy horizontal lines.
-        bar_chart = BarChart()
-        bar_chart.type = "col"
-        bar_chart.style = 10
-        bar_chart.title = "Students by Performance Category"
-        bar_chart.y_axis.title = "Number of Students"
-        bar_chart.x_axis.title = "Performance Category"
-        bar_chart.height = 5.3
-        bar_chart.width = 18.2
-        bar_chart.legend = None
-        bar_chart.gapWidth = 110
-        bar_chart.overlap = 0
+        # The image-based chart is consistent across Microsoft Excel and WPS.
+        bar_buffer = BytesIO()
+        bar_values = [int(counts[category]) for category in category_order]
+        bar_colours = ["#22C55E", "#3B82F6", "#F59E0B", "#EF4444"]
 
-        # Remove distracting horizontal gridlines.
-        bar_chart.y_axis.majorGridlines = None
-
-        # Use a simple axis range appropriate for the student counts.
-        bar_chart.y_axis.scaling.min = 0
-        maximum_count = int(max(counts.max(), 1))
-        rounded_maximum = ((maximum_count + 49) // 50) * 50
-        bar_chart.y_axis.scaling.max = rounded_maximum
-
-        bar_data = Reference(
-            dashboard_sheet,
-            min_col=4,
-            min_row=12,
-            max_row=15,
+        fig, ax = plt.subplots(figsize=(11.8, 4.4))
+        bars = ax.bar(
+            category_order,
+            bar_values,
+            color=bar_colours,
+            width=0.56,
         )
-        bar_categories = Reference(
-            dashboard_sheet,
-            min_col=1,
-            min_row=12,
-            max_row=15,
+        ax.set_title(
+            "Students by Performance Category",
+            fontsize=14,
+            fontweight="bold",
+            pad=14,
         )
-        bar_chart.add_data(
-            bar_data,
-            titles_from_data=False,
+        ax.set_ylabel("Number of Students", fontsize=10)
+        ax.set_xlabel("Performance Category", fontsize=10)
+        ax.spines["top"].set_visible(False)
+        ax.spines["right"].set_visible(False)
+        ax.spines["left"].set_color("#CBD5E1")
+        ax.spines["bottom"].set_color("#CBD5E1")
+        ax.tick_params(axis="both", labelsize=9)
+        ax.grid(False)
+
+        maximum_value = max(bar_values) if bar_values else 1
+        ax.set_ylim(0, maximum_value * 1.22)
+
+        for bar, value in zip(bars, bar_values):
+            ax.text(
+                bar.get_x() + bar.get_width() / 2,
+                bar.get_height() + maximum_value * 0.035,
+                str(value),
+                ha="center",
+                va="bottom",
+                fontsize=10,
+                fontweight="bold",
+            )
+
+        fig.patch.set_facecolor("white")
+        ax.set_facecolor("white")
+        plt.tight_layout()
+        fig.savefig(
+            bar_buffer,
+            format="png",
+            dpi=170,
+            bbox_inches="tight",
+            facecolor="white",
         )
-        bar_chart.set_categories(bar_categories)
+        plt.close(fig)
+        bar_buffer.seek(0)
 
-        # Do not add Excel data labels. WPS otherwise adds "Series1" before
-        # every category. The values remain available in the summary table.
-        bar_chart.dataLabels = None
-
-        # Apply a separate colour to every bar.
-        bar_colours = [
-            "22C55E",  # Excellent - green
-            "3B82F6",  # Good - blue
-            "F59E0B",  # Average - amber
-            "EF4444",  # At Risk - red
-        ]
-        if bar_chart.series:
-            bar_chart.series[0].dPt = []
-            for point_index, colour in enumerate(bar_colours):
-                data_point = DataPoint(idx=point_index)
-                data_point.graphicalProperties = GraphicalProperties(
-                    solidFill=colour,
-                )
-                bar_chart.series[0].dPt.append(data_point)
-
-        dashboard_sheet.add_chart(
-            bar_chart,
+        bar_image = XLImage(bar_buffer)
+        bar_image.width = 1000
+        bar_image.height = 360
+        dashboard_sheet.add_image(
+            bar_image,
             "A19",
         )
 
@@ -1928,7 +1985,7 @@ def make_batch_excel_bytes(dataframe):
         dashboard_sheet.page_setup.fitToWidth = 1
         dashboard_sheet.page_setup.fitToHeight = 1
         dashboard_sheet.sheet_properties.pageSetUpPr.fitToPage = True
-        dashboard_sheet.print_area = "A1:O31"
+        dashboard_sheet.print_area = "A1:O36"
         dashboard_sheet.sheet_view.zoomScale = 90
 
         # Sheet 4: executive summary.
