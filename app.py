@@ -1911,15 +1911,15 @@ def make_batch_excel_bytes(dataframe):
         pie_buffer.seek(0)
 
         pie_image = XLImage(pie_buffer)
-        pie_image.width = 445
-        pie_image.height = 275
+        pie_image.width = 405
+        pie_image.height = 250
         dashboard_sheet.add_image(
             pie_image,
-            "F10",
+            "F11",
         )
 
         # Recommended-action panel on the right.
-        dashboard_sheet.merge_cells("K10:O17")
+        dashboard_sheet.merge_cells("K11:O18")
         at_risk_count = int(counts["At Risk"])
 
         if at_risk_count > 0:
@@ -1940,22 +1940,22 @@ def make_batch_excel_bytes(dataframe):
             recommendation_fill = "DCFCE7"
             recommendation_colour = "166534"
 
-        dashboard_sheet["K10"] = recommendation_text
-        dashboard_sheet["K10"].fill = PatternFill(
+        dashboard_sheet["K11"] = recommendation_text
+        dashboard_sheet["K11"].fill = PatternFill(
             "solid",
             fgColor=recommendation_fill,
         )
-        dashboard_sheet["K10"].font = Font(
+        dashboard_sheet["K11"].font = Font(
             color=recommendation_colour,
             bold=True,
             size=12,
         )
-        dashboard_sheet["K10"].alignment = Alignment(
+        dashboard_sheet["K11"].alignment = Alignment(
             horizontal="center",
             vertical="center",
             wrap_text=True,
         )
-        dashboard_sheet["K10"].border = Border(
+        dashboard_sheet["K11"].border = Border(
             left=Side(style="medium", color=recommendation_colour),
             right=Side(style="medium", color=recommendation_colour),
             top=Side(style="medium", color=recommendation_colour),
@@ -3272,6 +3272,42 @@ else:
 <div class="about-target about-red">
     <div class="about-target-title">At Risk</div>
     <div class="about-target-range">CGPA below 2.50</div>
+</div>
+""",
+            unsafe_allow_html=True
+        )
+
+    st.markdown("### 📚 Dataset Information")
+
+    info_col1, info_col2 = st.columns(2)
+
+    with info_col1:
+        st.markdown(
+            """
+<div class="about-card about-purple">
+    <h4>🗂️ Dataset Source</h4>
+    <div class="about-list-item">
+        University Student Performance & Habits Dataset from Kaggle
+    </div>
+    <h4 style="margin-top:14px;">🧩 Feature Engineering</h4>
+    <div class="about-list-item">Number of Subjects</div>
+    <div class="about-list-item">Average Score</div>
+</div>
+""",
+            unsafe_allow_html=True
+        )
+
+    with info_col2:
+        st.markdown(
+            """
+<div class="about-card about-orange">
+    <h4>⚠️ Important Note</h4>
+    <div class="about-list-item">
+        Final CGPA is used only during model training to generate the target class.
+    </div>
+    <div class="about-list-item">
+        It is not included as a prediction input because that would cause data leakage.
+    </div>
 </div>
 """,
             unsafe_allow_html=True
