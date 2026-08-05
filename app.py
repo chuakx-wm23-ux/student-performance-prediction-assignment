@@ -1911,8 +1911,8 @@ def make_batch_excel_bytes(dataframe):
         pie_buffer.seek(0)
 
         pie_image = XLImage(pie_buffer)
-        pie_image.width = 405
-        pie_image.height = 260
+        pie_image.width = 410
+        pie_image.height = 251
         dashboard_sheet.add_image(
             pie_image,
             "F11",
