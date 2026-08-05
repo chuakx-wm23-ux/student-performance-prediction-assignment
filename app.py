@@ -1911,15 +1911,15 @@ def make_batch_excel_bytes(dataframe):
         pie_buffer.seek(0)
 
         pie_image = XLImage(pie_buffer)
-        pie_image.width = 420
-        pie_image.height = 260
+        pie_image.width = 405
+        pie_image.height = 250
         dashboard_sheet.add_image(
             pie_image,
-            "G10",
+            "F11",
         )
 
         # Recommended-action panel on the right.
-        dashboard_sheet.merge_cells("J10:N17")
+        dashboard_sheet.merge_cells("K11:O18")
         at_risk_count = int(counts["At Risk"])
 
         if at_risk_count > 0:
@@ -1940,22 +1940,22 @@ def make_batch_excel_bytes(dataframe):
             recommendation_fill = "DCFCE7"
             recommendation_colour = "166534"
 
-        dashboard_sheet["J10"] = recommendation_text
-        dashboard_sheet["J10"].fill = PatternFill(
+        dashboard_sheet["K11"] = recommendation_text
+        dashboard_sheet["K11"].fill = PatternFill(
             "solid",
             fgColor=recommendation_fill,
         )
-        dashboard_sheet["J10"].font = Font(
+        dashboard_sheet["K11"].font = Font(
             color=recommendation_colour,
             bold=True,
             size=12,
         )
-        dashboard_sheet["J10"].alignment = Alignment(
+        dashboard_sheet["K11"].alignment = Alignment(
             horizontal="center",
             vertical="center",
             wrap_text=True,
         )
-        dashboard_sheet["J10"].border = Border(
+        dashboard_sheet["K11"].border = Border(
             left=Side(style="medium", color=recommendation_colour),
             right=Side(style="medium", color=recommendation_colour),
             top=Side(style="medium", color=recommendation_colour),
