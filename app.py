@@ -1911,11 +1911,11 @@ def make_batch_excel_bytes(dataframe):
         pie_buffer.seek(0)
 
         pie_image = XLImage(pie_buffer)
-        pie_image.width = 470
-        pie_image.height = 300
+        pie_image.width = 430
+        pie_image.height = 270
         dashboard_sheet.add_image(
             pie_image,
-            "F10",
+            "F11",
         )
 
         # Recommended-action panel on the right.
@@ -2025,11 +2025,11 @@ def make_batch_excel_bytes(dataframe):
         bar_buffer.seek(0)
 
         bar_image = XLImage(bar_buffer)
-        bar_image.width = 1180
-        bar_image.height = 360
+        bar_image.width = 1120
+        bar_image.height = 335
         dashboard_sheet.add_image(
             bar_image,
-            "A19",
+            "A20",
         )
 
         # Stable row heights.
@@ -2050,11 +2050,13 @@ def make_batch_excel_bytes(dataframe):
             15: 24,
             16: 24,
             17: 24,
+            18: 14,
+            19: 14,
         }
         for row_number, height in row_heights.items():
             dashboard_sheet.row_dimensions[row_number].height = height
 
-        for row_number in range(19, 37):
+        for row_number in range(20, 38):
             dashboard_sheet.row_dimensions[row_number].height = 23
 
         dashboard_sheet.freeze_panes = "A5"
@@ -2062,7 +2064,7 @@ def make_batch_excel_bytes(dataframe):
         dashboard_sheet.page_setup.fitToWidth = 1
         dashboard_sheet.page_setup.fitToHeight = 1
         dashboard_sheet.sheet_properties.pageSetUpPr.fitToPage = True
-        dashboard_sheet.print_area = "A1:O36"
+        dashboard_sheet.print_area = "A1:O37"
         dashboard_sheet.sheet_view.zoomScale = 85
 
         # Sheet 4: executive summary.
