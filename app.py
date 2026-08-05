@@ -1543,66 +1543,50 @@ def make_batch_excel_bytes(dataframe):
         )
 
         # Five aligned KPI cards.
+        # A single merged cell is used for each card because WPS handles this
+        # more reliably than stacked merged ranges.
         kpi_cards = [
-            ("A5:C8", "Total Students", total_students),
-            ("D5:F8", "Excellent", int(counts["Excellent"])),
-            ("G5:I8", "Good", int(counts["Good"])),
-            ("J5:L8", "Average", int(counts["Average"])),
-            ("M5:O8", "At Risk", int(counts["At Risk"])),
+            ("A5:C8", "TOTAL STUDENTS", total_students, "Students analysed"),
+            ("D5:F8", "EXCELLENT", int(counts["Excellent"]), "High performance"),
+            ("G5:I8", "GOOD", int(counts["Good"]), "Positive progress"),
+            ("J5:L8", "AVERAGE", int(counts["Average"]), "Academic guidance"),
+            ("M5:O8", "AT RISK", int(counts["At Risk"]), "Early intervention"),
         ]
 
-        for cell_range, label, value in kpi_cards:
+        for cell_range, label, value, subtitle in kpi_cards:
+            dashboard_sheet.merge_cells(cell_range)
             start_cell = cell_range.split(":")[0]
-            start_column = dashboard_sheet[start_cell].column
-            end_column = dashboard_sheet[cell_range.split(":")[1]].column
 
-            label_start = f"{get_column_letter(start_column)}5"
-            label_end = f"{get_column_letter(end_column)}6"
-            value_start = f"{get_column_letter(start_column)}7"
-            value_end = f"{get_column_letter(end_column)}8"
-
-            dashboard_sheet.merge_cells(f"{label_start}:{label_end}")
-            dashboard_sheet.merge_cells(f"{value_start}:{value_end}")
-
-            dashboard_sheet[label_start] = label.upper()
-            dashboard_sheet[value_start] = value
-
+            style_key = (
+                "Total Students"
+                if label == "TOTAL STUDENTS"
+                else label.title()
+            )
             fill = PatternFill(
                 "solid",
-                fgColor=card_styles[label]["fill"],
+                fgColor=card_styles[style_key]["fill"],
             )
-            font_colour = card_styles[label]["font"]
+            font_colour = card_styles[style_key]["font"]
 
-            for row in dashboard_sheet[
-                f"{get_column_letter(start_column)}5:"
-                f"{get_column_letter(end_column)}8"
-            ]:
-                for cell in row:
-                    cell.fill = fill
-                    cell.border = Border(
-                        left=Side(style="thin", color=dashboard_border),
-                        right=Side(style="thin", color=dashboard_border),
-                        top=Side(style="thin", color=dashboard_border),
-                        bottom=Side(style="thin", color=dashboard_border),
-                    )
-
-            dashboard_sheet[label_start].font = Font(
+            dashboard_sheet[start_cell] = (
+                f"{label}\n{value:,}\n{subtitle}"
+            )
+            dashboard_sheet[start_cell].fill = fill
+            dashboard_sheet[start_cell].font = Font(
                 color=font_colour,
                 bold=True,
-                size=10,
+                size=13,
             )
-            dashboard_sheet[label_start].alignment = Alignment(
+            dashboard_sheet[start_cell].alignment = Alignment(
                 horizontal="center",
                 vertical="center",
+                wrap_text=True,
             )
-            dashboard_sheet[value_start].font = Font(
-                color=font_colour,
-                bold=True,
-                size=20,
-            )
-            dashboard_sheet[value_start].alignment = Alignment(
-                horizontal="center",
-                vertical="center",
+            dashboard_sheet[start_cell].border = Border(
+                left=Side(style="medium", color=dashboard_border),
+                right=Side(style="medium", color=dashboard_border),
+                top=Side(style="medium", color=dashboard_border),
+                bottom=Side(style="medium", color=dashboard_border),
             )
 
         # Performance summary table.
@@ -1748,21 +1732,8 @@ def make_batch_excel_bytes(dataframe):
             )
         dashboard_sheet["E16"].number_format = "0%"
 
-        # Hidden source data for native Excel charts.
-        dashboard_sheet["N10"] = "Category"
-        dashboard_sheet["O10"] = "Students"
-
-        for row_index, category in enumerate(category_order, start=11):
-            dashboard_sheet.cell(
-                row=row_index,
-                column=14,
-                value=category,
-            )
-            dashboard_sheet.cell(
-                row=row_index,
-                column=15,
-                value=int(counts[category]),
-            )
+        # Charts use the visible Performance Summary table.
+        # This is more compatible with WPS than referencing hidden columns.
 
         # Pie chart in the centre.
         pie_chart = PieChart()
@@ -1773,15 +1744,15 @@ def make_batch_excel_bytes(dataframe):
 
         pie_data = Reference(
             dashboard_sheet,
-            min_col=15,
-            min_row=10,
-            max_row=14,
+            min_col=4,
+            min_row=11,
+            max_row=15,
         )
         pie_categories = Reference(
             dashboard_sheet,
-            min_col=14,
-            min_row=11,
-            max_row=14,
+            min_col=1,
+            min_row=12,
+            max_row=15,
         )
         pie_chart.add_data(
             pie_data,
@@ -1853,15 +1824,15 @@ def make_batch_excel_bytes(dataframe):
 
         bar_data = Reference(
             dashboard_sheet,
-            min_col=15,
-            min_row=10,
-            max_row=14,
+            min_col=4,
+            min_row=11,
+            max_row=15,
         )
         bar_categories = Reference(
             dashboard_sheet,
-            min_col=14,
-            min_row=11,
-            max_row=14,
+            min_col=1,
+            min_row=12,
+            max_row=15,
         )
         bar_chart.add_data(
             bar_data,
@@ -1875,17 +1846,13 @@ def make_batch_excel_bytes(dataframe):
             "A19",
         )
 
-        # Hide chart source columns while keeping charts operational.
-        dashboard_sheet.column_dimensions["N"].hidden = True
-        dashboard_sheet.column_dimensions["O"].hidden = True
-
         # Stable row heights.
         row_heights = {
             1: 30,
             2: 18,
             3: 24,
-            5: 20,
-            6: 20,
+            5: 24,
+            6: 24,
             7: 24,
             8: 24,
             10: 24,
