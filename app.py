@@ -150,9 +150,9 @@ st.markdown("""
 .sidebar-footer {
     position: fixed;
     left: 18px;
-    bottom: 18px;
+    bottom: 4px;
     width: calc(var(--sidebar-width) - 36px);
-    padding: 0.95rem 0.8rem 0.75rem;
+    padding: 0.80rem 0.8rem 0.35rem;
     border-top: 1px solid rgba(255,255,255,0.10);
     text-align: center;
     line-height: 1.55;
@@ -209,26 +209,35 @@ st.markdown("""
     border-radius: 28px;
     color: white;
     background:
-        radial-gradient(circle at 92% 12%, rgba(255,255,255,0.18), transparent 24%),
-        linear-gradient(135deg, #3b82f6 0%, #6366f1 52%, #8b5cf6 100%);
+        radial-gradient(
+            circle at 92% 12%,
+            rgba(99, 102, 241, 0.22),
+            transparent 28%
+        ),
+        linear-gradient(
+            135deg,
+            #0b1220 0%,
+            #111827 48%,
+            #172554 100%
+        );
     margin-bottom: 1.15rem;
     box-shadow:
-        0 24px 55px rgba(79, 70, 229, 0.26),
-        inset 0 1px 0 rgba(255,255,255,0.18);
+        0 22px 48px rgba(2, 6, 23, 0.30),
+        inset 0 1px 0 rgba(255,255,255,0.06);
     position: relative;
     overflow: hidden;
-    border: 1px solid rgba(255,255,255,0.14);
+    border: 1px solid rgba(255,255,255,0.08);
 }
 
 .hero:after {
     content: "";
     position: absolute;
-    width: 220px;
-    height: 220px;
+    width: 250px;
+    height: 250px;
     border-radius: 50%;
-    right: -70px;
-    top: -95px;
-    background: rgba(255,255,255,0.12);
+    right: -85px;
+    top: -105px;
+    background: rgba(99,102,241,0.18);
 }
 
 .hero h1 {
@@ -243,7 +252,7 @@ st.markdown("""
 .hero p {
     margin-top: .65rem;
     margin-bottom: 0;
-    color: #e0e7ff;
+    color: #cbd5e1;
     font-size: 0.90rem;
     position: relative;
     z-index: 1;
