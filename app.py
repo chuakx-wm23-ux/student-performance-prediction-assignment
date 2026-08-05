@@ -9,6 +9,8 @@ from openpyxl.styles import Alignment, Border, Font, PatternFill, Side
 from openpyxl.utils import get_column_letter
 from openpyxl.chart import BarChart, PieChart, Reference
 from openpyxl.chart.label import DataLabelList
+from openpyxl.chart.marker import DataPoint
+from openpyxl.chart.shapes import GraphicalProperties
 
 ROOT = Path(__file__).resolve().parent
 DATA = ROOT / "dataset" / "Student_data.csv"
@@ -1835,16 +1837,28 @@ def make_batch_excel_bytes(dataframe):
         )
 
         # Full-width bar chart below all summary content.
+        # Gridlines and automatic labels are removed because WPS may display
+        # repeated "Series1" text and heavy horizontal lines.
         bar_chart = BarChart()
         bar_chart.type = "col"
         bar_chart.style = 10
         bar_chart.title = "Students by Performance Category"
         bar_chart.y_axis.title = "Number of Students"
         bar_chart.x_axis.title = "Performance Category"
-        bar_chart.height = 5.8
-        bar_chart.width = 18.8
+        bar_chart.height = 5.3
+        bar_chart.width = 18.2
         bar_chart.legend = None
-        bar_chart.gapWidth = 85
+        bar_chart.gapWidth = 110
+        bar_chart.overlap = 0
+
+        # Remove distracting horizontal gridlines.
+        bar_chart.y_axis.majorGridlines = None
+
+        # Use a simple axis range appropriate for the student counts.
+        bar_chart.y_axis.scaling.min = 0
+        maximum_count = int(max(counts.max(), 1))
+        rounded_maximum = ((maximum_count + 49) // 50) * 50
+        bar_chart.y_axis.scaling.max = rounded_maximum
 
         bar_data = Reference(
             dashboard_sheet,
@@ -1863,9 +1877,27 @@ def make_batch_excel_bytes(dataframe):
             titles_from_data=False,
         )
         bar_chart.set_categories(bar_categories)
-        bar_chart.dataLabels = DataLabelList()
-        bar_chart.dataLabels.showVal = True
-        bar_chart.dataLabels.showSeriesName = False
+
+        # Do not add Excel data labels. WPS otherwise adds "Series1" before
+        # every category. The values remain available in the summary table.
+        bar_chart.dataLabels = None
+
+        # Apply a separate colour to every bar.
+        bar_colours = [
+            "22C55E",  # Excellent - green
+            "3B82F6",  # Good - blue
+            "F59E0B",  # Average - amber
+            "EF4444",  # At Risk - red
+        ]
+        if bar_chart.series:
+            bar_chart.series[0].dPt = []
+            for point_index, colour in enumerate(bar_colours):
+                data_point = DataPoint(idx=point_index)
+                data_point.graphicalProperties = GraphicalProperties(
+                    solidFill=colour,
+                )
+                bar_chart.series[0].dPt.append(data_point)
+
         dashboard_sheet.add_chart(
             bar_chart,
             "A19",
