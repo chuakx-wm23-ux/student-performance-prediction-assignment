@@ -3276,39 +3276,3 @@ else:
 """,
             unsafe_allow_html=True
         )
-
-    st.markdown("### 📚 Dataset Information")
-
-    info_col1, info_col2 = st.columns(2)
-
-    with info_col1:
-        st.markdown(
-            """
-<div class="about-card about-purple">
-    <h4>🗂️ Dataset Source</h4>
-    <div class="about-list-item">
-        University Student Performance & Habits Dataset from Kaggle
-    </div>
-    <h4 style="margin-top:14px;">🧩 Feature Engineering</h4>
-    <div class="about-list-item">Number of Subjects</div>
-    <div class="about-list-item">Average Score</div>
-</div>
-""",
-            unsafe_allow_html=True
-        )
-
-    with info_col2:
-        st.markdown(
-            """
-<div class="about-card about-orange">
-    <h4>⚠️ Important Note</h4>
-    <div class="about-list-item">
-        Final CGPA is used only during model training to generate the target class.
-    </div>
-    <div class="about-list-item">
-        It is not included as a prediction input because that would cause data leakage.
-    </div>
-</div>
-""",
-            unsafe_allow_html=True
-        )
