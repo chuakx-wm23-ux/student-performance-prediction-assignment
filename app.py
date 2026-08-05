@@ -3310,10 +3310,34 @@ elif page == "Dataset":
         )
         st.plotly_chart(fig, use_container_width=True)
 
+    st.markdown("### Complete Student Dataset")
+
+    dataset_info_col, dataset_download_col = st.columns([1, 2])
+
+    with dataset_info_col:
+        st.metric(
+            "Total Students",
+            f"{len(df):,}",
+        )
+
+    with dataset_download_col:
+        st.caption(
+            "Browse all student records below or download the complete dataset "
+            "as a CSV file."
+        )
+        st.download_button(
+            label="📥 Download Complete Dataset",
+            data=df.to_csv(index=False).encode("utf-8"),
+            file_name="student_performance_dataset.csv",
+            mime="text/csv",
+            use_container_width=True,
+        )
+
     st.dataframe(
-        df.head(100),
+        df,
         hide_index=True,
-        use_container_width=True
+        use_container_width=True,
+        height=700,
     )
 
 
