@@ -4,6 +4,8 @@ import joblib
 import pandas as pd
 import plotly.express as px
 import streamlit as st
+from openpyxl.styles import Alignment, Border, Font, PatternFill, Side
+from openpyxl.utils import get_column_letter
 
 ROOT = Path(__file__).resolve().parent
 DATA = ROOT / "dataset" / "Student_data.csv"
@@ -420,41 +422,322 @@ def load_models():
 
 
 def make_excel_bytes(dataframe):
+    """Create a clean, colour-coded Excel file for batch prediction results."""
+    export_df = dataframe.copy()
+
+    # Remove technical confidence/model metadata columns from the downloaded file.
+    columns_to_remove = [
+        column for column in export_df.columns
+        if "Confidence" in column or column == "Best_Model"
+    ]
+    export_df = export_df.drop(columns=columns_to_remove, errors="ignore")
+
+    preferred_columns = [
+        "Student_ID",
+        "Student_Name",
+        "Number_of_Subjects",
+        "Average_Score",
+        "Attendance_Pct",
+        "Study_Hours_Per_Day",
+        "Previous_CGPA",
+        "KNN_Prediction",
+        "SVM_Prediction",
+        "ANN_Prediction",
+        "Final_Prediction",
+    ]
+    ordered_columns = [
+        column for column in preferred_columns
+        if column in export_df.columns
+    ]
+    remaining_columns = [
+        column for column in export_df.columns
+        if column not in ordered_columns
+    ]
+    export_df = export_df[ordered_columns + remaining_columns]
+
+    friendly_headers = {
+        "Student_ID": "Student ID",
+        "Student_Name": "Student Name",
+        "Number_of_Subjects": "Number of Subjects",
+        "Average_Score": "Average Score",
+        "Attendance_Pct": "Attendance Rate (%)",
+        "Study_Hours_Per_Day": "Study Hours Per Day",
+        "Previous_CGPA": "Previous CGPA",
+        "KNN_Prediction": "KNN Prediction",
+        "SVM_Prediction": "SVM Prediction",
+        "ANN_Prediction": "ANN Prediction",
+        "Final_Prediction": "FINAL PREDICTION",
+    }
+    export_df = export_df.rename(columns=friendly_headers)
+
     output = BytesIO()
+
     with pd.ExcelWriter(output, engine="openpyxl") as writer:
-        dataframe.to_excel(writer, index=False, sheet_name="Prediction Results")
+        export_df.to_excel(
+            writer,
+            index=False,
+            sheet_name="Prediction Results",
+        )
+
+        workbook = writer.book
         worksheet = writer.sheets["Prediction Results"]
-        for column_cells in worksheet.columns:
-            max_length = max(len(str(cell.value)) if cell.value is not None else 0 for cell in column_cells)
-            worksheet.column_dimensions[column_cells[0].column_letter].width = min(max(max_length + 2, 12), 32)
+
+        # Reusable styles.
+        navy_fill = PatternFill("solid", fgColor="1E3A8A")
+        final_header_fill = PatternFill("solid", fgColor="5B21B6")
+        white_font = Font(color="FFFFFF", bold=True)
+        body_font = Font(color="172033")
+        thin_grey = Side(style="thin", color="D7DEE8")
+        cell_border = Border(
+            left=thin_grey,
+            right=thin_grey,
+            top=thin_grey,
+            bottom=thin_grey,
+        )
+
+        category_fills = {
+            "Excellent": PatternFill("solid", fgColor="DCFCE7"),
+            "Good": PatternFill("solid", fgColor="DBEAFE"),
+            "Average": PatternFill("solid", fgColor="FEF3C7"),
+            "At Risk": PatternFill("solid", fgColor="FEE2E2"),
+        }
+        category_fonts = {
+            "Excellent": Font(color="166534", bold=True),
+            "Good": Font(color="1D4ED8", bold=True),
+            "Average": Font(color="92400E", bold=True),
+            "At Risk": Font(color="B91C1C", bold=True),
+        }
+
+        # Header styling.
+        for cell in worksheet[1]:
+            cell.fill = (
+                final_header_fill
+                if cell.value == "FINAL PREDICTION"
+                else navy_fill
+            )
+            cell.font = white_font
+            cell.alignment = Alignment(
+                horizontal="center",
+                vertical="center",
+                wrap_text=True,
+            )
+            cell.border = cell_border
+
+        worksheet.row_dimensions[1].height = 30
         worksheet.freeze_panes = "A2"
         worksheet.auto_filter.ref = worksheet.dimensions
+        worksheet.sheet_view.showGridLines = False
+
+        # Identify key prediction columns.
+        header_lookup = {
+            cell.value: cell.column
+            for cell in worksheet[1]
+        }
+        final_prediction_col = header_lookup.get("FINAL PREDICTION")
+        prediction_headers = {
+            "KNN Prediction",
+            "SVM Prediction",
+            "ANN Prediction",
+            "FINAL PREDICTION",
+        }
+
+        # Body styling with alternating rows.
+        for row_index in range(2, worksheet.max_row + 1):
+            alternate_fill = (
+                PatternFill("solid", fgColor="F8FAFC")
+                if row_index % 2 == 0
+                else PatternFill("solid", fgColor="FFFFFF")
+            )
+
+            for cell in worksheet[row_index]:
+                cell.fill = alternate_fill
+                cell.font = body_font
+                cell.border = cell_border
+                cell.alignment = Alignment(
+                    horizontal="center",
+                    vertical="center",
+                )
+
+                column_header = worksheet.cell(
+                    row=1,
+                    column=cell.column,
+                ).value
+
+                if column_header == "Student Name":
+                    cell.alignment = Alignment(
+                        horizontal="left",
+                        vertical="center",
+                    )
+
+                if column_header in prediction_headers:
+                    category = str(cell.value)
+                    if category in category_fills:
+                        cell.fill = category_fills[category]
+                        cell.font = category_fonts[category]
+
+            # Make Final Prediction the visual focus.
+            if final_prediction_col is not None:
+                final_cell = worksheet.cell(
+                    row=row_index,
+                    column=final_prediction_col,
+                )
+                final_cell.border = Border(
+                    left=Side(style="medium", color="7C3AED"),
+                    right=Side(style="medium", color="7C3AED"),
+                    top=thin_grey,
+                    bottom=thin_grey,
+                )
+
+        # Friendly numeric formats.
+        for header, number_format in {
+            "Average Score": "0.00",
+            "Attendance Rate (%)": "0.0",
+            "Study Hours Per Day": "0.0",
+            "Previous CGPA": "0.00",
+        }.items():
+            column_index = header_lookup.get(header)
+            if column_index:
+                for row_index in range(2, worksheet.max_row + 1):
+                    worksheet.cell(
+                        row=row_index,
+                        column=column_index,
+                    ).number_format = number_format
+
+        # Sensible widths.
+        width_map = {
+            "Student ID": 14,
+            "Student Name": 22,
+            "Number of Subjects": 18,
+            "Average Score": 15,
+            "Attendance Rate (%)": 19,
+            "Study Hours Per Day": 21,
+            "Previous CGPA": 15,
+            "KNN Prediction": 17,
+            "SVM Prediction": 17,
+            "ANN Prediction": 17,
+            "FINAL PREDICTION": 21,
+        }
+
+        for column_index in range(1, worksheet.max_column + 1):
+            header = worksheet.cell(row=1, column=column_index).value
+            worksheet.column_dimensions[
+                get_column_letter(column_index)
+            ].width = width_map.get(header, 16)
+
+        # Add a compact summary sheet only for completed prediction output.
+        if "FINAL PREDICTION" in export_df.columns:
+            summary_sheet = workbook.create_sheet("Summary")
+            summary_sheet.sheet_view.showGridLines = False
+
+            summary_sheet.merge_cells("A1:D1")
+            summary_sheet["A1"] = "Batch Prediction Summary"
+            summary_sheet["A1"].fill = navy_fill
+            summary_sheet["A1"].font = Font(
+                color="FFFFFF",
+                bold=True,
+                size=16,
+            )
+            summary_sheet["A1"].alignment = Alignment(
+                horizontal="center",
+                vertical="center",
+            )
+            summary_sheet.row_dimensions[1].height = 32
+
+            summary_sheet["A3"] = "Performance Category"
+            summary_sheet["B3"] = "Number of Students"
+            summary_sheet["C3"] = "Percentage"
+            summary_sheet["D3"] = "Recommended Action"
+
+            for cell in summary_sheet[3]:
+                cell.fill = final_header_fill
+                cell.font = white_font
+                cell.alignment = Alignment(horizontal="center")
+                cell.border = cell_border
+
+            category_order = [
+                "Excellent",
+                "Good",
+                "Average",
+                "At Risk",
+            ]
+            counts = (
+                export_df["FINAL PREDICTION"]
+                .value_counts()
+                .reindex(category_order, fill_value=0)
+            )
+            total_students = len(export_df)
+
+            recommendations = {
+                "Excellent": "Maintain strong performance",
+                "Good": "Continue current progress",
+                "Average": "Provide academic guidance",
+                "At Risk": "Early intervention required",
+            }
+
+            for offset, category in enumerate(category_order, start=4):
+                count = int(counts[category])
+                percentage = (
+                    count / total_students
+                    if total_students
+                    else 0
+                )
+
+                summary_sheet.cell(offset, 1, category)
+                summary_sheet.cell(offset, 2, count)
+                summary_sheet.cell(offset, 3, percentage)
+                summary_sheet.cell(
+                    offset,
+                    4,
+                    recommendations[category],
+                )
+
+                for column_index in range(1, 5):
+                    cell = summary_sheet.cell(
+                        offset,
+                        column_index,
+                    )
+                    cell.border = cell_border
+                    cell.alignment = Alignment(
+                        horizontal=(
+                            "left"
+                            if column_index == 4
+                            else "center"
+                        ),
+                        vertical="center",
+                    )
+
+                summary_sheet.cell(offset, 1).fill = category_fills[category]
+                summary_sheet.cell(offset, 1).font = category_fonts[category]
+                summary_sheet.cell(offset, 3).number_format = "0.0%"
+
+            summary_sheet["A9"] = "Total Students"
+            summary_sheet["B9"] = total_students
+            summary_sheet["A9"].font = Font(bold=True)
+            summary_sheet["B9"].font = Font(bold=True)
+
+            summary_sheet.column_dimensions["A"].width = 24
+            summary_sheet.column_dimensions["B"].width = 20
+            summary_sheet.column_dimensions["C"].width = 16
+            summary_sheet.column_dimensions["D"].width = 32
+            summary_sheet.freeze_panes = "A3"
+
     output.seek(0)
     return output.getvalue()
 
 
 def make_template_bytes():
-    template = pd.DataFrame([
-        {
-            "Student_ID": "ID0001",
-            "Student_Name": "Example Student",
-            "Number_of_Subjects": 5,
-            "Average_Score": 75.0,
-            "Attendance_Pct": 85.0,
-            "Study_Hours_Per_Day": 3.0,
-            "Previous_CGPA": 3.20,
-        },
-        {
-            "Student_ID": "ID0002",
-            "Student_Name": "Example Student 2",
-            "Number_of_Subjects": 6,
-            "Average_Score": 62.5,
-            "Attendance_Pct": 72.0,
-            "Study_Hours_Per_Day": 2.0,
-            "Previous_CGPA": 2.60,
-        },
-    ])
-    return make_excel_bytes(template)
+    template_file = (
+        ROOT
+        / "template"
+        / "student_batch_prediction_template.xlsx"
+    )
+
+    if not template_file.exists():
+        raise FileNotFoundError(
+            "Batch prediction template was not found in the template folder."
+        )
+
+    return template_file.read_bytes()
 
 
 def validate_batch_data(batch_df):
@@ -647,10 +930,10 @@ elif page == "Prediction":
 
         with button_col1:
             st.download_button(
-                "⬇️ Download Result",
-                saved["report_csv"],
-                "prediction_result.csv",
-                "text/csv",
+                "⬇️ Download Result Excel",
+                data=saved["report_excel"],
+                file_name="individual_prediction_result.xlsx",
+                mime="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
                 use_container_width=True
             )
 
@@ -759,17 +1042,25 @@ elif page == "Prediction":
             result_df = pd.DataFrame(predictions)
             best_row = result_df[result_df["Model"] == best_name].iloc[0]
 
+            prediction_lookup = {
+                row["Model"]: row["Prediction"]
+                for _, row in result_df.iterrows()
+            }
+
             report = pd.DataFrame([{
-                "Student Name": name,
-                "Student ID": student_id,
-                "Number of Subjects": number_of_subjects,
-                "Average Score": average_score,
-                "Attendance Rate": attendance,
-                "Study Hours Per Day": study_hours,
-                "Previous CGPA": previous_cgpa,
-                "Prediction": best_row["Prediction"],
-                "Best Model": best_name,
-                "Confidence": best_row["Confidence"],
+                "Student_ID": student_id,
+                "Student_Name": name,
+                "Number_of_Subjects": number_of_subjects,
+                "Average_Score": average_score,
+                "Attendance_Pct": attendance,
+                "Study_Hours_Per_Day": study_hours,
+                "Previous_CGPA": previous_cgpa,
+                "KNN_Prediction": prediction_lookup.get("KNN", ""),
+                "SVM_Prediction": prediction_lookup.get("SVM", ""),
+                "ANN_Prediction": prediction_lookup.get("ANN", ""),
+                "Final_Prediction": best_row["Prediction"],
+                "Best_Model": best_name,
+                "Final_Confidence": best_row["Confidence"],
             }])
 
             st.session_state["prediction_result"] = {
@@ -777,7 +1068,7 @@ elif page == "Prediction":
                 "confidence": float(best_row["Confidence"]),
                 "best_model": best_name,
                 "result_df": result_df,
-                "report_csv": report.to_csv(index=False).encode("utf-8"),
+                "report_excel": make_excel_bytes(report),
             }
 
             st.rerun()
