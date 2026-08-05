@@ -1849,7 +1849,6 @@ def make_batch_excel_bytes(dataframe):
         # A rendered image is embedded instead of a native Excel chart because
         # WPS may add unwanted "Series1" labels to native chart data labels.
         pie_buffer = BytesIO()
-        pie_values = [int(counts[category]) for category in category_order]
         pie_colours = ["#22C55E", "#3B82F6", "#F59E0B", "#EF4444"]
 
         fig, ax = plt.subplots(
@@ -1860,7 +1859,7 @@ def make_batch_excel_bytes(dataframe):
         fig.patch.set_edgecolor("#C9D3E6")
         fig.patch.set_linewidth(2.2)
         wedges, texts, autotexts = ax.pie(
-            pie_values,
+            [int(counts[category]) for category in category_order],
             labels=None,
             autopct="%1.0f%%",
             startangle=90,
@@ -1911,15 +1910,15 @@ def make_batch_excel_bytes(dataframe):
         pie_buffer.seek(0)
 
         pie_image = XLImage(pie_buffer)
-        pie_image.width = 405
-        pie_image.height = 250
+        pie_image.width = 420
+        pie_image.height = 260
         dashboard_sheet.add_image(
             pie_image,
-            "F11",
+            "G10",
         )
 
         # Recommended-action panel on the right.
-        dashboard_sheet.merge_cells("K11:O18")
+        dashboard_sheet.merge_cells("J10:N17")
         at_risk_count = int(counts["At Risk"])
 
         if at_risk_count > 0:
@@ -1940,22 +1939,22 @@ def make_batch_excel_bytes(dataframe):
             recommendation_fill = "DCFCE7"
             recommendation_colour = "166534"
 
-        dashboard_sheet["K11"] = recommendation_text
-        dashboard_sheet["K11"].fill = PatternFill(
+        dashboard_sheet["J10"] = recommendation_text
+        dashboard_sheet["J10"].fill = PatternFill(
             "solid",
             fgColor=recommendation_fill,
         )
-        dashboard_sheet["K11"].font = Font(
+        dashboard_sheet["J10"].font = Font(
             color=recommendation_colour,
             bold=True,
             size=12,
         )
-        dashboard_sheet["K11"].alignment = Alignment(
+        dashboard_sheet["J10"].alignment = Alignment(
             horizontal="center",
             vertical="center",
             wrap_text=True,
         )
-        dashboard_sheet["K11"].border = Border(
+        dashboard_sheet["J10"].border = Border(
             left=Side(style="medium", color=recommendation_colour),
             right=Side(style="medium", color=recommendation_colour),
             top=Side(style="medium", color=recommendation_colour),
@@ -2402,6 +2401,15 @@ if page == "Home":
         title="Model Performance Comparison",
         height=420
     )
+    fig.update_layout(
+        title=dict(
+            x=0.5,
+            xanchor="center",
+            y=0.96,
+            yanchor="top",
+        ),
+        margin=dict(l=20, r=20, t=75, b=20),
+    )
 
     st.plotly_chart(fig, use_container_width=True)
 
@@ -2819,7 +2827,16 @@ elif page == "Prediction" and st.session_state.get("prediction_mode") == "batch"
             category_orders={"Performance Category": order},
         )
         fig.update_traces(textposition="outside")
-        fig.update_layout(title_x=0.5, height=390)
+        fig.update_layout(
+            title=dict(
+                x=0.5,
+                xanchor="center",
+                y=0.96,
+                yanchor="top",
+            ),
+            height=390,
+            margin=dict(l=20, r=20, t=75, b=20),
+        )
         st.plotly_chart(fig, use_container_width=True)
 
         display_df = result_df.copy()
@@ -2841,9 +2858,14 @@ elif page == "Prediction" and st.session_state.get("prediction_mode") == "batch"
             )
             bar_fig.update_traces(textposition="outside")
             bar_fig.update_layout(
-                title_x=0.5,
+                title=dict(
+                    x=0.5,
+                    xanchor="center",
+                    y=0.96,
+                    yanchor="top",
+                ),
                 height=390,
-                margin=dict(l=20, r=20, t=65, b=20),
+                margin=dict(l=20, r=20, t=75, b=20),
             )
             st.plotly_chart(bar_fig, use_container_width=True)
 
@@ -2856,9 +2878,14 @@ elif page == "Prediction" and st.session_state.get("prediction_mode") == "batch"
                 hole=0.42,
             )
             pie_fig.update_layout(
-                title_x=0.5,
+                title=dict(
+                    x=0.5,
+                    xanchor="center",
+                    y=0.96,
+                    yanchor="top",
+                ),
                 height=390,
-                margin=dict(l=20, r=20, t=65, b=20),
+                margin=dict(l=20, r=20, t=75, b=20),
             )
             st.plotly_chart(pie_fig, use_container_width=True)
 
@@ -3037,9 +3064,14 @@ elif page == "Model Results":
         range=[0, min(1.0, float(evaluation["Accuracy"].max()) + 0.12)]
     )
     accuracy_fig.update_layout(
-        title_x=0.5,
+        title=dict(
+            x=0.5,
+            xanchor="center",
+            y=0.96,
+            yanchor="top",
+        ),
         height=420,
-        margin=dict(l=20, r=20, t=70, b=20)
+        margin=dict(l=20, r=20, t=75, b=20)
     )
     st.plotly_chart(accuracy_fig, use_container_width=True)
 
@@ -3098,9 +3130,14 @@ elif page == "Model Results":
                 range=[0, 1.05]
             )
             model_fig.update_layout(
-                title_x=0.5,
+                title=dict(
+                    x=0.5,
+                    xanchor="center",
+                    y=0.96,
+                    yanchor="top",
+                ),
                 height=390,
-                margin=dict(l=20, r=20, t=70, b=20)
+                margin=dict(l=20, r=20, t=75, b=20)
             )
             st.plotly_chart(model_fig, use_container_width=True)
 
@@ -3147,6 +3184,15 @@ elif page == "Dataset":
             nbins=25,
             title="Average Score Distribution"
         )
+        fig.update_layout(
+            title=dict(
+                x=0.5,
+                xanchor="center",
+                y=0.96,
+                yanchor="top",
+            ),
+            margin=dict(l=20, r=20, t=75, b=20),
+        )
         st.plotly_chart(fig, use_container_width=True)
 
     with c2:
@@ -3156,6 +3202,15 @@ elif page == "Dataset":
             y="Average_Score",
             color="Performance_Category",
             title="Attendance vs Average Score"
+        )
+        fig.update_layout(
+            title=dict(
+                x=0.5,
+                xanchor="center",
+                y=0.96,
+                yanchor="top",
+            ),
+            margin=dict(l=20, r=20, t=75, b=20),
         )
         st.plotly_chart(fig, use_container_width=True)
 
