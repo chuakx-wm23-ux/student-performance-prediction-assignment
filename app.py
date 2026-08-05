@@ -1157,7 +1157,7 @@ def make_batch_excel_bytes(dataframe):
         - KNN, SVM and ANN predictions for detailed checking
 
     Sheet 3: Executive Dashboard
-        - KPI cards, native Excel  chart and bar chart
+        - KPI cards, native Excel pie chart and bar chart
 
     Sheet 4: Summary
         - Category totals, percentages and recommended actions
@@ -1845,7 +1845,7 @@ def make_batch_excel_bytes(dataframe):
         # Charts use the visible Performance Summary table.
         # This is more compatible with WPS than referencing hidden columns.
 
-        #  chart in the centre.
+        # Pie chart in the centre.
         # A rendered image is embedded instead of a native Excel chart because
         # WPS may add unwanted "Series1" labels to native chart data labels.
         pie_buffer = BytesIO()
@@ -1860,11 +1860,11 @@ def make_batch_excel_bytes(dataframe):
         fig.patch.set_edgecolor("#C9D3E6")
         fig.patch.set_linewidth(2.2)
         wedges, texts, autotexts = ax.pie(
-            _values,
+            pie_values,
             labels=None,
             autopct="%1.0f%%",
             startangle=90,
-            colors=_colours,
+            colors=pie_colours,
             pctdistance=0.70,
             wedgeprops={
                 "linewidth": 1.2,
@@ -1911,8 +1911,8 @@ def make_batch_excel_bytes(dataframe):
         pie_buffer.seek(0)
 
         pie_image = XLImage(pie_buffer)
-        pie_image.width = 420
-        pie_image.height = 251
+        pie_image.width = 405
+        pie_image.height = 250
         dashboard_sheet.add_image(
             pie_image,
             "F11",
