@@ -1345,6 +1345,7 @@ def make_batch_excel_bytes(dataframe):
             cell.alignment = Alignment(
                 horizontal="center",
                 vertical="center",
+                wrap_text=True,
             )
             cell.border = Border(
                 left=thin_grey,
@@ -1353,32 +1354,13 @@ def make_batch_excel_bytes(dataframe):
                 bottom=thin_grey,
             )
 
-        for row_index, category in enumerate(
-            category_order,
-            start=11,
-        ):
+        for row_index, category in enumerate(category_order, start=11):
             count = int(counts[category])
-            percentage = (
-                count / total_students
-                if total_students
-                else 0
-            )
+            percentage = count / total_students if total_students else 0
 
-            dashboard_sheet.cell(
-                row=row_index,
-                column=1,
-                value=category,
-            )
-            dashboard_sheet.cell(
-                row=row_index,
-                column=2,
-                value=count,
-            )
-            dashboard_sheet.cell(
-                row=row_index,
-                column=3,
-                value=percentage,
-            )
+            dashboard_sheet.cell(row=row_index, column=1, value=category)
+            dashboard_sheet.cell(row=row_index, column=2, value=count)
+            dashboard_sheet.cell(row=row_index, column=3, value=percentage)
 
             for column_index in range(1, 4):
                 cell = dashboard_sheet.cell(
@@ -1409,11 +1391,11 @@ def make_batch_excel_bytes(dataframe):
                 column=3,
             ).number_format = "0.0%"
 
-        # Pie chart.
+        # Pie chart - upper-right, compact enough to avoid overlap.
         pie_chart = PieChart()
         pie_chart.title = "Prediction Distribution"
-        pie_chart.height = 8.5
-        pie_chart.width = 11.5
+        pie_chart.height = 7.2
+        pie_chart.width = 10.2
 
         pie_data = Reference(
             dashboard_sheet,
@@ -1427,29 +1409,25 @@ def make_batch_excel_bytes(dataframe):
             min_row=11,
             max_row=14,
         )
-        pie_chart.add_data(
-            pie_data,
-            titles_from_data=True,
-        )
+        pie_chart.add_data(pie_data, titles_from_data=True)
         pie_chart.set_categories(pie_labels)
         pie_chart.legend.position = "r"
         pie_chart.dataLabels = DataLabelList()
         pie_chart.dataLabels.showPercent = True
+        pie_chart.dataLabels.showCategoryName = False
+        pie_chart.dataLabels.showSeriesName = False
         pie_chart.dataLabels.showLeaderLines = True
-        dashboard_sheet.add_chart(
-            pie_chart,
-            "E10",
-        )
+        dashboard_sheet.add_chart(pie_chart, "E9")
 
-        # Bar chart.
+        # Bar chart - lower-left.
         bar_chart = BarChart()
         bar_chart.type = "col"
         bar_chart.style = 10
         bar_chart.title = "Students by Performance Category"
-        bar_chart.y_axis.title = "Number of Students"
+        bar_chart.y_axis.title = "Students"
         bar_chart.x_axis.title = "Performance Category"
-        bar_chart.height = 8.5
-        bar_chart.width = 13.5
+        bar_chart.height = 7.3
+        bar_chart.width = 11.2
         bar_chart.legend = None
 
         bar_data = Reference(
@@ -1464,25 +1442,19 @@ def make_batch_excel_bytes(dataframe):
             min_row=11,
             max_row=14,
         )
-        bar_chart.add_data(
-            bar_data,
-            titles_from_data=True,
-        )
+        bar_chart.add_data(bar_data, titles_from_data=True)
         bar_chart.set_categories(bar_categories)
         bar_chart.dataLabels = DataLabelList()
         bar_chart.dataLabels.showVal = True
-        dashboard_sheet.add_chart(
-            bar_chart,
-            "A17",
-        )
+        dashboard_sheet.add_chart(bar_chart, "A18")
 
-        # Academic recommendation panel.
-        dashboard_sheet.merge_cells("H17:L21")
+        # Academic recommendation panel - lower-right and fully visible.
+        dashboard_sheet.merge_cells("H19:L25")
         at_risk_count = int(counts["At Risk"])
 
         if at_risk_count > 0:
             recommendation_text = (
-                f"{at_risk_count:,} student(s) were classified as At Risk.\n"
+                f"{at_risk_count:,} student(s) were classified as At Risk.\n\n"
                 "Early academic intervention and continuous monitoring "
                 "are recommended."
             )
@@ -1490,31 +1462,30 @@ def make_batch_excel_bytes(dataframe):
             recommendation_color = "B91C1C"
         else:
             recommendation_text = (
-                "No students were classified as At Risk.\n"
+                "No students were classified as At Risk.\n\n"
                 "Continue monitoring academic progress."
             )
             recommendation_fill = "DCFCE7"
             recommendation_color = "166534"
 
-        dashboard_sheet["H17"] = (
-            "Recommended Action\n\n"
-            + recommendation_text
+        dashboard_sheet["H19"] = (
+            "RECOMMENDED ACTION\n\n" + recommendation_text
         )
-        dashboard_sheet["H17"].fill = PatternFill(
+        dashboard_sheet["H19"].fill = PatternFill(
             "solid",
             fgColor=recommendation_fill,
         )
-        dashboard_sheet["H17"].font = Font(
+        dashboard_sheet["H19"].font = Font(
             color=recommendation_color,
             bold=True,
-            size=12,
+            size=11,
         )
-        dashboard_sheet["H17"].alignment = Alignment(
+        dashboard_sheet["H19"].alignment = Alignment(
             horizontal="center",
             vertical="center",
             wrap_text=True,
         )
-        dashboard_sheet["H17"].border = Border(
+        dashboard_sheet["H19"].border = Border(
             left=purple_side,
             right=purple_side,
             top=purple_side,
@@ -1522,17 +1493,41 @@ def make_batch_excel_bytes(dataframe):
         )
 
         # Dashboard sizing and print settings.
-        for column_letter in "ABCDEFGHIJKL":
-            dashboard_sheet.column_dimensions[column_letter].width = 13
+        dashboard_widths = {
+            "A": 18,
+            "B": 14,
+            "C": 14,
+            "D": 3,
+            "E": 13,
+            "F": 13,
+            "G": 13,
+            "H": 13,
+            "I": 13,
+            "J": 13,
+            "K": 13,
+            "L": 13,
+        }
+        for column_letter, width in dashboard_widths.items():
+            dashboard_sheet.column_dimensions[column_letter].width = width
 
-        dashboard_sheet.row_dimensions[5].height = 24
-        dashboard_sheet.row_dimensions[6].height = 24
-        dashboard_sheet.row_dimensions[7].height = 24
+        for row_number in range(1, 36):
+            dashboard_sheet.row_dimensions[row_number].height = 21
+
+        dashboard_sheet.row_dimensions[1].height = 30
+        dashboard_sheet.row_dimensions[2].height = 15
+        dashboard_sheet.row_dimensions[3].height = 24
+        dashboard_sheet.row_dimensions[5].height = 25
+        dashboard_sheet.row_dimensions[6].height = 25
+        dashboard_sheet.row_dimensions[7].height = 25
+        dashboard_sheet.row_dimensions[19].height = 28
+
         dashboard_sheet.freeze_panes = "A4"
         dashboard_sheet.page_setup.orientation = "landscape"
         dashboard_sheet.page_setup.fitToWidth = 1
+        dashboard_sheet.page_setup.fitToHeight = 1
         dashboard_sheet.sheet_properties.pageSetUpPr.fitToPage = True
         dashboard_sheet.print_area = "A1:L34"
+        dashboard_sheet.sheet_view.zoomScale = 85
 
         # Sheet 4: executive summary.
         summary_sheet = workbook.create_sheet("Summary")
