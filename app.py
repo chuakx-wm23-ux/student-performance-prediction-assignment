@@ -37,10 +37,22 @@ st.markdown("""
 
 .stApp {
     background:
-        radial-gradient(circle at top right, rgba(124, 58, 237, 0.08), transparent 30%),
-        radial-gradient(circle at top left, rgba(37, 99, 235, 0.08), transparent 28%),
-        #f4f7fb;
+        radial-gradient(circle at 92% 8%, rgba(124, 58, 237, 0.20), transparent 28%),
+        radial-gradient(circle at 8% 88%, rgba(59, 130, 246, 0.16), transparent 30%),
+        radial-gradient(circle at 45% 38%, rgba(14, 165, 233, 0.08), transparent 34%),
+        linear-gradient(180deg, #f9fbff 0%, #eef4ff 48%, #f8fafc 100%);
+    background-size: 150% 150%;
+    animation: ambientShift 18s ease-in-out infinite alternate;
     color: var(--text);
+}
+
+@keyframes ambientShift {
+    0% {
+        background-position: 0% 0%;
+    }
+    100% {
+        background-position: 100% 100%;
+    }
 }
 
 .block-container {
@@ -54,8 +66,10 @@ st.markdown("""
     width: var(--sidebar-width) !important;
     min-width: var(--sidebar-width) !important;
     background:
-        linear-gradient(180deg, #0f172a 0%, #111c35 58%, #172554 100%);
+        radial-gradient(circle at 15% 8%, rgba(99, 102, 241, 0.24), transparent 26%),
+        linear-gradient(180deg, #0b1220 0%, #111827 48%, #172554 100%);
     border-right: 1px solid rgba(255,255,255,0.08);
+    box-shadow: 10px 0 40px rgba(2, 6, 23, 0.18);
 }
 
 [data-testid="stSidebar"] > div:first-child {
@@ -111,15 +125,19 @@ st.markdown("""
 
 /* Main hero */
 .hero {
-    padding: 1.2rem 1.4rem;
-    border-radius: 24px;
+    padding: 1.1rem 1.35rem;
+    border-radius: 28px;
     color: white;
     background:
-        linear-gradient(120deg, rgba(30,58,138,0.98), rgba(37,99,235,0.96), rgba(124,58,237,0.96));
-    margin-bottom: 1.5rem;
-    box-shadow: 0 22px 55px rgba(37, 99, 235, 0.20);
+        radial-gradient(circle at 92% 12%, rgba(255,255,255,0.18), transparent 24%),
+        linear-gradient(135deg, #2563eb 0%, #4f46e5 52%, #7c3aed 100%);
+    margin-bottom: 1.15rem;
+    box-shadow:
+        0 24px 55px rgba(79, 70, 229, 0.26),
+        inset 0 1px 0 rgba(255,255,255,0.18);
     position: relative;
     overflow: hidden;
+    border: 1px solid rgba(255,255,255,0.14);
 }
 
 .hero:after {
@@ -624,6 +642,146 @@ h1, h2, h3 {
 @media (max-width: 900px) {
     .why-grid {
         grid-template-columns: repeat(2, 1fr);
+    }
+}
+
+/* Premium Glass Surfaces */
+[data-testid="stMetric"],
+[data-testid="stForm"],
+[data-testid="stDataFrame"],
+[data-testid="stPlotlyChart"],
+.cgpa-guide,
+.about-card,
+.about-hero,
+.batch-card,
+.why-system,
+.prediction-mode-card {
+    background: rgba(255,255,255,0.82) !important;
+    backdrop-filter: blur(16px);
+    -webkit-backdrop-filter: blur(16px);
+    border: 1px solid rgba(255,255,255,0.72) !important;
+    box-shadow:
+        0 18px 42px rgba(15,23,42,0.08),
+        inset 0 1px 0 rgba(255,255,255,0.80);
+}
+
+/* Inputs */
+[data-testid="stTextInput"] input,
+[data-testid="stNumberInput"] input,
+[data-testid="stFileUploader"] section,
+[data-baseweb="select"] > div {
+    border-radius: 14px !important;
+    border: 1px solid #dbe4f0 !important;
+    background: rgba(255,255,255,0.90) !important;
+    transition: border-color .18s ease, box-shadow .18s ease, transform .18s ease;
+}
+
+[data-testid="stTextInput"] input:focus,
+[data-testid="stNumberInput"] input:focus,
+[data-baseweb="select"] > div:focus-within {
+    border-color: #2563eb !important;
+    box-shadow: 0 0 0 4px rgba(37,99,235,0.14) !important;
+}
+
+/* Primary buttons */
+.stButton > button,
+[data-testid="stFormSubmitButton"] > button {
+    border-radius: 15px !important;
+    background: linear-gradient(135deg, #2563eb 0%, #4f46e5 52%, #7c3aed 100%) !important;
+    border: 1px solid rgba(255,255,255,0.18) !important;
+    box-shadow: 0 14px 28px rgba(79,70,229,0.24) !important;
+}
+
+.stButton > button:hover,
+[data-testid="stFormSubmitButton"] > button:hover {
+    transform: translateY(-3px) scale(1.01) !important;
+    box-shadow: 0 18px 34px rgba(79,70,229,0.30) !important;
+}
+
+/* Download buttons */
+.stDownloadButton > button {
+    border-radius: 15px !important;
+    background: linear-gradient(135deg, #10b981 0%, #059669 100%) !important;
+    color: white !important;
+    border: 1px solid rgba(255,255,255,0.18) !important;
+    box-shadow: 0 14px 28px rgba(16,185,129,0.22) !important;
+}
+
+.stDownloadButton > button:hover {
+    transform: translateY(-3px) scale(1.01) !important;
+    box-shadow: 0 18px 34px rgba(5,150,105,0.28) !important;
+}
+
+/* Sidebar navigation */
+[data-testid="stSidebar"] div[role="radiogroup"] label {
+    background: rgba(255,255,255,0.05);
+    border: 1px solid rgba(255,255,255,0.07);
+    box-shadow: inset 0 1px 0 rgba(255,255,255,0.03);
+}
+
+[data-testid="stSidebar"] div[role="radiogroup"] label:hover {
+    background: rgba(255,255,255,0.10);
+    border-color: rgba(255,255,255,0.12);
+    transform: translateX(4px);
+}
+
+[data-testid="stSidebar"] div[role="radiogroup"] label:has(input:checked) {
+    background: linear-gradient(135deg, #2563eb 0%, #7c3aed 100%);
+    box-shadow: 0 12px 28px rgba(79,70,229,0.30);
+}
+
+/* Premium KPI cards */
+[data-testid="stMetric"] {
+    border-radius: 20px !important;
+    transition: transform .18s ease, box-shadow .18s ease;
+}
+
+[data-testid="stMetric"]:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 22px 48px rgba(37,99,235,0.14) !important;
+}
+
+/* Smooth page entrance */
+.block-container {
+    animation: pageFade .45s ease-out;
+}
+
+@keyframes pageFade {
+    from {
+        opacity: 0;
+        transform: translateY(8px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* Soft scrollbar */
+::-webkit-scrollbar {
+    width: 10px;
+    height: 10px;
+}
+
+::-webkit-scrollbar-track {
+    background: rgba(226,232,240,0.55);
+}
+
+::-webkit-scrollbar-thumb {
+    background: linear-gradient(180deg, #94a3b8, #64748b);
+    border-radius: 999px;
+    border: 2px solid rgba(248,250,252,0.90);
+}
+
+/* Reduce motion for accessibility */
+@media (prefers-reduced-motion: reduce) {
+    .stApp,
+    .block-container {
+        animation: none !important;
+    }
+
+    * {
+        transition: none !important;
     }
 }
 
