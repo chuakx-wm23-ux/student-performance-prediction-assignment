@@ -3084,11 +3084,30 @@ elif page == "Prediction" and st.session_state.get("prediction_mode") == "batch"
             f"Showing {len(filtered_df):,} of {len(display_df):,} predicted records."
         )
 
-        st.dataframe(
-            filtered_df,
-            hide_index=True,
-            use_container_width=True,
-        )
+        # Keep the report download controls visible above the large results table.
+        # This is especially important for mobile users and batches with thousands
+        # of records, where the table would otherwise push the buttons far below.
+        download_col, clear_col = st.columns(2)
+
+        with download_col:
+            st.download_button(
+                "⬇️ Download Predicted Excel",
+                data=make_batch_excel_bytes(result_df),
+                file_name="student_batch_predictions.xlsx",
+                mime="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+                use_container_width=True,
+                key="download_batch_prediction_excel",
+            )
+
+        with clear_col:
+            if st.button(
+                "↻ Upload Another File",
+                type="secondary",
+                use_container_width=True,
+                key="clear_batch_prediction_result",
+            ):
+                del st.session_state["batch_prediction_result"]
+                st.rerun()
 
         low_confidence_count = int(
             (result_df["Final_Confidence"] < 0.60).sum()
@@ -3100,25 +3119,12 @@ elif page == "Prediction" and st.session_state.get("prediction_mode") == "batch"
                 "These records may require lecturer review."
             )
 
-        download_col, clear_col = st.columns(2)
-
-        with download_col:
-            st.download_button(
-                "⬇️ Download Predicted Excel",
-                data=make_batch_excel_bytes(result_df),
-                file_name="student_batch_predictions.xlsx",
-                mime="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
-                use_container_width=True,
-            )
-
-        with clear_col:
-            if st.button(
-                "↻ Upload Another File",
-                type="secondary",
-                use_container_width=True,
-            ):
-                del st.session_state["batch_prediction_result"]
-                st.rerun()
+        st.dataframe(
+            filtered_df,
+            hide_index=True,
+            use_container_width=True,
+            height=620,
+        )
 
 
 elif page == "Model Results":
