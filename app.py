@@ -3277,15 +3277,15 @@ elif page == "Model Results":
 
 
 elif page == "Correlation Analysis":
-    st.subheader("Correlation Analysis")
+    st.subheader("Feature Correlation & Relevance Analysis")
 
     st.markdown(
         """
 <div class="about-hero">
     <div class="about-hero-title">🔗 Feature Correlation Analysis</div>
     <div class="about-hero-subtitle">
-        Examine relationships across the original numerical dataset and then focus
-        on the five features selected for student performance prediction.
+        Explore how available student attributes are associated with academic performance
+        and evaluate the relevance of the five features selected for model training.
     </div>
 </div>
 """,
@@ -3606,6 +3606,29 @@ elif page == "Correlation Analysis":
                 f"{weakest['Feature'].replace('_', ' ')} "
                 f"(ρ = {weakest['Correlation']:+.2f}), representing a "
                 f"{weakest['Strength'].lower()} {weakest_direction} relationship."
+            )
+
+            st.markdown(
+                f"""
+<div class="about-card about-blue">
+    <h4>Key Finding</h4>
+    <div class="about-list-item">
+        <b>{strongest['Feature'].replace('_', ' ')}</b> shows the strongest statistical
+        association with student performance (ρ = {strongest['Correlation']:+.2f}).
+    </div>
+    <div class="about-list-item">
+        <b>{weakest['Feature'].replace('_', ' ')}</b> shows the weakest individual
+        association (ρ = {weakest['Correlation']:+.2f}).
+    </div>
+    <div class="about-list-item">
+        The selected features contribute different levels of association and should be
+        interpreted together rather than individually. A weak individual correlation
+        does not automatically mean a feature has no predictive value when combined
+        with other variables in a machine learning model.
+    </div>
+</div>
+""",
+                unsafe_allow_html=True,
             )
 
         st.markdown("### How to Interpret the Correlation")
