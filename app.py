@@ -3487,14 +3487,13 @@ elif page == "Correlation":
         )
 
         # --------------------------------------------------------------
-        # Relationship charts based on the actual student dataset
+        # Interactive relationship chart based on the actual student dataset
         # --------------------------------------------------------------
-        st.markdown("### Student Dataset Correlation Patterns")
+        st.markdown("### Student Dataset Correlation Pattern")
         st.caption(
-            "Each chart uses the actual student records. Performance is displayed "
-            "on an ordinal scale (At Risk → Average → Good → Excellent). "
-            "A small vertical display jitter is applied only to reduce point overlap; "
-            "the Spearman correlation value is calculated from the original values."
+            "Select one model feature to examine its relationship with student "
+            "performance. The chart uses the actual student records. Performance "
+            "is displayed on an ordinal scale (At Risk → Average → Good → Excellent)."
         )
 
         feature_labels = {
@@ -3505,140 +3504,200 @@ elif page == "Correlation":
             "Previous_CGPA": "Previous CGPA",
         }
 
-        # Draw the five selected-feature relationship charts in a clean 2-column grid.
-        for feature_index, feature in enumerate(selected_features):
-            if feature_index % 2 == 0:
-                relationship_cols = st.columns(2, gap="small")
+        available_feature_options = [
+            feature for feature in [
+                "Previous_CGPA",
+                "Average_Score",
+                "Attendance_Pct",
+                "Study_Hours_Per_Day",
+                "Number_of_Subjects",
+            ]
+            if feature in selected_features
+        ]
 
-            chart_col = relationship_cols[feature_index % 2]
+        selected_feature = st.selectbox(
+            "Select Feature to Analyse",
+            options=available_feature_options,
+            format_func=lambda feature: feature_labels.get(feature, feature),
+            key="correlation_feature_selector",
+        )
 
-            with chart_col:
-                feature_data = analysis_df[
-                    [feature, "Performance_Score", "Performance_Category"]
-                ].dropna().copy()
+        feature_data = analysis_df[
+            [selected_feature, "Performance_Score", "Performance_Category"]
+        ].dropna().copy()
 
-                # Display-only jitter makes overlapping ordinal points easier to see.
-                jitter_sequence = [
-                    ((position % 13) - 6) * 0.022
-                    for position in range(len(feature_data))
+        # Display-only jitter reduces overlap between the four ordinal categories.
+        jitter_sequence = [
+            ((position % 13) - 6) * 0.022
+            for position in range(len(feature_data))
+        ]
+        feature_data["Performance_Display"] = (
+            feature_data["Performance_Score"].astype(float)
+            + pd.Series(jitter_sequence, index=feature_data.index)
+        )
+
+        rho = float(
+            analysis_df[[selected_feature, "Performance_Score"]]
+            .corr(method="spearman")
+            .iloc[0, 1]
+        )
+        strength = correlation_strength(rho)
+        direction = correlation_direction(rho)
+
+        summary_col1, summary_col2, summary_col3 = st.columns(3)
+        summary_col1.metric(
+            "Selected Feature",
+            feature_labels.get(selected_feature, selected_feature),
+        )
+        summary_col2.metric(
+            "Spearman Correlation",
+            f"{rho:+.2f}",
+        )
+        summary_col3.metric(
+            "Relationship",
+            f"{strength} {direction}",
+        )
+
+        relationship_fig = px.scatter(
+            feature_data,
+            x=selected_feature,
+            y="Performance_Display",
+            color="Performance_Category",
+            category_orders={
+                "Performance_Category": [
+                    "At Risk",
+                    "Average",
+                    "Good",
+                    "Excellent",
                 ]
-                feature_data["Performance_Display"] = (
-                    feature_data["Performance_Score"].astype(float)
-                    + pd.Series(jitter_sequence, index=feature_data.index)
-                )
+            },
+            title=(
+                f"{feature_labels.get(selected_feature, selected_feature)} "
+                f"vs Student Performance"
+                f"<br><sup>ρ = {rho:+.2f} • {strength} {direction.lower()} correlation</sup>"
+            ),
+            labels={
+                selected_feature: feature_labels.get(
+                    selected_feature,
+                    selected_feature,
+                ),
+                "Performance_Display": "Performance Category",
+                "Performance_Category": "Category",
+            },
+            opacity=0.42,
+        )
 
-                rho = float(
-                    analysis_df[[feature, "Performance_Score"]]
-                    .corr(method="spearman")
-                    .iloc[0, 1]
-                )
-                strength = correlation_strength(rho)
-                direction = correlation_direction(rho)
+        relationship_fig.update_traces(
+            marker=dict(size=6),
+            selector=dict(mode="markers"),
+        )
 
-                relationship_fig = px.scatter(
-                    feature_data,
-                    x=feature,
-                    y="Performance_Display",
-                    color="Performance_Category",
-                    category_orders={
-                        "Performance_Category": [
-                            "At Risk",
-                            "Average",
-                            "Good",
-                            "Excellent",
-                        ]
-                    },
-                    title=(
-                        f"{feature_labels.get(feature, feature)} vs Performance"
-                        f"<br><sup>ρ = {rho:+.2f} • {strength} {direction.lower()} correlation</sup>"
-                    ),
-                    labels={
-                        feature: feature_labels.get(feature, feature),
-                        "Performance_Display": "Performance Category",
-                        "Performance_Category": "Category",
-                    },
-                    opacity=0.42,
-                )
+        # Add a simple visual trend line without additional dependencies.
+        x_values = pd.to_numeric(
+            feature_data[selected_feature],
+            errors="coerce",
+        )
+        y_values = pd.to_numeric(
+            feature_data["Performance_Score"],
+            errors="coerce",
+        )
+        valid_mask = x_values.notna() & y_values.notna()
+        x_values = x_values[valid_mask]
+        y_values = y_values[valid_mask]
 
-                relationship_fig.update_traces(
-                    marker=dict(size=5),
-                    selector=dict(mode="markers"),
-                )
+        if (
+            len(x_values) > 1
+            and float(((x_values - x_values.mean()) ** 2).sum()) > 0
+        ):
+            x_mean = float(x_values.mean())
+            y_mean = float(y_values.mean())
+            denominator = float(((x_values - x_mean) ** 2).sum())
+            slope = float(
+                ((x_values - x_mean) * (y_values - y_mean)).sum()
+                / denominator
+            )
+            intercept = y_mean - slope * x_mean
 
-                # Add a simple least-squares visual trend line without extra dependencies.
-                x_values = pd.to_numeric(feature_data[feature], errors="coerce")
-                y_values = pd.to_numeric(
-                    feature_data["Performance_Score"],
-                    errors="coerce",
-                )
-                valid_mask = x_values.notna() & y_values.notna()
-                x_values = x_values[valid_mask]
-                y_values = y_values[valid_mask]
+            line_x = [
+                float(x_values.min()),
+                float(x_values.max()),
+            ]
+            line_y = [
+                slope * line_x[0] + intercept,
+                slope * line_x[1] + intercept,
+            ]
 
-                if len(x_values) > 1 and float(((x_values - x_values.mean()) ** 2).sum()) > 0:
-                    x_mean = float(x_values.mean())
-                    y_mean = float(y_values.mean())
-                    denominator = float(((x_values - x_mean) ** 2).sum())
-                    slope = float(
-                        ((x_values - x_mean) * (y_values - y_mean)).sum()
-                        / denominator
-                    )
-                    intercept = y_mean - slope * x_mean
-                    line_x = [float(x_values.min()), float(x_values.max())]
-                    line_y = [
-                        slope * line_x[0] + intercept,
-                        slope * line_x[1] + intercept,
-                    ]
-                    relationship_fig.add_scatter(
-                        x=line_x,
-                        y=line_y,
-                        mode="lines",
-                        name="Trend",
-                        line=dict(width=3),
-                    )
+            relationship_fig.add_scatter(
+                x=line_x,
+                y=line_y,
+                mode="lines",
+                name="Trend",
+                line=dict(width=4),
+            )
 
-                relationship_fig.update_yaxes(
-                    tickmode="array",
-                    tickvals=[0, 1, 2, 3],
-                    ticktext=["At Risk", "Average", "Good", "Excellent"],
-                    range=[-0.35, 3.35],
-                )
-                relationship_fig.update_layout(
-                    title=dict(
-                        x=0.5,
-                        xanchor="center",
-                        y=0.96,
-                        yanchor="top",
-                    ),
-                    height=390,
-                    margin=dict(l=20, r=20, t=85, b=20),
-                    legend=dict(
-                        orientation="h",
-                        yanchor="bottom",
-                        y=-0.30,
-                        xanchor="center",
-                        x=0.5,
-                    ),
-                )
+        relationship_fig.update_yaxes(
+            tickmode="array",
+            tickvals=[0, 1, 2, 3],
+            ticktext=[
+                "At Risk",
+                "Average",
+                "Good",
+                "Excellent",
+            ],
+            range=[-0.35, 3.35],
+        )
 
-                st.plotly_chart(
-                    relationship_fig,
-                    use_container_width=True,
-                    key=f"relationship_{feature}",
-                )
+        relationship_fig.update_layout(
+            title=dict(
+                x=0.5,
+                xanchor="center",
+                y=0.97,
+                yanchor="top",
+            ),
+            height=560,
+            margin=dict(l=30, r=30, t=95, b=35),
+            legend=dict(
+                orientation="h",
+                yanchor="bottom",
+                y=-0.22,
+                xanchor="center",
+                x=0.5,
+            ),
+        )
+
+        st.plotly_chart(
+            relationship_fig,
+            use_container_width=True,
+            key="selected_feature_relationship_chart",
+        )
+
+        # Feature-specific interpretation.
+        if abs(rho) < 0.05:
+            interpretation_text = (
+                f"{feature_labels.get(selected_feature, selected_feature)} "
+                "shows no meaningful monotonic relationship with student "
+                "performance in this dataset."
+            )
+        else:
+            interpretation_text = (
+                f"{feature_labels.get(selected_feature, selected_feature)} "
+                f"shows a {strength.lower()} {direction.lower()} association "
+                f"with student performance (ρ = {rho:+.2f})."
+            )
+
+        st.info(interpretation_text)
 
         st.markdown(
             """
 <div class="about-card about-purple">
-    <h4>How to Read These Charts</h4>
+    <h4>How to Read This Chart</h4>
     <div class="about-list-item">
         An upward trend indicates a positive association with student performance,
         while a downward trend indicates a negative association.
     </div>
     <div class="about-list-item">
-        A flatter pattern indicates a weaker individual relationship. The coefficient
-        shown above each chart is the Spearman correlation calculated from the actual
-        dataset rather than from the visual trend line.
+        A flatter pattern indicates a weaker individual relationship. The Spearman
+        coefficient shown above the chart is calculated from the actual dataset.
     </div>
 </div>
 """,
