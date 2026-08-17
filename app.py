@@ -2437,6 +2437,7 @@ page = st.sidebar.radio(
         "🏠 Home",
         "🎯 Prediction",
         "📊 Model Results",
+        "🔗 Correlation Analysis",
         "📈 Dataset",
         "ℹ️ About"
     ],
@@ -3272,6 +3273,372 @@ elif page == "Model Results":
         "Recall measures how many actual cases were identified, while "
         "F1 Score balances precision and recall."
     )
+
+
+
+elif page == "Correlation Analysis":
+    st.subheader("Correlation Analysis")
+
+    st.markdown(
+        """
+<div class="about-hero">
+    <div class="about-hero-title">🔗 Feature Correlation Analysis</div>
+    <div class="about-hero-subtitle">
+        Examine relationships across the original numerical dataset and then focus
+        on the five features selected for student performance prediction.
+    </div>
+</div>
+""",
+        unsafe_allow_html=True,
+    )
+
+    # ------------------------------------------------------------------
+    # Correlation helpers
+    # ------------------------------------------------------------------
+    def correlation_strength(value):
+        absolute_value = abs(float(value))
+        if absolute_value < 0.20:
+            return "Very weak"
+        if absolute_value < 0.40:
+            return "Weak"
+        if absolute_value < 0.60:
+            return "Moderate"
+        if absolute_value < 0.80:
+            return "Strong"
+        return "Very strong"
+
+    def correlation_direction(value):
+        value = float(value)
+        if value > 0:
+            return "Positive"
+        if value < 0:
+            return "Negative"
+        return "No linear"
+
+    # Dataset-level overview.
+    numeric_columns = df.select_dtypes(include="number").columns.tolist()
+
+    # IDs are identifiers, not meaningful continuous academic variables.
+    overall_numeric_columns = [
+        column for column in numeric_columns
+        if column.lower() not in {"student_id", "id"}
+    ]
+
+    selected_features = [
+        "Number_of_Subjects",
+        "Average_Score",
+        "Attendance_Pct",
+        "Study_Hours_Per_Day",
+        "Previous_CGPA",
+    ]
+    selected_features = [
+        column for column in selected_features
+        if column in df.columns
+    ]
+
+    overview1, overview2, overview3 = st.columns(3)
+    overview1.metric("Students", f"{len(df):,}")
+    overview2.metric("Numerical Attributes", len(overall_numeric_columns))
+    overview3.metric("Selected Model Features", len(selected_features))
+
+    st.info(
+        "This page uses two levels of analysis. Part A examines the available "
+        "numerical attributes in the dataset. Part B focuses on the five features "
+        "used by the KNN, SVM and ANN prediction models."
+    )
+
+    tab_overall, tab_selected = st.tabs(
+        [
+            "Part A — Overall Dataset Correlation",
+            "Part B — Selected Features vs Performance",
+        ]
+    )
+
+    # ==================================================================
+    # PART A: all usable numerical attributes
+    # ==================================================================
+    with tab_overall:
+        st.markdown("### Part A — Overall Dataset Correlation")
+        st.caption(
+            "Pearson correlation is used here to examine linear relationships "
+            "between the available numerical attributes. Student_ID is excluded "
+            "because it is an identifier rather than an academic measurement."
+        )
+
+        if len(overall_numeric_columns) < 2:
+            st.warning(
+                "At least two numerical attributes are required to calculate "
+                "the overall correlation matrix."
+            )
+        else:
+            overall_corr = (
+                df[overall_numeric_columns]
+                .apply(pd.to_numeric, errors="coerce")
+                .corr(method="pearson")
+                .round(2)
+            )
+
+            overall_fig = px.imshow(
+                overall_corr,
+                text_auto=".2f",
+                aspect="auto",
+                color_continuous_scale="RdBu_r",
+                zmin=-1,
+                zmax=1,
+                title="Overall Numerical Attribute Correlation Matrix",
+            )
+            overall_fig.update_layout(
+                title=dict(
+                    x=0.5,
+                    xanchor="center",
+                    y=0.98,
+                    yanchor="top",
+                ),
+                height=max(560, 55 * len(overall_corr.columns)),
+                margin=dict(l=30, r=30, t=85, b=30),
+                coloraxis_colorbar=dict(title="Pearson r"),
+            )
+            overall_fig.update_xaxes(side="bottom")
+            st.plotly_chart(overall_fig, use_container_width=True)
+
+            with st.expander("View Overall Correlation Values"):
+                st.dataframe(
+                    overall_corr,
+                    use_container_width=True,
+                )
+
+            st.markdown("#### Numerical Attributes Included")
+            st.write(", ".join(overall_numeric_columns))
+
+            if "Final_CGPA" in overall_corr.columns:
+                final_cgpa_corr = (
+                    overall_corr["Final_CGPA"]
+                    .drop(labels=["Final_CGPA"], errors="ignore")
+                    .dropna()
+                    .sort_values(key=lambda series: series.abs(), ascending=False)
+                )
+
+                if not final_cgpa_corr.empty:
+                    overall_rank_df = final_cgpa_corr.rename(
+                        "Correlation"
+                    ).reset_index()
+                    overall_rank_df.columns = ["Attribute", "Correlation"]
+
+                    overall_rank_fig = px.bar(
+                        overall_rank_df,
+                        x="Correlation",
+                        y="Attribute",
+                        orientation="h",
+                        text=overall_rank_df["Correlation"].map(
+                            lambda value: f"{value:+.2f}"
+                        ),
+                        title="Numerical Attributes Associated with Final CGPA",
+                        range_x=[-1, 1],
+                    )
+                    overall_rank_fig.update_traces(textposition="outside")
+                    overall_rank_fig.update_layout(
+                        title=dict(x=0.5, xanchor="center"),
+                        yaxis=dict(
+                            categoryorder="array",
+                            categoryarray=overall_rank_df["Attribute"].tolist()[::-1],
+                        ),
+                        height=max(400, 48 * len(overall_rank_df)),
+                        margin=dict(l=20, r=30, t=75, b=20),
+                    )
+                    st.plotly_chart(overall_rank_fig, use_container_width=True)
+
+    # ==================================================================
+    # PART B: selected model features vs ordinal performance category
+    # ==================================================================
+    with tab_selected:
+        st.markdown("### Part B — Selected Features vs Performance")
+        st.caption(
+            "Performance Category is ordinally encoded only for this analysis: "
+            "At Risk = 0, Average = 1, Good = 2, Excellent = 3. "
+            "Spearman correlation is used because the target categories have "
+            "a natural order."
+        )
+
+        performance_map = {
+            "At Risk": 0,
+            "Average": 1,
+            "Good": 2,
+            "Excellent": 3,
+        }
+
+        analysis_df = df[selected_features + ["Performance_Category"]].copy()
+        analysis_df["Performance_Score"] = (
+            analysis_df["Performance_Category"]
+            .astype(str)
+            .map(performance_map)
+        )
+
+        for feature in selected_features:
+            analysis_df[feature] = pd.to_numeric(
+                analysis_df[feature],
+                errors="coerce",
+            )
+
+        focused_columns = selected_features + ["Performance_Score"]
+        focused_corr = (
+            analysis_df[focused_columns]
+            .corr(method="spearman")
+            .round(2)
+        )
+
+        focused_fig = px.imshow(
+            focused_corr,
+            text_auto=".2f",
+            aspect="auto",
+            color_continuous_scale="RdBu_r",
+            zmin=-1,
+            zmax=1,
+            title="Selected Features and Performance Correlation Matrix",
+        )
+        focused_fig.update_layout(
+            title=dict(
+                x=0.5,
+                xanchor="center",
+                y=0.98,
+                yanchor="top",
+            ),
+            height=600,
+            margin=dict(l=30, r=30, t=85, b=30),
+            coloraxis_colorbar=dict(title="Spearman ρ"),
+        )
+        st.plotly_chart(focused_fig, use_container_width=True)
+
+        performance_corr = (
+            focused_corr["Performance_Score"]
+            .drop(labels=["Performance_Score"], errors="ignore")
+            .dropna()
+            .sort_values(key=lambda series: series.abs(), ascending=False)
+        )
+
+        ranking_df = performance_corr.rename(
+            "Correlation"
+        ).reset_index()
+        ranking_df.columns = ["Feature", "Correlation"]
+        ranking_df["Strength"] = ranking_df["Correlation"].map(
+            correlation_strength
+        )
+        ranking_df["Direction"] = ranking_df["Correlation"].map(
+            correlation_direction
+        )
+
+        st.markdown("### Feature–Performance Correlation Ranking")
+
+        ranking_fig = px.bar(
+            ranking_df,
+            x="Correlation",
+            y="Feature",
+            orientation="h",
+            text=ranking_df["Correlation"].map(
+                lambda value: f"{value:+.2f}"
+            ),
+            title="Correlation of Selected Features with Student Performance",
+            range_x=[-1, 1],
+        )
+        ranking_fig.update_traces(textposition="outside")
+        ranking_fig.update_layout(
+            title=dict(
+                x=0.5,
+                xanchor="center",
+                y=0.96,
+                yanchor="top",
+            ),
+            yaxis=dict(
+                categoryorder="array",
+                categoryarray=ranking_df["Feature"].tolist()[::-1],
+            ),
+            height=430,
+            margin=dict(l=20, r=30, t=75, b=20),
+        )
+        st.plotly_chart(ranking_fig, use_container_width=True)
+
+        if not ranking_df.empty:
+            strongest = ranking_df.iloc[0]
+            weakest = ranking_df.iloc[-1]
+
+            metric1, metric2, metric3 = st.columns(3)
+            metric1.metric(
+                "Strongest Association",
+                strongest["Feature"].replace("_", " "),
+            )
+            metric2.metric(
+                "Strongest Correlation",
+                f"{strongest['Correlation']:+.2f}",
+            )
+            metric3.metric(
+                "Relationship Strength",
+                strongest["Strength"],
+            )
+
+            st.markdown("### Detailed Interpretation")
+            interpretation_table = ranking_df.copy()
+            interpretation_table["Feature"] = (
+                interpretation_table["Feature"]
+                .str.replace("_", " ", regex=False)
+            )
+            interpretation_table["Correlation"] = (
+                interpretation_table["Correlation"]
+                .map(lambda value: f"{value:+.2f}")
+            )
+
+            st.dataframe(
+                interpretation_table,
+                hide_index=True,
+                use_container_width=True,
+            )
+
+            strongest_direction = strongest["Direction"].lower()
+            weakest_direction = weakest["Direction"].lower()
+
+            st.success(
+                f"The strongest association with student performance is "
+                f"{strongest['Feature'].replace('_', ' ')} "
+                f"(ρ = {strongest['Correlation']:+.2f}), representing a "
+                f"{strongest['Strength'].lower()} {strongest_direction} relationship."
+            )
+
+            st.info(
+                f"The weakest association among the selected model features is "
+                f"{weakest['Feature'].replace('_', ' ')} "
+                f"(ρ = {weakest['Correlation']:+.2f}), representing a "
+                f"{weakest['Strength'].lower()} {weakest_direction} relationship."
+            )
+
+        st.markdown("### How to Interpret the Correlation")
+        interpretation_guide = pd.DataFrame(
+            {
+                "|Correlation|": [
+                    "0.00 – 0.19",
+                    "0.20 – 0.39",
+                    "0.40 – 0.59",
+                    "0.60 – 0.79",
+                    "0.80 – 1.00",
+                ],
+                "Interpretation": [
+                    "Very weak",
+                    "Weak",
+                    "Moderate",
+                    "Strong",
+                    "Very strong",
+                ],
+            }
+        )
+        st.dataframe(
+            interpretation_guide,
+            hide_index=True,
+            use_container_width=True,
+        )
+
+        st.warning(
+            "Correlation measures statistical association, not causation. "
+            "A higher absolute correlation coefficient indicates a stronger "
+            "association with performance, but it does not prove that the "
+            "feature directly causes the student's performance."
+        )
 
 
 elif page == "Dataset":
