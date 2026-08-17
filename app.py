@@ -2437,7 +2437,7 @@ page = st.sidebar.radio(
         "🏠 Home",
         "🎯 Prediction",
         "📊 Model Results",
-        "🔗 Correlation Analysis",
+        "🔗 Correlation",
         "📈 Dataset",
         "ℹ️ About"
     ],
@@ -3276,7 +3276,7 @@ elif page == "Model Results":
 
 
 
-elif page == "Correlation Analysis":
+elif page == "Correlation":
     st.subheader("Feature Correlation & Relevance Analysis")
 
     st.markdown(
