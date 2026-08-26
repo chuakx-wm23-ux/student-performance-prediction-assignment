@@ -2709,17 +2709,17 @@ elif page == "Prediction" and st.session_state.get("prediction_mode") == "indivi
         # All inputs are outside st.form so that changes refresh immediately.
         name = st.text_input("Student Name", key="student_name")
 
-name_error = validate_student_name(name)
-if name_error:
-    st.error(name_error)
-else:
-    name = " ".join(word.capitalize() for word in name.split())
+        name_error = validate_student_name(name)
+        if name_error:
+            st.error(name_error)
+        else:
+            name = " ".join(word.capitalize() for word in name.split())
 
         student_id = st.text_input("Student ID", key="student_id")
 
-id_error = validate_student_id(student_id)
-if id_error:
-    st.error(id_error)
+        id_error = validate_student_id(student_id)
+        if id_error:
+            st.error(id_error)
 
 
         number_of_subjects = st.slider(
