@@ -3,6 +3,7 @@ from io import BytesIO
 from datetime import datetime
 import joblib
 import re
+import math
 import pandas as pd
 import plotly.express as px
 import streamlit as st
@@ -2846,9 +2847,16 @@ elif page == "Prediction" and st.session_state.get("prediction_mode") == "indivi
                     st.error(error)
                 st.stop()
 
+            # Convert all subject scores into binary values
+            # Rule: score < 0.5 = 0, score >= 0.5 = 1
+            binary_scores = [
+                1 if score >= 0.5 else 0
+                for score in scores
+            ]
+
             input_df = pd.DataFrame([{
                 "Number_of_Subjects": number_of_subjects,
-                "Average_Score": average_score,
+                "Average_Score": sum(binary_scores) / len(binary_scores),
                 "Attendance_Pct": attendance,
                 "Study_Hours_Per_Day": study_hours,
                 "Previous_CGPA": previous_cgpa,
