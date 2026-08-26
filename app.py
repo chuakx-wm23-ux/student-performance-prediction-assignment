@@ -15,6 +15,24 @@ from openpyxl.chart.shapes import GraphicalProperties
 from openpyxl.drawing.image import Image as XLImage
 import matplotlib.pyplot as plt
 
+def validate_student_name(value):
+    value = value.strip()
+    if not value:
+        return "❌ Student Name is required."
+    if not re.match(r"^[A-Za-z ]+$", value):
+        return "❌ Student Name can only contain letters and spaces."
+    return None
+
+
+def validate_student_id(value):
+    value = value.strip()
+    if not value:
+        return "❌ Student ID is required."
+    if not re.match(r"^\d{7}$", value):
+        return "❌ Student ID must contain exactly 7 digits."
+    return None
+
+
 ROOT = Path(__file__).resolve().parent
 DATA = ROOT / "dataset" / "Student_data.csv"
 MODELS = ROOT / "models"
@@ -2690,7 +2708,19 @@ elif page == "Prediction" and st.session_state.get("prediction_mode") == "indivi
     else:
         # All inputs are outside st.form so that changes refresh immediately.
         name = st.text_input("Student Name", key="student_name")
+
+name_error = validate_student_name(name)
+if name_error:
+    st.error(name_error)
+else:
+    name = " ".join(word.capitalize() for word in name.split())
+
         student_id = st.text_input("Student ID", key="student_id")
+
+id_error = validate_student_id(student_id)
+if id_error:
+    st.error(id_error)
+
 
         number_of_subjects = st.slider(
             "Number of Subjects",
@@ -4153,3 +4183,12 @@ else:
 """,
             unsafe_allow_html=True
         )
+
+
+
+if 'name_error' in globals() and name_error:
+    can_predict = False
+elif 'id_error' in globals() and id_error:
+    can_predict = False
+else:
+    can_predict = True
