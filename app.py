@@ -15,10 +15,14 @@ from openpyxl.chart.shapes import GraphicalProperties
 from openpyxl.drawing.image import Image as XLImage
 import matplotlib.pyplot as plt
 
+# ==========================
+# REAL-TIME INPUT VALIDATION
+# ==========================
+
 def validate_student_name(value):
     value = value.strip()
     if not value:
-        return "❌ Student Name is required."
+        return None
     if not re.match(r"^[A-Za-z ]+$", value):
         return "❌ Student Name can only contain letters and spaces."
     return None
@@ -27,7 +31,7 @@ def validate_student_name(value):
 def validate_student_id(value):
     value = value.strip()
     if not value:
-        return "❌ Student ID is required."
+        return None
     if not re.match(r"^\d{7}$", value):
         return "❌ Student ID must contain exactly 7 digits."
     return None
@@ -2710,7 +2714,7 @@ elif page == "Prediction" and st.session_state.get("prediction_mode") == "indivi
         name = st.text_input("Student Name", key="student_name")
 
         name_error = validate_student_name(name)
-        if name_error:
+        if name_error and name.strip():
             st.error(name_error)
         else:
             name = " ".join(word.capitalize() for word in name.split())
@@ -2718,7 +2722,7 @@ elif page == "Prediction" and st.session_state.get("prediction_mode") == "indivi
         student_id = st.text_input("Student ID", key="student_id")
 
         id_error = validate_student_id(student_id)
-        if id_error:
+        if id_error and student_id.strip():
             st.error(id_error)
 
 
@@ -2762,7 +2766,7 @@ elif page == "Prediction" and st.session_state.get("prediction_mode") == "indivi
             min_value=0.0,
             max_value=12.0,
             value=0.0,
-            step=0.1,
+            step=0.5,
             key="study_hours"
         )
 
