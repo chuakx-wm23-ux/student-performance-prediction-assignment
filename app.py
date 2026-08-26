@@ -2,6 +2,7 @@ from pathlib import Path
 from io import BytesIO
 from datetime import datetime
 import joblib
+import re
 import pandas as pd
 import plotly.express as px
 import streamlit as st
@@ -2708,7 +2709,7 @@ elif page == "Prediction" and st.session_state.get("prediction_mode") == "indivi
                     f"Subject {i + 1} Score",
                     min_value=0.0,
                     max_value=100.0,
-                    value=75.0,
+                    value=0.0,
                     step=1.0,
                     key=f"subject_{i}"
                 )
@@ -2721,7 +2722,7 @@ elif page == "Prediction" and st.session_state.get("prediction_mode") == "indivi
             "Attendance Rate (%)",
             min_value=0.0,
             max_value=100.0,
-            value=85.0,
+            value=0.0,
             step=0.5,
             key="attendance"
         )
@@ -2730,7 +2731,7 @@ elif page == "Prediction" and st.session_state.get("prediction_mode") == "indivi
             "Study Hours Per Day",
             min_value=0.0,
             max_value=12.0,
-            value=3.0,
+            value=0.0,
             step=0.1,
             key="study_hours"
         )
@@ -2739,7 +2740,7 @@ elif page == "Prediction" and st.session_state.get("prediction_mode") == "indivi
             "Previous CGPA",
             min_value=0.0,
             max_value=4.0,
-            value=3.0,
+            value=0.0,
             step=0.01,
             key="previous_cgpa"
         )
@@ -2751,6 +2752,61 @@ elif page == "Prediction" and st.session_state.get("prediction_mode") == "indivi
         )
 
         if submit:
+
+            # ==========================
+            # REQUIRED INPUT VALIDATION
+            # ==========================
+
+            name = name.strip()
+            student_id = student_id.strip()
+
+            # Student name validation
+            if not name:
+                st.error("❌ Student Name is required.")
+                st.stop()
+
+            if not re.match(r"^[A-Za-z ]+$", name):
+                st.error("❌ Student Name can only contain letters and spaces.")
+                st.stop()
+
+            # Auto format name
+            name = " ".join(
+                word.capitalize()
+                for word in name.split()
+            )
+
+            # Student ID validation
+            if not student_id:
+                st.error("❌ Student ID is required.")
+                st.stop()
+
+            if not re.match(r"^\\d{7}$", student_id):
+                st.error("❌ Student ID must contain exactly 7 digits.")
+                st.stop()
+
+            # Subject score validation
+            if all(score == 0 for score in scores):
+                st.error("❌ Please enter subject scores before prediction.")
+                st.stop()
+
+            for index, score in enumerate(scores):
+                if score < 0 or score > 100:
+                    st.error(f"❌ Subject {index + 1} score must be between 0 and 100.")
+                    st.stop()
+
+            # Other required inputs
+            if attendance <= 0:
+                st.error("❌ Attendance Rate is required.")
+                st.stop()
+
+            if study_hours <= 0:
+                st.error("❌ Study Hours Per Day is required.")
+                st.stop()
+
+            if previous_cgpa <= 0:
+                st.error("❌ Previous CGPA is required.")
+                st.stop()
+
             input_df = pd.DataFrame([{
                 "Number_of_Subjects": number_of_subjects,
                 "Average_Score": average_score,
