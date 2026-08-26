@@ -37,6 +37,14 @@ def validate_student_id(value):
     return None
 
 
+
+
+def enforce_half_score(key):
+    """Allow only 0.0 or 0.5 score increments."""
+    value = st.session_state.get(key, 0.0)
+    if value * 2 != int(value * 2):
+        st.session_state[key] = round(value * 2) / 2
+
 ROOT = Path(__file__).resolve().parent
 DATA = ROOT / "dataset" / "Student_data.csv"
 MODELS = ROOT / "models"
@@ -2744,8 +2752,11 @@ elif page == "Prediction" and st.session_state.get("prediction_mode") == "indivi
                     min_value=0.0,
                     max_value=100.0,
                     value=0.0,
-                    step=1.0,
-                    key=f"subject_{i}"
+                    step=0.5,
+                    format="%.1f",
+                    key=f"subject_{i}",
+                    on_change=enforce_half_score,
+                    args=(f"subject_{i}",)
                 )
                 scores.append(score)
 
