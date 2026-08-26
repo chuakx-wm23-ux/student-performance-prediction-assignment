@@ -2757,54 +2757,48 @@ elif page == "Prediction" and st.session_state.get("prediction_mode") == "indivi
             # REQUIRED INPUT VALIDATION
             # ==========================
 
+            errors = []
+
             name = name.strip()
             student_id = student_id.strip()
 
-            # Student name validation
             if not name:
-                st.error("❌ Student Name is required.")
-                st.stop()
+                errors.append("❌ Student Name is required.")
+            elif not re.match(r"^[A-Za-z ]+$", name):
+                errors.append("❌ Student Name can only contain letters and spaces.")
 
-            if not re.match(r"^[A-Za-z ]+$", name):
-                st.error("❌ Student Name can only contain letters and spaces.")
-                st.stop()
+            else:
+                name = " ".join(
+                    word.capitalize()
+                    for word in name.split()
+                )
 
-            # Auto format name
-            name = " ".join(
-                word.capitalize()
-                for word in name.split()
-            )
-
-            # Student ID validation
             if not student_id:
-                st.error("❌ Student ID is required.")
-                st.stop()
-
-            if not re.match(r"^\\d{7}$", student_id):
-                st.error("❌ Student ID must contain exactly 7 digits.")
-                st.stop()
+                errors.append("❌ Student ID is required.")
+            elif not re.match(r"^\d{7}$", student_id):
+                errors.append("❌ Student ID must contain exactly 7 digits.")
 
             # Subject score validation
             if all(score == 0 for score in scores):
-                st.error("❌ Please enter subject scores before prediction.")
-                st.stop()
+                errors.append("❌ Please enter subject scores before prediction.")
 
             for index, score in enumerate(scores):
                 if score < 0 or score > 100:
-                    st.error(f"❌ Subject {index + 1} score must be between 0 and 100.")
-                    st.stop()
+                    errors.append(f"❌ Subject {index + 1} score must be between 0 and 100.")
 
             # Other required inputs
             if attendance <= 0:
-                st.error("❌ Attendance Rate is required.")
-                st.stop()
+                errors.append("❌ Attendance Rate is required.")
 
             if study_hours <= 0:
-                st.error("❌ Study Hours Per Day is required.")
-                st.stop()
+                errors.append("❌ Study Hours Per Day is required.")
 
             if previous_cgpa <= 0:
-                st.error("❌ Previous CGPA is required.")
+                errors.append("❌ Previous CGPA is required.")
+
+            if errors:
+                for error in errors:
+                    st.error(error)
                 st.stop()
 
             input_df = pd.DataFrame([{
