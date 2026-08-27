@@ -167,19 +167,19 @@ st.markdown("""
     position: fixed !important;
     bottom: 18px !important;
     left: 25px !important;
-    width: 180px !important;
+    width: 200px !important;
     text-align: center !important;
     z-index: 999 !important;
 }
 
 .sidebar-footer .footer-brand {
-    font-size: 0.38rem !important;
+    font-size: 0.52rem !important;
     font-weight: 700 !important;
     margin-bottom: 4px !important;
 }
 
 .sidebar-footer .footer-subtitle {
-    font-size: 0.38rem !important;
+    font-size: 0.52rem !important;
     line-height: 1.2 !important;
 }
 
@@ -187,7 +187,7 @@ st.markdown("""
 .sidebar-footer .footer-version,
 .sidebar-footer .footer-group,
 .sidebar-footer .footer-copyright {
-    font-size: 0.35rem !important;
+    font-size: 0.48rem !important;
     line-height: 1.2 !important;
     opacity: 0.85;
 }
@@ -887,8 +887,8 @@ h1, h2, h3 {
 
 /* FINAL COMPACT SIDEBAR OVERRIDE */
 [data-testid="stSidebar"] {
-    width: 180px !important;
-    min-width: 180px !important;
+    width: 200px !important;
+    min-width: 200px !important;
 }
 
 [data-testid="stSidebar"] div[role="radiogroup"] label {
@@ -903,12 +903,12 @@ h1, h2, h3 {
 }
 
 .sidebar-footer {
-    width: 145px !important;
+    width: 170px !important;
     left: 15px !important;
 }
 
 .sidebar-footer * {
-    transform: scale(0.85);
+    transform: scale(1);
 }
 
 </style>
