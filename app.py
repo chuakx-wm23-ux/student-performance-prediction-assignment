@@ -14,6 +14,7 @@ from openpyxl.chart.shapes import GraphicalProperties
 from openpyxl.drawing.image import Image as XLImage
 import matplotlib.pyplot as plt
 import re
+import math
 
 ROOT = Path(__file__).resolve().parent
 DATA = ROOT / "dataset" / "Student_data.csv"
@@ -2698,10 +2699,11 @@ elif page == "Prediction" and st.session_state.get("prediction_mode") == "indivi
 
         # Real-time input validation
         name_valid = bool(re.fullmatch(r"[A-Za-z ]+", name.strip())) if name.strip() else False
-        id_valid = bool(re.fullmatch(r"\d{7}", student_id.strip())) if student_id.strip() else False
 
         if name.strip() and not name_valid:
             st.error("❌ Student Name can only contain English letters.")
+
+        id_valid = bool(re.fullmatch(r"\d{7}", student_id.strip())) if student_id.strip() else False
 
         if student_id.strip() and not id_valid:
             st.error("❌ Student ID must contain exactly 7 digits.")
@@ -2725,7 +2727,7 @@ elif page == "Prediction" and st.session_state.get("prediction_mode") == "indivi
                     max_value=100.0,
                     value=None,
                     placeholder="Enter score",
-                    step=1.0,
+                    step=0.5,
                     key=f"subject_{i}"
                 )
                 scores.append(score)
@@ -2733,8 +2735,11 @@ elif page == "Prediction" and st.session_state.get("prediction_mode") == "indivi
         valid_scores = [s for s in scores if s is not None]
 
         if len(valid_scores) == number_of_subjects:
-            average_score = sum(valid_scores) / len(valid_scores)
-            st.info(f"Calculated Average Score: {average_score:.2f}")
+            # Convert decimal marks upward (e.g. 90.5 -> 91, 4.8 -> 5)
+            rounded_scores = [math.ceil(score) for score in valid_scores]
+
+            average_score = sum(rounded_scores) / len(rounded_scores)
+            st.info(f"Calculated Average Score: {average_score:.0f}")
         else:
             average_score = None
             st.warning("Please enter all subject scores before prediction.")
