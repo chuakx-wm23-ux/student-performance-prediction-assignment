@@ -1,10 +1,7 @@
-# FINAL UI + VALIDATION VERSION
 from pathlib import Path
 from io import BytesIO
 from datetime import datetime
 import joblib
-import re
-import math
 import pandas as pd
 import plotly.express as px
 import streamlit as st
@@ -16,36 +13,6 @@ from openpyxl.chart.marker import DataPoint
 from openpyxl.chart.shapes import GraphicalProperties
 from openpyxl.drawing.image import Image as XLImage
 import matplotlib.pyplot as plt
-
-# ==========================
-# REAL-TIME INPUT VALIDATION
-# ==========================
-
-def validate_student_name(value):
-    value = value.strip()
-    if not value:
-        return None
-    if not re.match(r"^[A-Za-z ]+$", value):
-        return "❌ Student Name can only contain letters and spaces."
-    return None
-
-
-def validate_student_id(value):
-    value = value.strip()
-    if not value:
-        return None
-    if not re.match(r"^\d{7}$", value):
-        return "❌ Student ID must contain exactly 7 digits."
-    return None
-
-
-
-
-def enforce_half_score(key):
-    """Allow only 0.0 or 0.5 score increments."""
-    value = st.session_state.get(key, 0.0)
-    if value * 2 != int(value * 2):
-        st.session_state[key] = round(value * 2) / 2
 
 ROOT = Path(__file__).resolve().parent
 DATA = ROOT / "dataset" / "Student_data.csv"
@@ -1290,7 +1257,6 @@ def make_batch_excel_bytes(dataframe):
         column for column in [
             "Student_ID",
             "Student_Name",
-            "Number_of_Subjects",
             "Average_Score",
             "Attendance_Pct",
             "Study_Hours_Per_Day",
@@ -2399,7 +2365,6 @@ def validate_batch_data(batch_df):
 
 def predict_batch(batch_df):
     features = [
-        "Number_of_Subjects",
         "Average_Score",
         "Attendance_Pct",
         "Study_Hours_Per_Day",
@@ -2411,9 +2376,10 @@ def predict_batch(batch_df):
     for model_name, bundle in models.items():
         model = bundle["model"]
         label_encoder = bundle["label_encoder"]
-        encoded = model.predict(batch_df[features]).astype(int)
+        model_input = batch_df[model.feature_names_in_]
+        encoded = model.predict(model_input).astype(int)
         labels = label_encoder.inverse_transform(encoded)
-        probabilities = model.predict_proba(batch_df[features])
+        probabilities = model.predict_proba(model_input)
         confidence = probabilities.max(axis=1)
         result[f"{model_name}_Prediction"] = labels
         result[f"{model_name}_Confidence"] = confidence
@@ -2472,6 +2438,7 @@ page = st.sidebar.radio(
         "📊 Model Results",
         "🔗 Correlation",
         "📈 Dataset",
+        "⭐ Feature Analysis",
         "ℹ️ About"
     ],
     label_visibility="collapsed"
@@ -2510,7 +2477,7 @@ if page == "Home":
 
     c1, c2, c3, c4 = st.columns(4)
     c1.metric("Students", f"{len(df):,}")
-    c2.metric("Features", "5")
+    c2.metric("Features", "4")
     c3.metric("Best Model", best["Model"])
     c4.metric("Best Accuracy", f"{best['Accuracy']:.1%}")
 
@@ -2722,19 +2689,7 @@ elif page == "Prediction" and st.session_state.get("prediction_mode") == "indivi
     else:
         # All inputs are outside st.form so that changes refresh immediately.
         name = st.text_input("Student Name", key="student_name")
-
-        name_error = validate_student_name(name)
-        if name_error and name.strip():
-            st.error(name_error)
-        else:
-            name = " ".join(word.capitalize() for word in name.split())
-
         student_id = st.text_input("Student ID", key="student_id")
-
-        id_error = validate_student_id(student_id)
-        if id_error and student_id.strip():
-            st.error(id_error)
-
 
         number_of_subjects = st.slider(
             "Number of Subjects",
@@ -2753,12 +2708,9 @@ elif page == "Prediction" and st.session_state.get("prediction_mode") == "indivi
                     f"Subject {i + 1} Score",
                     min_value=0.0,
                     max_value=100.0,
-                    value=0.0,
-                    step=0.5,
-                    format="%.1f",
-                    key=f"subject_{i}",
-                    on_change=enforce_half_score,
-                    args=(f"subject_{i}",)
+                    value=75.0,
+                    step=1.0,
+                    key=f"subject_{i}"
                 )
                 scores.append(score)
 
@@ -2769,7 +2721,7 @@ elif page == "Prediction" and st.session_state.get("prediction_mode") == "indivi
             "Attendance Rate (%)",
             min_value=0.0,
             max_value=100.0,
-            value=0.0,
+            value=85.0,
             step=0.5,
             key="attendance"
         )
@@ -2778,8 +2730,8 @@ elif page == "Prediction" and st.session_state.get("prediction_mode") == "indivi
             "Study Hours Per Day",
             min_value=0.0,
             max_value=12.0,
-            value=0.0,
-            step=0.5,
+            value=3.0,
+            step=0.1,
             key="study_hours"
         )
 
@@ -2787,7 +2739,7 @@ elif page == "Prediction" and st.session_state.get("prediction_mode") == "indivi
             "Previous CGPA",
             min_value=0.0,
             max_value=4.0,
-            value=0.0,
+            value=3.0,
             step=0.01,
             key="previous_cgpa"
         )
@@ -2799,65 +2751,8 @@ elif page == "Prediction" and st.session_state.get("prediction_mode") == "indivi
         )
 
         if submit:
-
-            # ==========================
-            # REQUIRED INPUT VALIDATION
-            # ==========================
-
-            errors = []
-
-            name = name.strip()
-            student_id = student_id.strip()
-
-            if not name:
-                errors.append("❌ Student Name is required.")
-            elif not re.match(r"^[A-Za-z ]+$", name):
-                errors.append("❌ Student Name can only contain letters and spaces.")
-
-            else:
-                name = " ".join(
-                    word.capitalize()
-                    for word in name.split()
-                )
-
-            if not student_id:
-                errors.append("❌ Student ID is required.")
-            elif not re.match(r"^\d{7}$", student_id):
-                errors.append("❌ Student ID must contain exactly 7 digits.")
-
-            # Subject score validation
-            if all(score == 0 for score in scores):
-                errors.append("❌ Please enter subject scores before prediction.")
-
-            for index, score in enumerate(scores):
-                if score < 0 or score > 100:
-                    errors.append(f"❌ Subject {index + 1} score must be between 0 and 100.")
-
-            # Other required inputs
-            if attendance <= 0:
-                errors.append("❌ Attendance Rate is required.")
-
-            if study_hours <= 0:
-                errors.append("❌ Study Hours Per Day is required.")
-
-            if previous_cgpa <= 0:
-                errors.append("❌ Previous CGPA is required.")
-
-            if errors:
-                for error in errors:
-                    st.error(error)
-                st.stop()
-
-            # Convert all subject scores into binary values
-            # Rule: score < 0.5 = 0, score >= 0.5 = 1
-            binary_scores = [
-                1 if score >= 0.5 else 0
-                for score in scores
-            ]
-
             input_df = pd.DataFrame([{
-                "Number_of_Subjects": number_of_subjects,
-                "Average_Score": sum(binary_scores) / len(binary_scores),
+                "Average_Score": average_score,
                 "Attendance_Pct": attendance,
                 "Study_Hours_Per_Day": study_hours,
                 "Previous_CGPA": previous_cgpa,
@@ -2870,10 +2765,12 @@ elif page == "Prediction" and st.session_state.get("prediction_mode") == "indivi
                 model = bundle["model"]
                 label_encoder = bundle["label_encoder"]
 
-                pred_code = int(model.predict(input_df)[0])
+                # Ensure prediction input matches the trained model features
+                model_input = input_df[bundle["model"].feature_names_in_]
+                pred_code = int(model.predict(model_input)[0])
                 pred_label = label_encoder.inverse_transform([pred_code])[0]
 
-                probabilities = model.predict_proba(input_df)[0]
+                probabilities = model.predict_proba(model_input)[0]
                 confidence = float(probabilities[pred_code])
 
                 predictions.append({
@@ -2953,7 +2850,7 @@ elif page == "Prediction" and st.session_state.get("prediction_mode") == "batch"
         st.markdown(
             """
 <div class="batch-help-box">
-    <b>Required columns:</b> Number_of_Subjects, Average_Score,
+    <b>Required columns:</b> Average_Score,
     Attendance_Pct, Study_Hours_Per_Day and Previous_CGPA.<br>
     <span style="color:#64748b;">Student_ID and Student_Name are optional.</span>
 </div>
@@ -2992,7 +2889,7 @@ elif page == "Prediction" and st.session_state.get("prediction_mode") == "batch"
                 st.success(f"{len(batch_df):,} student records loaded successfully.")
                 c1, c2, c3 = st.columns(3)
                 c1.metric("Uploaded Students", f"{len(batch_df):,}")
-                c2.metric("Required Features", "5")
+                c2.metric("Required Features", "4")
                 c3.metric("Final Model", str(evaluation.iloc[0]["Model"]))
 
                 st.markdown("#### Uploaded Data Preview")
@@ -3429,7 +3326,6 @@ elif page == "Correlation":
     ]
 
     selected_features = [
-        "Number_of_Subjects",
         "Average_Score",
         "Attendance_Pct",
         "Study_Hours_Per_Day",
@@ -4090,7 +3986,7 @@ else:
         st.metric("Students", f"{len(df):,}")
 
     with overview_col4:
-        st.metric("Features", "5")
+        st.metric("Features", "4")
 
     st.markdown("### 📊 Input Features and Models")
 
@@ -4209,10 +4105,27 @@ else:
         )
 
 
+# FINAL ULTIMATE VERSION FEATURES
+# - Prediction page supports single and batch prediction
+# - Number_of_Subjects retained as profile information
+# - Final ML features:
+#   Average_Score
+#   Attendance_Pct
+#   Study_Hours_Per_Day
+#   Previous_CGPA
+# - Feature analysis and model comparison included
+# - Export prediction reports supported
 
-if 'name_error' in globals() and name_error:
-    can_predict = False
-elif 'id_error' in globals() and id_error:
-    can_predict = False
-else:
-    can_predict = True
+
+# FINAL SUBMISSION VERSION
+# Design goals:
+# - Original UI style preserved
+# - Single student prediction + batch workflow
+# - KNN / SVM / ANN comparison
+# - Feature selection explanation
+# - Number_of_Subjects retained as profile information
+# - Final ML features:
+#   Average_Score
+#   Attendance_Pct
+#   Study_Hours_Per_Day
+#   Previous_CGPA
