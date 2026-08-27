@@ -13,6 +13,7 @@ from openpyxl.chart.marker import DataPoint
 from openpyxl.chart.shapes import GraphicalProperties
 from openpyxl.drawing.image import Image as XLImage
 import matplotlib.pyplot as plt
+import re
 
 ROOT = Path(__file__).resolve().parent
 DATA = ROOT / "dataset" / "Student_data.csv"
@@ -2688,7 +2689,22 @@ elif page == "Prediction" and st.session_state.get("prediction_mode") == "indivi
     else:
         # All inputs are outside st.form so that changes refresh immediately.
         name = st.text_input("Student Name", key="student_name")
-        student_id = st.text_input("Student ID", key="student_id")
+
+        student_id = st.text_input(
+            "Student ID",
+            key="student_id",
+            placeholder="Enter 7-digit Student ID"
+        )
+
+        # Real-time input validation
+        name_valid = bool(re.fullmatch(r"[A-Za-z ]+", name.strip())) if name.strip() else False
+        id_valid = bool(re.fullmatch(r"\d{7}", student_id.strip())) if student_id.strip() else False
+
+        if name.strip() and not name_valid:
+            st.error("❌ Student Name can only contain English letters.")
+
+        if student_id.strip() and not id_valid:
+            st.error("❌ Student ID must contain exactly 7 digits.")
 
         number_of_subjects = st.slider(
             "Number of Subjects",
@@ -2759,11 +2775,19 @@ elif page == "Prediction" and st.session_state.get("prediction_mode") == "indivi
         if submit:
 
             if not name.strip():
-                st.error("Student Name is required.")
+                st.error("❌ Student Name is required.")
+                st.stop()
+
+            if not name_valid:
+                st.error("❌ Student Name can only contain English letters.")
                 st.stop()
 
             if not student_id.strip():
-                st.error("Student ID is required.")
+                st.error("❌ Student ID is required.")
+                st.stop()
+
+            if not id_valid:
+                st.error("❌ Student ID must contain exactly 7 digits.")
                 st.stop()
 
             if average_score is None:
