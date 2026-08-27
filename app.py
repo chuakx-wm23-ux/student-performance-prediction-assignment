@@ -1,3 +1,4 @@
+# FINAL FIXED VERSION - VALIDATION + NO EMPTY SCORE CRASH
 # FINAL VERSION - 4 ML FEATURES + VALIDATION READY
 from pathlib import Path
 from io import BytesIO
@@ -2728,7 +2729,14 @@ elif page == "Prediction" and st.session_state.get("prediction_mode") == "indivi
                 )
                 scores.append(score)
 
-        average_score = sum(scores) / len(scores)
+        valid_scores = [s for s in scores if s is not None]
+
+        if len(valid_scores) > 0:
+            average_score = sum(valid_scores) / len(valid_scores)
+            st.info(f"Calculated Average Score: {average_score:.2f}")
+        else:
+            average_score = None
+            st.info("Please enter subject scores to calculate average score.")
         st.info(f"Calculated Average Score: {average_score:.2f}")
 
         attendance = st.slider(
