@@ -2621,10 +2621,16 @@ CGPA below 2.50
 
 
 # ---------------- AUTHENTICATION MODULE ----------------
-from login import login_screen
+try:
+    from login import login_screen
+except ImportError:
+    from login.login import login_screen
 
 if "authenticated" not in st.session_state:
     st.session_state.authenticated = False
+
+if "role" not in st.session_state:
+    st.session_state.role = "Student"
 
 if not st.session_state.authenticated:
     login_screen()
@@ -2658,9 +2664,17 @@ if st.sidebar.button("🚪 Logout", use_container_width=True):
     st.rerun()
 
 st.sidebar.markdown("### Navigation")
-page = st.sidebar.radio(
-    "Navigation Menu",
-    [
+# Role-based navigation
+role = st.session_state.get("role", "Student")
+
+if role == "Student":
+    navigation_options = [
+        "🏠 Home",
+        "🎯 Prediction",
+        "ℹ️ About"
+    ]
+else:
+    navigation_options = [
         "🏠 Home",
         "🎯 Prediction",
         "📊 Model Results",
@@ -2668,7 +2682,30 @@ page = st.sidebar.radio(
         "📈 Dataset",
         "⭐ Feature Analysis",
         "ℹ️ About"
-    ],
+    ]
+
+role = st.session_state.get("role", "Student")
+
+if role == "Student":
+    navigation_options = [
+        "🏠 Home",
+        "🎯 Prediction",
+        "ℹ️ About"
+    ]
+else:
+    navigation_options = [
+        "🏠 Home",
+        "🎯 Prediction",
+        "📊 Model Results",
+        "🔗 Correlation",
+        "📈 Dataset",
+        "⭐ Feature Analysis",
+        "ℹ️ About"
+    ]
+
+page = st.sidebar.radio(
+    "Navigation",
+    navigation_options,
     label_visibility="collapsed"
 )
 
