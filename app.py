@@ -991,6 +991,74 @@ h1, h2, h3 {
 }
 
 
+
+/* ===== PREMIUM SIDEBAR V2 ===== */
+
+[data-testid="stSidebar"] {
+    width: 250px !important;
+    min-width: 250px !important;
+}
+
+[data-testid="stSidebar"] > div:first-child {
+    padding: 1.2rem 0.9rem 6.5rem 0.9rem !important;
+}
+
+/* User area */
+.sidebar-user-card {
+    margin-top: 0.8rem;
+    margin-bottom: 1.2rem;
+    padding: 10px 14px;
+    border-radius: 14px;
+    background: rgba(255,255,255,0.08);
+    border: 1px solid rgba(255,255,255,0.12);
+}
+
+.sidebar-user-name {
+    font-size: 0.82rem;
+    font-weight: 750;
+    color: white;
+}
+
+.sidebar-user-role {
+    font-size: 0.68rem;
+    color: #cbd5e1;
+}
+
+/* Navigation */
+[data-testid="stSidebar"] div[role="radiogroup"] {
+    gap: 0.45rem !important;
+}
+
+[data-testid="stSidebar"] div[role="radiogroup"] label {
+    min-height: 40px !important;
+    padding: 0.25rem 0.55rem !important;
+    border-radius: 13px !important;
+}
+
+[data-testid="stSidebar"] div[role="radiogroup"] label p {
+    font-size: 0.76rem !important;
+    font-weight: 750 !important;
+}
+
+/* Logout */
+[data-testid="stSidebar"] button {
+    border-radius: 12px !important;
+    min-height: 36px !important;
+    font-size: 0.75rem !important;
+}
+
+/* Footer */
+.sidebar-footer {
+    bottom: 15px !important;
+    width: 210px !important;
+    left: 18px !important;
+}
+
+.sidebar-footer * {
+    font-size: 0.62rem !important;
+    line-height: 1.35 !important;
+}
+
 </style>
 """, unsafe_allow_html=True)
 
@@ -2601,8 +2669,18 @@ evaluation = pd.read_csv(RESULTS / "evaluation.csv")
 
 st.sidebar.title("🎓 Student AI")
 
-st.sidebar.caption(
-    f"Welcome, {st.session_state.get('username','User')}"
+st.sidebar.markdown(
+    f"""
+    <div class="sidebar-user-card">
+        <div class="sidebar-user-name">
+            👤 {st.session_state.get('username','User')}
+        </div>
+        <div class="sidebar-user-role">
+            {st.session_state.get('role','Lecturer')}
+        </div>
+    </div>
+    """,
+    unsafe_allow_html=True
 )
 
 if st.sidebar.button("🚪 Logout", use_container_width=True):
