@@ -2620,78 +2620,27 @@ CGPA below 2.50
 
 
 
-# ---------------- AUTHENTICATION MODULE ----------------
-try:
-    from login.login import login_screen
-except ImportError:
-    from login import login_screen
-
-# Secure session control
-if "authenticated" not in st.session_state:
-    st.session_state.authenticated = False
-
-if "role" not in st.session_state:
-    st.session_state.role = None
-
-if not st.session_state.authenticated:
-    login_screen()
-    st.stop()
-
-# Force role refresh after login
-current_role = st.session_state.get("role", "Student")
-
-if current_role not in ["Student", "Educator"]:
-    st.session_state.role = "Student"
-
-
-df = load_data()
+# ---------------- MAIN APPLICATION (NO LOGIN) ----------------\n\ndf = load_data()
 models = load_models()
 evaluation = pd.read_csv(RESULTS / "evaluation.csv")
 
 st.sidebar.title("🎓 Student AI")
 
 st.sidebar.markdown(
-    f"""
-    <div class="sidebar-user-card">
-        <div class="sidebar-user-name">
-            👤 {st.session_state.get('username','User')}
-        </div>
-        <div class="sidebar-user-role">
-            {st.session_state.get('role','Educator')}
-        </div>
-    </div>
-    """,
-    unsafe_allow_html=True
+    "AI-powered academic performance analysis system"
 )
 
-if st.sidebar.button("🚪 Logout", use_container_width=True):
-    st.session_state.authenticated = False
-    st.session_state.pop("username", None)
-    st.session_state.pop("role", None)
-    st.rerun()
-
 st.sidebar.markdown("### Navigation")
-# Role-based navigation
-role = st.session_state.get("role", "Student")
 
-role = st.session_state.get("role", "Student")
-
-if role == "Student":
-    navigation_options = [
-        "🏠 Home",
-        "🎯 Prediction",
-        "ℹ️ About"
-    ]
-else:
-    navigation_options = [
-        "🏠 Home",
-        "🎯 Prediction",
-        "📊 Model Results",
-        "🔗 Correlation",
-        "📈 Dataset",
-        "⭐ Feature Analysis",
-        "ℹ️ About"
-    ]
+navigation_options = [
+    "🏠 Home",
+    "🎯 Prediction",
+    "📊 Model Results",
+    "🔗 Correlation",
+    "📈 Dataset",
+    "⭐ Feature Analysis",
+    "ℹ️ About"
+]
 
 
 page = st.sidebar.radio(
