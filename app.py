@@ -14,6 +14,8 @@ from openpyxl.drawing.image import Image as XLImage
 import matplotlib.pyplot as plt
 import re
 import math
+import json
+import hashlib
 
 from pathlib import Path
 
@@ -950,6 +952,44 @@ h1, h2, h3 {
     font-size: 0.60rem !important;
     line-height: 1.35 !important;
 }
+
+
+/* Premium Login Screen */
+.login-shell {
+    max-width: 460px;
+    margin: 5rem auto;
+    padding: 2.4rem;
+    border-radius: 32px;
+    background: rgba(255,255,255,0.88);
+    backdrop-filter: blur(20px);
+    border: 1px solid rgba(148,163,184,.25);
+    box-shadow: 0 30px 70px rgba(15,23,42,.18);
+    text-align:center;
+}
+
+.login-logo {
+    font-size:3.2rem;
+    margin-bottom:.4rem;
+}
+
+.login-title {
+    font-size:2rem;
+    font-weight:900;
+    background:linear-gradient(135deg,#2563eb,#7c3aed);
+    -webkit-background-clip:text;
+    color:transparent;
+}
+
+.login-subtitle {
+    color:#64748b;
+    margin-bottom:1.8rem;
+}
+
+.auth-switch {
+    color:#475569;
+    font-size:.9rem;
+}
+
 
 </style>
 """, unsafe_allow_html=True)
@@ -2479,11 +2519,98 @@ CGPA below 2.50
     )
 
 
+
+# ---------------- AUTHENTICATION ----------------
+
+USERS_FILE = ROOT / "users.json"
+
+def hash_password(password):
+    return hashlib.sha256(password.encode()).hexdigest()
+
+def load_users():
+    if not USERS_FILE.exists():
+        USERS_FILE.write_text(
+            json.dumps({
+                "admin": {
+                    "password": hash_password("admin123"),
+                    "role": "Admin"
+                }
+            }, indent=4)
+        )
+    return json.loads(USERS_FILE.read_text())
+
+def save_users(users):
+    USERS_FILE.write_text(json.dumps(users, indent=4))
+
+def login_screen():
+    st.markdown("""
+    <div class="login-shell">
+        <div class="login-logo">🎓</div>
+        <div class="login-title">Student AI</div>
+        <div class="login-subtitle">
+        Intelligent Student Performance Prediction System
+        </div>
+    </div>
+    """, unsafe_allow_html=True)
+
+    users = load_users()
+
+    tab1, tab2 = st.tabs(["🔐 Login", "📝 Register"])
+
+    with tab1:
+        username = st.text_input("Username", key="login_user")
+        password = st.text_input("Password", type="password", key="login_pass")
+
+        if st.button("Login", use_container_width=True):
+            if username in users and users[username]["password"] == hash_password(password):
+                st.session_state.authenticated = True
+                st.session_state.username = username
+                st.session_state.role = users[username]["role"]
+                st.rerun()
+            else:
+                st.error("Invalid username or password.")
+
+    with tab2:
+        new_user = st.text_input("Create Username", key="reg_user")
+        new_pass = st.text_input("Create Password", type="password", key="reg_pass")
+
+        if st.button("Create Account", use_container_width=True):
+            if new_user in users:
+                st.warning("Username already exists.")
+            elif not new_user or not new_pass:
+                st.warning("Please complete all fields.")
+            else:
+                users[new_user] = {
+                    "password": hash_password(new_pass),
+                    "role": "Lecturer"
+                }
+                save_users(users)
+                st.success("Account created. Please login.")
+
+if "authenticated" not in st.session_state:
+    st.session_state.authenticated = False
+
+if not st.session_state.authenticated:
+    login_screen()
+    st.stop()
+
+
 df = load_data()
 models = load_models()
 evaluation = pd.read_csv(RESULTS / "evaluation.csv")
 
 st.sidebar.title("🎓 Student AI")
+
+st.sidebar.caption(
+    f"Welcome, {st.session_state.get('username','User')}"
+)
+
+if st.sidebar.button("🚪 Logout", use_container_width=True):
+    st.session_state.authenticated = False
+    st.session_state.pop("username", None)
+    st.session_state.pop("role", None)
+    st.rerun()
+
 st.sidebar.markdown("### Navigation")
 page = st.sidebar.radio(
     "Navigation Menu",
