@@ -2762,15 +2762,8 @@ elif page == "Prediction" and not st.session_state.get("prediction_mode"):
             unsafe_allow_html=True,
         )
         if st.button(
-            "🚀 Start Individual Prediction
-</button>
-<div class="batch-card-added">
-<h3>📁 Batch Prediction</h3>
-<p>
-Upload an Excel or CSV file to predict multiple students simultaneously,
-identify performance categories and generate analytical reports.
-</p>
-</div>
+            "🚀 Start Individual Prediction"
+
 ",
             key="start_individual_prediction",
             type="primary",
