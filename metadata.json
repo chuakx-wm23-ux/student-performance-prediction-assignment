@@ -1,0 +1,22 @@
+{
+  "features": [
+    "Average_Score",
+    "Attendance_Pct",
+    "Study_Hours_Per_Day",
+    "Previous_CGPA"
+  ],
+  "classes": [
+    "Excellent",
+    "Good",
+    "Average",
+    "At Risk"
+  ],
+  "cgpa_ranges": {
+    "Excellent": "3.50 - 4.00",
+    "Good": "3.00 - 3.49",
+    "Average": "2.50 - 2.99",
+    "At Risk": "Below 2.50"
+  },
+  "best_model": "ANN",
+  "best_accuracy": 0.811
+}
