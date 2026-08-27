@@ -167,7 +167,7 @@ st.markdown("""
     position: fixed !important;
     bottom: 18px !important;
     left: 25px !important;
-    width: 200px !important;
+    width: 230px !important;
     text-align: center !important;
     z-index: 999 !important;
 }
@@ -887,8 +887,8 @@ h1, h2, h3 {
 
 /* FINAL COMPACT SIDEBAR OVERRIDE */
 [data-testid="stSidebar"] {
-    width: 200px !important;
-    min-width: 200px !important;
+    width: 230px !important;
+    min-width: 230px !important;
 }
 
 [data-testid="stSidebar"] div[role="radiogroup"] label {
