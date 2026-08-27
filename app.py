@@ -43,7 +43,7 @@ st.set_page_config(
 st.markdown("""
 <style>
 :root {
-    --sidebar-width: 190px;
+    --sidebar-width: 165px;
     --navy: #0f172a;
     --navy-soft: #172554;
     --blue: #2563eb;
@@ -120,14 +120,14 @@ st.markdown("""
 }
 
 [data-testid="stSidebar"] h1 {
-    font-size: 1.65rem !important;
+    font-size: 1.35rem !important;
     font-weight: 800 !important;
     letter-spacing: -0.02em;
     margin-bottom: 1.35rem !important;
 }
 
 [data-testid="stSidebar"] [data-testid="stMarkdownContainer"] p {
-    font-size: 0.95rem !important;
+    font-size: 0.78rem !important;
     font-weight: 800 !important;
 }
 
@@ -139,9 +139,9 @@ st.markdown("""
     background: rgba(255,255,255,0.045);
     border: 1px solid rgba(255,255,255,0.06);
     border-radius: 14px;
-    padding: 0.72rem 0.85rem;
+    padding: 0.50rem 0.65rem;
     transition: all 0.18s ease;
-    min-height: 44px;
+    min-height: 36px;
 }
 
 [data-testid="stSidebar"] div[role="radiogroup"] label:hover {
@@ -156,7 +156,7 @@ st.markdown("""
 }
 
 [data-testid="stSidebar"] div[role="radiogroup"] label p {
-    font-size: 0.98rem !important;
+    font-size: 0.82rem !important;
     font-weight: 700 !important;
     margin: 0 !important;
 }
@@ -164,9 +164,9 @@ st.markdown("""
 /* Sidebar footer */
 .sidebar-footer {
     position: fixed;
-    left: 18px;
+    left: 12px;
     bottom: 4px;
-    width: calc(var(--sidebar-width) - 36px);
+    width: calc(var(--sidebar-width) - 24px);
     padding: 0.80rem 0.8rem 0.35rem;
     border-top: 1px solid rgba(255,255,255,0.10);
     text-align: center;
@@ -2730,6 +2730,16 @@ elif page == "Prediction" and st.session_state.get("prediction_mode") == "indivi
             key="number_of_subjects"
         )
 
+        # Convert entered score immediately using 0.5 threshold rule
+        def normalize_score(index):
+            key = f"subject_{index}"
+            value = st.session_state.get(key)
+
+            if value is not None:
+                converted = math.floor(float(value) + 0.5)
+                converted = max(0, min(5, converted))
+                st.session_state[key] = converted
+
         scores = []
         columns = st.columns(2)
 
@@ -2742,19 +2752,10 @@ elif page == "Prediction" and st.session_state.get("prediction_mode") == "indivi
                     value=None,
                     placeholder="Enter score",
                     step=0.1,
-                    key=f"subject_{i}"
+                    key=f"subject_{i}",
+                    on_change=normalize_score,
+                    args=(i,)
                 )
-
-                if score is not None:
-                    # Round each subject score using normal 0.5 rule
-                    score = math.floor(score + 0.5)
-
-                    if score < 0:
-                        score = 0
-
-                    if score > 5:
-                        st.error("❌ Subject score must be between 0 and 5.")
-                        st.stop()
 
                 scores.append(score)
 
