@@ -552,7 +552,10 @@ h1, h2, h3 {
     border: 1px solid #e2e8f0;
     border-radius: 22px;
     padding: .82rem .92rem .68rem;
-    min-height: 176px;
+    height: 190px;
+    min-height: 190px;
+    display: flex;
+    flex-direction: column;
     box-shadow: 0 16px 38px rgba(15,23,42,.07);
     margin-bottom: .8rem;
     transition: transform .22s ease, box-shadow .22s ease, border-color .22s ease;
@@ -682,6 +685,10 @@ h1, h2, h3 {
     line-height: 1.5;
 }
 
+
+.prediction-mode-card .prediction-feature-row {
+    margin-top: auto;
+}
 
 .prediction-feature-row {
     display: flex;
