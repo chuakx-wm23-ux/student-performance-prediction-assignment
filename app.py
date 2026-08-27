@@ -2840,14 +2840,19 @@ elif page == "Prediction" and not st.session_state.get("prediction_mode"):
 """,
             unsafe_allow_html=True,
         )
-        if st.button(
-            "📂 Start Batch Prediction",
-            key="start_batch_prediction",
-            type="primary",
-            use_container_width=True,
-        ):
-            st.session_state["prediction_mode"] = "batch"
-            st.rerun()
+        user_role = st.session_state.get("role", "Student")
+
+        if user_role == "Educator":
+            if st.button(
+                "📂 Start Batch Prediction",
+                key="start_batch_prediction",
+                type="primary",
+                use_container_width=True,
+            ):
+                st.session_state["prediction_mode"] = "batch"
+                st.rerun()
+        else:
+            st.info("📂 Batch Prediction is only available for Educator accounts.")
 
     st.markdown(
         """
