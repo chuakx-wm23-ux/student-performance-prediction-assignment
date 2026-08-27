@@ -1109,7 +1109,7 @@ h1, h2, h3 {
     border-radius: 12px !important;
 }
 
-/* Footer single compact line */
+/* Footer single compact line FINAL */
 .sidebar-footer {
     position: fixed !important;
     bottom: 12px !important;
@@ -1117,12 +1117,14 @@ h1, h2, h3 {
     width: 220px !important;
     text-align: center !important;
     white-space: nowrap !important;
+    overflow: hidden !important;
 }
 
 .sidebar-footer > div {
     display: inline !important;
-    font-size: 0.55rem !important;
+    font-size: 0.52rem !important;
     line-height: 1 !important;
+    white-space: nowrap !important;
 }
 
 .sidebar-footer > div:not(:last-child)::after {
