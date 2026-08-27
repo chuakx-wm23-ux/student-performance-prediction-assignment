@@ -2834,7 +2834,7 @@ def create_batch_template():
     return output.getvalue()
 
 
-elif page == "Prediction" and st.session_state.get("prediction_mode") == "batch":
+if page == "Prediction" and st.session_state.get("prediction_mode") == "batch":
 
     st.markdown(
         """
