@@ -177,28 +177,11 @@ st.markdown("""
     font-weight: 750 !important;
 }
 
-/* Footer */
-.sidebar-footer {
-    position: fixed !important;
-    bottom: 16px !important;
-    left: 18px !important;
-    width: 210px !important;
-    text-align: center !important;
-    z-index: 999 !important;
-}
 
-.sidebar-footer .footer-brand {
-    font-size: 0.62rem !important;
-}
 
-.sidebar-footer .footer-subtitle,
-.sidebar-footer .footer-powered,
-.sidebar-footer .footer-version,
-.sidebar-footer .footer-group,
-.sidebar-footer .footer-copyright {
-    font-size: 0.55rem !important;
-    line-height: 1.25 !important;
-}
+
+
+
 
 /* Main hero */
 .hero {
@@ -938,26 +921,11 @@ h1, h2, h3 {
     background: rgba(255,255,255,0.12);
 }
 
-/* Footer */
-.sidebar-footer {
-    width: 200px !important;
-    left: 15px !important;
-    bottom: 20px !important;
-}
 
-.sidebar-footer .footer-brand {
-    font-size: 0.68rem !important;
-    font-weight: 800 !important;
-}
 
-.sidebar-footer .footer-subtitle,
-.sidebar-footer .footer-powered,
-.sidebar-footer .footer-version,
-.sidebar-footer .footer-group,
-.sidebar-footer .footer-copyright {
-    font-size: 0.60rem !important;
-    line-height: 1.35 !important;
-}
+
+
+
 
 
 /* Premium Login Screen */
@@ -1053,17 +1021,9 @@ h1, h2, h3 {
     font-size: 0.75rem !important;
 }
 
-/* Footer */
-.sidebar-footer {
-    bottom: 15px !important;
-    width: 210px !important;
-    left: 18px !important;
-}
 
-.sidebar-footer * {
-    font-size: 0.62rem !important;
-    line-height: 1.35 !important;
-}
+
+
 
 
 /* ===== FINAL SIDEBAR CLEAN OVERRIDE ===== */
@@ -1109,27 +1069,11 @@ h1, h2, h3 {
     border-radius: 12px !important;
 }
 
-/* Footer exactly 2 lines compact FINAL */
-.sidebar-footer {
-    position: fixed !important;
-    bottom: 10px !important;
-    left: 10px !important;
-    width: 235px !important;
-    text-align: center !important;
-    white-space: normal !important;
-}
 
-.sidebar-footer > div {
-    display: inline !important;
-    font-size: 0.50rem !important;
-    line-height: 1.05 !important;
-    margin: 0 !important;
-}
 
-.sidebar-footer > div:not(:last-child)::after {
-    content: " • ";
-    color: rgba(255,255,255,.45);
-}
+
+
+
 
 /* keep footer away from About button */
 .sidebar-footer {
@@ -1137,29 +1081,11 @@ h1, h2, h3 {
 }
 
 
-/* Footer one short line FINAL */
-.sidebar-footer {
-    position: fixed !important;
-    bottom: 10px !important;
-    left: 8px !important;
-    width: 240px !important;
-    text-align: center !important;
-    white-space: nowrap !important;
-    overflow: hidden !important;
-}
 
-.sidebar-footer > div {
-    display: inline !important;
-    font-size: 0.48rem !important;
-    line-height: 1 !important;
-    margin: 0 !important;
-    white-space: nowrap !important;
-}
 
-.sidebar-footer > div:not(:last-child)::after {
-    content: " • ";
-    color: rgba(255,255,255,.45);
-}
+
+
+
 
 
 /* FINAL FOOTER CLEAN */
@@ -1174,6 +1100,22 @@ h1, h2, h3 {
     z-index: 10 !important;
     font-size: 0.55rem !important;
     line-height: 1 !important;
+}
+
+
+/* FINAL COMPACT SIDEBAR FOOTER */
+.sidebar-footer {
+    position: fixed !important;
+    bottom: 12px !important;
+    left: 12px !important;
+    width: 225px !important;
+    text-align: center !important;
+    white-space: nowrap !important;
+    overflow: hidden !important;
+    font-size: 0.52rem !important;
+    line-height: 1 !important;
+    color: rgba(255,255,255,0.75) !important;
+    z-index: 5 !important;
 }
 
 </style>
