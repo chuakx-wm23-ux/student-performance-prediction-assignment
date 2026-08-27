@@ -20,9 +20,6 @@ from pathlib import Path
 def validate_student_inputs(name, student_id):
     errors = []
 
-    if name.strip() and not re.fullmatch(r"[A-Za-z ]+", name.strip()):
-        errors.append("❌ Student Name can only contain English letters.")
-
     if student_id.strip():
         if not student_id.isdigit():
             errors.append("❌ Student ID must contain numbers only.")
@@ -46,7 +43,7 @@ st.set_page_config(
 st.markdown("""
 <style>
 :root {
-    --sidebar-width: 235px;
+    --sidebar-width: 145px;
     --navy: #0f172a;
     --navy-soft: #172554;
     --blue: #2563eb;
@@ -123,14 +120,14 @@ st.markdown("""
 }
 
 [data-testid="stSidebar"] h1 {
-    font-size: 1.65rem !important;
+    font-size: 1.35rem !important;
     font-weight: 800 !important;
     letter-spacing: -0.02em;
     margin-bottom: 1.35rem !important;
 }
 
 [data-testid="stSidebar"] [data-testid="stMarkdownContainer"] p {
-    font-size: 0.95rem !important;
+    font-size: 0.78rem !important;
     font-weight: 800 !important;
 }
 
@@ -142,9 +139,9 @@ st.markdown("""
     background: rgba(255,255,255,0.045);
     border: 1px solid rgba(255,255,255,0.06);
     border-radius: 14px;
-    padding: 0.72rem 0.85rem;
+    padding: 0.50rem 0.65rem;
     transition: all 0.18s ease;
-    min-height: 44px;
+    min-height: 36px;
 }
 
 [data-testid="stSidebar"] div[role="radiogroup"] label:hover {
@@ -159,7 +156,7 @@ st.markdown("""
 }
 
 [data-testid="stSidebar"] div[role="radiogroup"] label p {
-    font-size: 0.98rem !important;
+    font-size: 0.72rem !important;
     font-weight: 700 !important;
     margin: 0 !important;
 }
@@ -167,9 +164,9 @@ st.markdown("""
 /* Sidebar footer */
 .sidebar-footer {
     position: fixed;
-    left: 18px;
+    left: 12px;
     bottom: 4px;
-    width: calc(var(--sidebar-width) - 36px);
+    width: calc(var(--sidebar-width) - 24px);
     padding: 0.80rem 0.8rem 0.35rem;
     border-top: 1px solid rgba(255,255,255,0.10);
     text-align: center;
@@ -2707,21 +2704,23 @@ elif page == "Prediction" and st.session_state.get("prediction_mode") == "indivi
         # All inputs are outside st.form so that changes refresh immediately.
         name = st.text_input("Student Name", key="student_name")
 
+        name_valid = True
+        if name.strip():
+            name_valid = bool(re.fullmatch(r"[A-Za-z ]+", name.strip()))
+            if not name_valid:
+                st.error("❌ Student Name can only contain English letters.")
+
         student_id = st.text_input(
             "Student ID",
             key="student_id",
             placeholder="Enter 7-digit Student ID"
         )
 
-        # Real-time input validation
-        name_valid = bool(re.fullmatch(r"[A-Za-z ]+", name.strip())) if name.strip() else False
-        id_valid = bool(re.fullmatch(r"\d{7}", student_id.strip())) if student_id.strip() else False
-
-        if name.strip() and not name_valid:
-            st.error("❌ Student Name can only contain English letters.")
-
-        if student_id.strip() and not id_valid:
-            st.error("❌ Student ID must contain exactly 7 digits.")
+        id_valid = True
+        if student_id.strip():
+            id_valid = student_id.isdigit() and len(student_id.strip()) == 7
+            if not id_valid:
+                st.error("❌ Student ID must contain exactly 7 digits.")
 
         number_of_subjects = st.slider(
             "Number of Subjects",
@@ -2731,37 +2730,57 @@ elif page == "Prediction" and st.session_state.get("prediction_mode") == "indivi
             key="number_of_subjects"
         )
 
+        # Subject scores: 0-100 scale, convert decimals using 0.5 rule
+        # Example: 44.4 -> 44, 44.5 -> 45, 87.8 -> 88
+        def normalize_score(index):
+            key = f"subject_{index}"
+            value = st.session_state.get(key)
+
+            if value is not None:
+                try:
+                    value = float(value)
+                    converted = int(math.floor(value + 0.5))
+                    converted = max(0, min(100, converted))
+                    st.session_state[key] = converted
+                except:
+                    st.session_state[key] = None
+
         scores = []
         columns = st.columns(2)
 
         for i in range(number_of_subjects):
             with columns[i % 2]:
+                key = f"subject_{i}"
+
                 score = st.number_input(
                     f"Subject {i + 1} Score",
                     min_value=0.0,
                     max_value=100.0,
                     value=None,
-                    placeholder="Enter score",
-                    step=0.1,
-                    key=f"subject_{i}"
+                    placeholder="Enter score (0-100)",
+                    step=0.5,
+                    format="%.1f",
+                    key=key,
+                    on_change=normalize_score,
+                    args=(i,)
                 )
-
-                # Automatically round every entered score to nearest 0.5
-                if score is not None:
-                    score = round(score * 2) / 2
-                    if score < 0.5:
-                        score = 0.0
 
                 scores.append(score)
 
         valid_scores = [s for s in scores if s is not None]
 
         if len(valid_scores) == number_of_subjects:
-            average_score = sum(valid_scores) / len(valid_scores)
-            st.info(f"Calculated Average Score: {average_score:.2f}")
+            rounded_scores = [
+                int(math.floor(float(s) + 0.5))
+                for s in valid_scores
+            ]
+
+            raw_average = sum(rounded_scores) / len(rounded_scores)
+            average_score = int(math.floor(raw_average + 0.5))
+            st.info(f"Calculated Average Score: {average_score}")
         else:
             average_score = None
-            st.warning("Please enter all subject scores before prediction.")
+            st.warning("⚠️ Please complete all subject scores before prediction.")
 
         attendance = st.slider(
             "Attendance Rate (%)",
@@ -2798,6 +2817,7 @@ elif page == "Prediction" and st.session_state.get("prediction_mode") == "indivi
 
         if submit:
 
+
             if not name.strip():
                 st.error("❌ Student Name is required.")
                 st.stop()
@@ -2817,6 +2837,7 @@ elif page == "Prediction" and st.session_state.get("prediction_mode") == "indivi
             if average_score is None:
                 st.error("Please complete all subject scores.")
                 st.stop()
+
 
             input_df = pd.DataFrame([{
                 "Average_Score": average_score,
