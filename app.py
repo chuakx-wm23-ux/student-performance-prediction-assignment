@@ -1,6 +1,7 @@
 from pathlib import Path
 from io import BytesIO
 from datetime import datetime
+import re
 import joblib
 import pandas as pd
 import plotly.express as px
@@ -2751,68 +2752,97 @@ elif page == "Prediction" and st.session_state.get("prediction_mode") == "indivi
         )
 
         if submit:
-            input_df = pd.DataFrame([{
-                "Average_Score": average_score,
-                "Attendance_Pct": attendance,
-                "Study_Hours_Per_Day": study_hours,
-                "Previous_CGPA": previous_cgpa,
-            }])
+            # ============================
+            # INPUT VALIDATION
+            # ============================
+            validation_passed = True
 
-            predictions = []
-            best_name = evaluation.iloc[0]["Model"]
+            clean_name = name.strip()
 
-            for model_name, bundle in models.items():
-                model = bundle["model"]
-                label_encoder = bundle["label_encoder"]
+            if not clean_name:
+                st.error("Student Name is required.")
+                validation_passed = False
+            elif not re.fullmatch(r"[A-Za-z ]+", clean_name):
+                st.error("Student Name can only contain letters and spaces.")
+                validation_passed = False
 
-                # Ensure prediction input matches the trained model features
-                model_input = input_df[bundle["model"].feature_names_in_]
-                pred_code = int(model.predict(model_input)[0])
-                pred_label = label_encoder.inverse_transform([pred_code])[0]
+            if not student_id.strip():
+                st.error("Student ID is required.")
+                validation_passed = False
+            elif not re.fullmatch(r"\d{7}", student_id.strip()):
+                st.error("Student ID must contain exactly 7 digits.")
+                validation_passed = False
 
-                probabilities = model.predict_proba(model_input)[0]
-                confidence = float(probabilities[pred_code])
+            for idx, score_value in enumerate(scores, start=1):
+                if score_value % 0.5 != 0:
+                    st.error(f"Subject {idx} score must use 0.5 interval.")
+                    validation_passed = False
 
-                predictions.append({
-                    "Model": model_name,
-                    "Prediction": pred_label,
-                    "Confidence": confidence,
-                })
+            if validation_passed:
+                name = clean_name.title()
 
-            result_df = pd.DataFrame(predictions)
-            best_row = result_df[result_df["Model"] == best_name].iloc[0]
+            if validation_passed:
+                input_df = pd.DataFrame([{
+                    "Average_Score": average_score,
+                    "Attendance_Pct": attendance,
+                    "Study_Hours_Per_Day": study_hours,
+                    "Previous_CGPA": previous_cgpa,
+                }])
 
-            prediction_lookup = {
-                row["Model"]: row["Prediction"]
-                for _, row in result_df.iterrows()
-            }
+                predictions = []
+                best_name = evaluation.iloc[0]["Model"]
 
-            report = pd.DataFrame([{
-                "Student_ID": student_id,
-                "Student_Name": name,
-                "Number_of_Subjects": number_of_subjects,
-                "Average_Score": average_score,
-                "Attendance_Pct": attendance,
-                "Study_Hours_Per_Day": study_hours,
-                "Previous_CGPA": previous_cgpa,
-                "KNN_Prediction": prediction_lookup.get("KNN", ""),
-                "SVM_Prediction": prediction_lookup.get("SVM", ""),
-                "ANN_Prediction": prediction_lookup.get("ANN", ""),
-                "Final_Prediction": best_row["Prediction"],
-                "Best_Model": best_name,
-                "Final_Confidence": best_row["Confidence"],
-            }])
+                for model_name, bundle in models.items():
+                    model = bundle["model"]
+                    label_encoder = bundle["label_encoder"]
 
-            st.session_state["prediction_result"] = {
-                "prediction": best_row["Prediction"],
-                "confidence": float(best_row["Confidence"]),
-                "best_model": best_name,
-                "result_df": result_df,
-                "report_excel": make_excel_bytes(report),
-            }
+                    # Ensure prediction input matches the trained model features
+                    model_input = input_df[bundle["model"].feature_names_in_]
+                    pred_code = int(model.predict(model_input)[0])
+                    pred_label = label_encoder.inverse_transform([pred_code])[0]
 
-            st.rerun()
+                    probabilities = model.predict_proba(model_input)[0]
+                    confidence = float(probabilities[pred_code])
 
+                    predictions.append({
+                        "Model": model_name,
+                        "Prediction": pred_label,
+                        "Confidence": confidence,
+                    })
+
+                result_df = pd.DataFrame(predictions)
+                best_row = result_df[result_df["Model"] == best_name].iloc[0]
+
+                prediction_lookup = {
+                    row["Model"]: row["Prediction"]
+                    for _, row in result_df.iterrows()
+                }
+
+                report = pd.DataFrame([{
+                    "Student_ID": student_id,
+                    "Student_Name": name,
+                    "Number_of_Subjects": number_of_subjects,
+                    "Average_Score": average_score,
+                    "Attendance_Pct": attendance,
+                    "Study_Hours_Per_Day": study_hours,
+                    "Previous_CGPA": previous_cgpa,
+                    "KNN_Prediction": prediction_lookup.get("KNN", ""),
+                    "SVM_Prediction": prediction_lookup.get("SVM", ""),
+                    "ANN_Prediction": prediction_lookup.get("ANN", ""),
+                    "Final_Prediction": best_row["Prediction"],
+                    "Best_Model": best_name,
+                    "Final_Confidence": best_row["Confidence"],
+                }])
+
+                st.session_state["prediction_result"] = {
+                    "prediction": best_row["Prediction"],
+                    "confidence": float(best_row["Confidence"]),
+                    "best_model": best_name,
+                    "result_df": result_df,
+                    "report_excel": make_excel_bytes(report),
+                }
+
+                st.rerun()
 elif page == "Prediction" and st.session_state.get("prediction_mode") == "batch":
     st.markdown(
         """
