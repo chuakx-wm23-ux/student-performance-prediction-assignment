@@ -168,7 +168,7 @@ st.markdown("""
     box-shadow: 0 10px 25px rgba(124,58,237,.35);
 }
 
-/* Logout button only */
+/* Sidebar buttons */
 [data-testid="stSidebar"] .stButton button {
     min-height: 34px !important;
     height: 34px !important;
@@ -1012,14 +1012,14 @@ h1, h2, h3 {
 }
 
 [data-testid="stSidebar"] div[role="radiogroup"] label {
-    min-height: 46px !important;
-    height: 46px !important;
+    min-height: 56px !important;
+    height: 56px !important;
     padding: 0.15rem 0.5rem !important;
     border-radius: 12px !important;
 }
 
 [data-testid="stSidebar"] div[role="radiogroup"] label p {
-    font-size: 0.74rem !important;
+    font-size: 0.88rem !important;
     font-weight: 750 !important;
 }
 
@@ -2618,30 +2618,6 @@ CGPA below 2.50
         unsafe_allow_html=True
     )
 
-
-
-# ---------------- AUTHENTICATION MODULE ----------------
-try:
-    from login.login import login_screen
-except ImportError:
-    from login import login_screen
-
-# Secure session control
-if "authenticated" not in st.session_state:
-    st.session_state.authenticated = False
-
-if "role" not in st.session_state:
-    st.session_state.role = None
-
-if not st.session_state.authenticated:
-    login_screen()
-    st.stop()
-
-# Force role refresh after login
-current_role = st.session_state.get("role", "Student")
-
-if current_role not in ["Student", "Educator"]:
-    st.session_state.role = "Student"
 
 
 df = load_data()
