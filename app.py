@@ -2626,6 +2626,7 @@ try:
 except ImportError:
     from login.login import login_screen
 
+# Authentication is handled by login/login.py
 if "authenticated" not in st.session_state:
     st.session_state.authenticated = False
 
