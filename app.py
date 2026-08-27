@@ -1091,6 +1091,20 @@ h1, h2, h3 {
     bottom: 12px !important;
 }
 
+
+.batch-card-added {
+    background: rgba(255,255,255,0.96);
+    border-radius: 22px;
+    padding: 1.2rem;
+    box-shadow: 0 16px 38px rgba(15,23,42,.08);
+    border: 1px solid #e2e8f0;
+}
+.batch-card-added h3 {
+    color:#172033;
+}
+.batch-card-added p {
+    color:#64748b;
+}
 </style>
 """, unsafe_allow_html=True)
 
@@ -2748,7 +2762,16 @@ elif page == "Prediction" and not st.session_state.get("prediction_mode"):
             unsafe_allow_html=True,
         )
         if st.button(
-            "🚀 Start Individual Prediction",
+            "🚀 Start Individual Prediction
+</button>
+<div class="batch-card-added">
+<h3>📁 Batch Prediction</h3>
+<p>
+Upload an Excel or CSV file to predict multiple students simultaneously,
+identify performance categories and generate analytical reports.
+</p>
+</div>
+",
             key="start_individual_prediction",
             type="primary",
             use_container_width=True,
