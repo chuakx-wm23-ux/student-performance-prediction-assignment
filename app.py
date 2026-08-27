@@ -2892,15 +2892,20 @@ if page == "Prediction" and st.session_state.get("prediction_mode") == "batch":
         else:
             batch_df = pd.read_excel(uploaded_file)
 
+        st.markdown("### 👀 Preview Uploaded Data")
+        st.dataframe(
+            batch_df.head(100),
+            hide_index=True,
+            use_container_width=True
+        )
+
         errors = validate_batch_data(batch_df)
 
         if errors:
             for error in errors:
                 st.error(error)
         else:
-            # Automatically generate batch prediction after valid upload
-            # No manual Run button required
-            if "batch_uploaded_file" not in st.session_state or st.session_state["batch_uploaded_file"] != uploaded_file.name:
+            if st.button("🚀 Run Batch Prediction", key="run_batch_prediction"):
                 result = predict_batch(batch_df)
                 st.session_state["batch_result"] = result
                 st.session_state["batch_uploaded_file"] = uploaded_file.name
@@ -2967,6 +2972,11 @@ if page == "Prediction" and st.session_state.get("prediction_mode") == "batch":
             file_name="Batch_Prediction_Report.xlsx",
             mime="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
         )
+
+        if st.button("🔄 Make Another Prediction", key="make_another_batch", type="secondary"):
+            st.session_state.pop("batch_result", None)
+            st.session_state.pop("batch_uploaded_file", None)
+            st.rerun()
 
 
 
