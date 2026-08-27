@@ -1,4 +1,3 @@
-from pathlib import Path
 from io import BytesIO
 from datetime import datetime
 import joblib
@@ -16,10 +15,27 @@ import matplotlib.pyplot as plt
 import re
 import math
 
+from pathlib import Path
+
+def validate_student_inputs(name, student_id):
+    errors = []
+
+    if name.strip() and not re.fullmatch(r"[A-Za-z ]+", name.strip()):
+        errors.append("❌ Student Name can only contain English letters.")
+
+    if student_id.strip():
+        if not student_id.isdigit():
+            errors.append("❌ Student ID must contain numbers only.")
+        elif len(student_id.strip()) != 7:
+            errors.append("❌ Student ID must contain exactly 7 digits.")
+
+    return errors
+
 ROOT = Path(__file__).resolve().parent
 DATA = ROOT / "dataset" / "Student_data.csv"
 MODELS = ROOT / "models"
 RESULTS = ROOT / "results"
+
 
 st.set_page_config(
     page_title="Student Performance Prediction",
@@ -2699,11 +2715,10 @@ elif page == "Prediction" and st.session_state.get("prediction_mode") == "indivi
 
         # Real-time input validation
         name_valid = bool(re.fullmatch(r"[A-Za-z ]+", name.strip())) if name.strip() else False
+        id_valid = bool(re.fullmatch(r"\d{7}", student_id.strip())) if student_id.strip() else False
 
         if name.strip() and not name_valid:
             st.error("❌ Student Name can only contain English letters.")
-
-        id_valid = bool(re.fullmatch(r"\d{7}", student_id.strip())) if student_id.strip() else False
 
         if student_id.strip() and not id_valid:
             st.error("❌ Student ID must contain exactly 7 digits.")
@@ -2735,11 +2750,8 @@ elif page == "Prediction" and st.session_state.get("prediction_mode") == "indivi
         valid_scores = [s for s in scores if s is not None]
 
         if len(valid_scores) == number_of_subjects:
-            # Convert decimal marks upward (e.g. 90.5 -> 91, 4.8 -> 5)
-            rounded_scores = [math.ceil(score) for score in valid_scores]
-
-            average_score = sum(rounded_scores) / len(rounded_scores)
-            st.info(f"Calculated Average Score: {average_score:.0f}")
+            average_score = sum([math.ceil(s) for s in valid_scores]) / len(valid_scores)
+            st.info(f"Calculated Average Score: {average_score:.2f}")
         else:
             average_score = None
             st.warning("Please enter all subject scores before prediction.")
