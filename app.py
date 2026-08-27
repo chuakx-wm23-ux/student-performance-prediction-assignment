@@ -1473,6 +1473,7 @@ def make_excel_bytes(dataframe):
     return output.getvalue()
 
 
+@st.cache_data(show_spinner=False)
 def make_batch_excel_bytes(dataframe):
     """
     Create a polished batch Excel export.
@@ -3007,7 +3008,8 @@ if page == "Prediction" and st.session_state.get("prediction_mode") == "batch":
 
         st.dataframe(result, hide_index=True, use_container_width=True)
 
-        excel = make_batch_excel_bytes(result)
+        with st.spinner("Preparing Excel report..."):
+            excel = make_batch_excel_bytes(result)
 
         button_col1, button_col2 = st.columns(2, gap="large")
 
