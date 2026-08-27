@@ -1136,6 +1136,31 @@ h1, h2, h3 {
     z-index: 0 !important;
 }
 
+
+/* Footer one short line FINAL */
+.sidebar-footer {
+    position: fixed !important;
+    bottom: 10px !important;
+    left: 8px !important;
+    width: 240px !important;
+    text-align: center !important;
+    white-space: nowrap !important;
+    overflow: hidden !important;
+}
+
+.sidebar-footer > div {
+    display: inline !important;
+    font-size: 0.48rem !important;
+    line-height: 1 !important;
+    margin: 0 !important;
+    white-space: nowrap !important;
+}
+
+.sidebar-footer > div:not(:last-child)::after {
+    content: " • ";
+    color: rgba(255,255,255,.45);
+}
+
 </style>
 """, unsafe_allow_html=True)
 
@@ -4626,3 +4651,6 @@ elif page == "About":
 #   Attendance_Pct
 #   Study_Hours_Per_Day
 #   Previous_CGPA
+
+<!-- Compact Footer -->
+<div class="sidebar-footer">🎓 Student AI • Version 1.0 • RIS Group 5 • ©2026</div>
