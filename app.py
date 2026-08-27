@@ -1126,6 +1126,15 @@ h1, h2, h3 {
     min-height: 32px !important;
 }
 
+
+/* FINAL BUTTON SIZE BOOST */
+.stButton > button,
+.stDownloadButton > button,
+[data-testid="stFormSubmitButton"] > button {
+    min-height: 54px !important;
+    font-size: 0.95rem !important;
+}
+
 </style>
 """, unsafe_allow_html=True)
 
@@ -2933,6 +2942,29 @@ if page == "Prediction" and st.session_state.get("prediction_mode") == "batch":
             c2.metric("Excellent", int(counts.get("Excellent", 0)))
             c3.metric("Good", int(counts.get("Good", 0)))
             c4.metric("At Risk", int(counts.get("At Risk", 0)))
+
+            # ===== Large Dashboard Graph =====
+            performance_df = counts.reset_index()
+            performance_df.columns = ["Performance", "Students"]
+
+            large_fig = px.bar(
+                performance_df,
+                x="Performance",
+                y="Students",
+                title="Overall Student Performance Distribution",
+                text="Students",
+                template="plotly_white",
+            )
+            large_fig.update_layout(
+                height=520,
+                xaxis_title="Performance Category",
+                yaxis_title="Number of Students",
+                title_x=0.5,
+            )
+            st.plotly_chart(
+                large_fig,
+                use_container_width=True,
+            )
 
             chart_col1, chart_col2 = st.columns(2)
 
