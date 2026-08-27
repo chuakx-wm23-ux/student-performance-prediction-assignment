@@ -2704,7 +2704,6 @@ elif page == "Prediction" and st.session_state.get("prediction_mode") == "indivi
         # All inputs are outside st.form so that changes refresh immediately.
         name = st.text_input("Student Name", key="student_name")
 
-        # Name validation directly below Name input
         name_valid = True
         if name.strip():
             name_valid = bool(re.fullmatch(r"[A-Za-z ]+", name.strip()))
@@ -2717,7 +2716,6 @@ elif page == "Prediction" and st.session_state.get("prediction_mode") == "indivi
             placeholder="Enter 7-digit Student ID"
         )
 
-        # ID validation directly below ID input
         id_valid = True
         if student_id.strip():
             id_valid = student_id.isdigit() and len(student_id.strip()) == 7
@@ -2748,12 +2746,20 @@ elif page == "Prediction" and st.session_state.get("prediction_mode") == "indivi
                 )
 
                 if score is not None:
-                    # nearest 0.5 rounding
                     score = round(score * 2) / 2
                     if score < 0.5:
                         score = 0.0
 
                 scores.append(score)
+
+        valid_scores = [s for s in scores if s is not None]
+
+        if len(valid_scores) == number_of_subjects:
+            average_score = sum(valid_scores) / len(valid_scores)
+            st.info(f"Calculated Average Score: {average_score:.2f}")
+        else:
+            average_score = None
+            st.warning("Please enter all subject scores before prediction.")
 
         attendance = st.slider(
             "Attendance Rate (%)",
@@ -2790,6 +2796,7 @@ elif page == "Prediction" and st.session_state.get("prediction_mode") == "indivi
 
         if submit:
 
+
             if not name.strip():
                 st.error("❌ Student Name is required.")
                 st.stop()
@@ -2809,6 +2816,7 @@ elif page == "Prediction" and st.session_state.get("prediction_mode") == "indivi
             if average_score is None:
                 st.error("Please complete all subject scores.")
                 st.stop()
+
 
             input_df = pd.DataFrame([{
                 "Average_Score": average_score,
