@@ -979,7 +979,7 @@ h1, h2, h3 {
 /* Logout */
 [data-testid="stSidebar"] button {
     border-radius: 12px !important;
-    min-height: 36px !important;
+    min-height: 46px !important;
     font-size: 0.75rem !important;
 }
 
@@ -1012,8 +1012,8 @@ h1, h2, h3 {
 }
 
 [data-testid="stSidebar"] div[role="radiogroup"] label {
-    min-height: 36px !important;
-    height: 36px !important;
+    min-height: 46px !important;
+    height: 46px !important;
     padding: 0.15rem 0.5rem !important;
     border-radius: 12px !important;
 }
@@ -2620,18 +2620,38 @@ CGPA below 2.50
 
 
 
-# ---------------- MAIN APPLICATION (NO LOGIN) ----------------\n\ndf = load_data()
+# ---------------- AUTHENTICATION MODULE ----------------
+try:
+    from login.login import login_screen
+except ImportError:
+    from login import login_screen
+
+# Secure session control
+if "authenticated" not in st.session_state:
+    st.session_state.authenticated = False
+
+if "role" not in st.session_state:
+    st.session_state.role = None
+
+if not st.session_state.authenticated:
+    login_screen()
+    st.stop()
+
+# Force role refresh after login
+current_role = st.session_state.get("role", "Student")
+
+if current_role not in ["Student", "Educator"]:
+    st.session_state.role = "Student"
+
+
+df = load_data()
 models = load_models()
 evaluation = pd.read_csv(RESULTS / "evaluation.csv")
 
 st.sidebar.title("🎓 Student AI")
 
-st.sidebar.markdown(
-    "AI-powered academic performance analysis system"
-)
 
-st.sidebar.markdown("### Navigation")
-
+# Single user navigation (no login / no role restriction)
 navigation_options = [
     "🏠 Home",
     "🎯 Prediction",
@@ -2716,8 +2736,7 @@ elif page == "Prediction" and not st.session_state.get("prediction_mode"):
     <h2>Student Performance Prediction System</h2>
     <p>
         Predict student academic performance using KNN, SVM and ANN.
-        Choose individual analysis or batch processing to identify at-risk
-        students and support faster academic decisions.
+        Analyse individual student performance and generate AI-based insights.
     </p>
     <p><b>Select a prediction mode below to begin.</b></p>
 </div>
@@ -2731,7 +2750,7 @@ elif page == "Prediction" and not st.session_state.get("prediction_mode"):
     stat_col3.metric("📚 Input Features", "4")
     stat_col4.metric("🤖 ML Models", "3")
 
-    card_col1, card_col2 = st.columns(2, gap="small")
+    card_col1 = st.columns(1)[0]
 
     with card_col1:
         st.markdown(
@@ -2760,39 +2779,6 @@ elif page == "Prediction" and not st.session_state.get("prediction_mode"):
         ):
             st.session_state["prediction_mode"] = "individual"
             st.rerun()
-
-    with card_col2:
-        st.markdown(
-            """
-<div class="prediction-mode-card">
-    <div class="prediction-mode-icon">📂</div>
-    <div class="prediction-mode-title">Batch Prediction</div>
-    <div class="prediction-mode-desc">
-        Upload an Excel or CSV file to predict multiple students simultaneously,
-        identify at-risk students and export a professional analytical workbook.
-    </div>
-    <div class="prediction-feature-row">
-        <div class="prediction-feature-chip">✓ Excel / CSV</div>
-        <div class="prediction-feature-chip">✓ Dashboard</div>
-        <div class="prediction-feature-chip">✓ At-risk detection</div>
-    </div>
-</div>
-""",
-            unsafe_allow_html=True,
-        )
-        user_role = st.session_state.get("role", "Student")
-
-        if user_role == "Educator":
-            if st.button(
-                "📂 Start Batch Prediction",
-                key="start_batch_prediction",
-                type="primary",
-                use_container_width=True,
-            ):
-                st.session_state["prediction_mode"] = "batch"
-                st.rerun()
-        else:
-            st.info("📂 Batch Prediction is only available for Educator accounts.")
 
     st.markdown(
         """
@@ -3089,322 +3075,6 @@ elif page == "Prediction" and st.session_state.get("prediction_mode") == "indivi
             }
 
             st.rerun()
-
-elif page == "Prediction" and st.session_state.get("prediction_mode") == "batch":
-    st.markdown(
-        """
-<div class="mode-page-hero">
-    <div class="mode-page-eyebrow">Multi-Student Analysis</div>
-    <h2>📂 Batch Prediction</h2>
-    <p>
-        Upload an Excel or CSV file to predict multiple students simultaneously,
-        identify at-risk students and export a professional Excel dashboard.
-    </p>
-</div>
-""",
-        unsafe_allow_html=True,
-    )
-
-    if st.button(
-        "← Back to Prediction Modes",
-        key="back_from_batch",
-        type="secondary",
-    ):
-        st.session_state.pop("prediction_mode", None)
-        st.session_state.pop("batch_prediction_result", None)
-        st.rerun()
-
-    template_col, note_col = st.columns([1, 2])
-    with template_col:
-        st.download_button(
-            "⬇️ Download Excel Template",
-            data=make_template_bytes(),
-            file_name="student_batch_prediction_template.xlsx",
-            mime="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
-            use_container_width=True,
-        )
-    with note_col:
-        st.markdown(
-            """
-<div class="batch-help-box">
-    <b>Required columns:</b> Average_Score,
-    Attendance_Pct, Study_Hours_Per_Day and Previous_CGPA.<br>
-    <span style="color:#64748b;">Student_ID and Student_Name are optional.</span>
-</div>
-""",
-            unsafe_allow_html=True,
-        )
-
-    uploaded_file = st.file_uploader(
-        "Upload completed Excel or CSV file",
-        type=["xlsx", "xls", "csv"],
-    )
-
-    if uploaded_file is not None:
-        try:
-            if uploaded_file.name.lower().endswith(".csv"):
-                batch_df = pd.read_csv(uploaded_file)
-            else:
-                batch_df = pd.read_excel(uploaded_file)
-
-            errors = validate_batch_data(batch_df)
-            if errors:
-                st.error("The uploaded file cannot be processed.")
-                for error in errors:
-                    st.write(f"• {error}")
-            else:
-                required = [
-                    "Number_of_Subjects",
-                    "Average_Score",
-                    "Attendance_Pct",
-                    "Study_Hours_Per_Day",
-                    "Previous_CGPA",
-                ]
-                for column in required:
-                    batch_df[column] = pd.to_numeric(batch_df[column])
-
-                st.success(f"{len(batch_df):,} student records loaded successfully.")
-                c1, c2, c3 = st.columns(3)
-                c1.metric("Uploaded Students", f"{len(batch_df):,}")
-                c2.metric("Required Features", "5")
-                c3.metric("Final Model", str(evaluation.iloc[0]["Model"]))
-
-                st.markdown("#### Uploaded Data Preview")
-                st.dataframe(batch_df.head(50), hide_index=True, use_container_width=True)
-
-                if st.button("Predict All Students", type="primary", use_container_width=True):
-                    with st.spinner("Generating batch predictions..."):
-                        st.session_state["batch_prediction_result"] = predict_batch(batch_df)
-                    st.rerun()
-
-        except ImportError:
-            st.error("Excel support is unavailable. Add openpyxl to requirements.txt and redeploy.")
-        except Exception as error:
-            st.error(f"Unable to process the uploaded file: {error}")
-
-    if "batch_prediction_result" in st.session_state:
-        result_df = st.session_state["batch_prediction_result"]
-        st.success(f"Batch prediction completed for {len(result_df):,} students.")
-
-        order = ["At Risk", "Average", "Good", "Excellent"]
-        counts = result_df["Final_Prediction"].value_counts().reindex(order, fill_value=0)
-        summary_cols = st.columns(4)
-        for col, category in zip(summary_cols, order):
-            col.metric(category, int(counts[category]))
-
-        summary_df = counts.rename_axis("Performance Category").reset_index(name="Students")
-        fig = px.bar(
-            summary_df,
-            x="Performance Category",
-            y="Students",
-            text="Students",
-            title="Batch Prediction Distribution",
-            category_orders={"Performance Category": order},
-        )
-        fig.update_traces(textposition="outside")
-        fig.update_layout(
-            title=dict(
-                x=0.5,
-                xanchor="center",
-                y=0.96,
-                yanchor="top",
-            ),
-            height=390,
-            margin=dict(l=20, r=20, t=75, b=20),
-        )
-        st.plotly_chart(fig, use_container_width=True)
-
-        display_df = result_df.copy()
-        for column in ["KNN_Confidence", "SVM_Confidence", "ANN_Confidence", "Final_Confidence"]:
-            display_df[column] = display_df[column].map(lambda value: f"{value:.1%}")
-
-        st.markdown("#### Batch Prediction Insights")
-
-        insight_col1, insight_col2 = st.columns(2)
-
-        with insight_col1:
-            bar_fig = px.bar(
-                summary_df,
-                x="Performance Category",
-                y="Students",
-                text="Students",
-                title="Students by Predicted Category",
-                category_orders={"Performance Category": order},
-            )
-            bar_fig.update_traces(textposition="outside")
-            bar_fig.update_layout(
-                title=dict(
-                    x=0.5,
-                    xanchor="center",
-                    y=0.96,
-                    yanchor="top",
-                ),
-                height=390,
-                margin=dict(l=20, r=20, t=75, b=20),
-            )
-            st.plotly_chart(bar_fig, use_container_width=True)
-
-        with insight_col2:
-            pie_fig = px.pie(
-                summary_df,
-                names="Performance Category",
-                values="Students",
-                title="Prediction Distribution",
-                hole=0.42,
-            )
-            pie_fig.update_layout(
-                title=dict(
-                    x=0.5,
-                    xanchor="center",
-                    y=0.96,
-                    yanchor="top",
-                ),
-                height=390,
-                margin=dict(l=20, r=20, t=75, b=20),
-            )
-            st.plotly_chart(pie_fig, use_container_width=True)
-
-        at_risk_df = result_df[
-            result_df["Final_Prediction"] == "At Risk"
-        ].copy()
-
-        st.markdown("#### ⚠️ At-Risk Student Dashboard")
-
-        risk_col1, risk_col2, risk_col3 = st.columns(3)
-        risk_col1.metric("Students Requiring Intervention", len(at_risk_df))
-        risk_col2.metric(
-            "At-Risk Percentage",
-            f"{(len(at_risk_df) / len(result_df)):.1%}" if len(result_df) else "0.0%",
-        )
-        risk_col3.metric("Recommended Action", "Early Support")
-
-        if at_risk_df.empty:
-            st.success("No students were classified as At Risk in this batch.")
-        else:
-            st.warning(
-                f"{len(at_risk_df):,} student(s) were classified as At Risk. "
-                "Early academic intervention is recommended."
-            )
-
-            risk_columns = [
-                column for column in [
-                    "Student_ID",
-                    "Student_Name",
-                    "Average_Score",
-                    "Attendance_Pct",
-                    "Study_Hours_Per_Day",
-                    "Previous_CGPA",
-                    "Final_Prediction",
-                    "Final_Confidence",
-                ]
-                if column in at_risk_df.columns
-            ]
-
-            at_risk_display = at_risk_df[risk_columns].copy()
-
-            if "Final_Confidence" in at_risk_display.columns:
-                at_risk_display["Final_Confidence"] = (
-                    at_risk_display["Final_Confidence"]
-                    .map(lambda value: f"{value:.1%}")
-                )
-
-            st.dataframe(
-                at_risk_display,
-                hide_index=True,
-                use_container_width=True,
-            )
-
-        st.markdown("#### Complete Prediction Results")
-
-        filter_col1, filter_col2 = st.columns([2, 1])
-
-        with filter_col1:
-            search_text = st.text_input(
-                "Search by Student ID or Student Name",
-                placeholder="Type a student ID or name...",
-                key="batch_result_search",
-            )
-
-        with filter_col2:
-            category_filter = st.selectbox(
-                "Filter by Performance Category",
-                ["All Categories"] + order,
-                key="batch_category_filter",
-            )
-
-        filtered_df = display_df.copy()
-
-        if search_text.strip():
-            searchable_columns = [
-                column for column in ["Student_ID", "Student_Name"]
-                if column in filtered_df.columns
-            ]
-
-            if searchable_columns:
-                search_mask = pd.Series(False, index=filtered_df.index)
-
-                for column in searchable_columns:
-                    search_mask = search_mask | filtered_df[
-                        column
-                    ].astype(str).str.contains(
-                        search_text.strip(),
-                        case=False,
-                        na=False,
-                    )
-
-                filtered_df = filtered_df[search_mask]
-
-        if category_filter != "All Categories":
-            filtered_df = filtered_df[
-                filtered_df["Final_Prediction"] == category_filter
-            ]
-
-        st.caption(
-            f"Showing {len(filtered_df):,} of {len(display_df):,} predicted records."
-        )
-
-        # Keep the report download controls visible above the large results table.
-        # This is especially important for mobile users and batches with thousands
-        # of records, where the table would otherwise push the buttons far below.
-        download_col, clear_col = st.columns(2)
-
-        with download_col:
-            st.download_button(
-                "⬇️ Download Predicted Excel",
-                data=make_batch_excel_bytes(result_df),
-                file_name="student_batch_predictions.xlsx",
-                mime="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
-                use_container_width=True,
-                key="download_batch_prediction_excel",
-            )
-
-        with clear_col:
-            if st.button(
-                "↻ Upload Another File",
-                type="secondary",
-                use_container_width=True,
-                key="clear_batch_prediction_result",
-            ):
-                del st.session_state["batch_prediction_result"]
-                st.rerun()
-
-        low_confidence_count = int(
-            (result_df["Final_Confidence"] < 0.60).sum()
-        )
-
-        if low_confidence_count > 0:
-            st.info(
-                f"{low_confidence_count:,} prediction(s) have confidence below 60%. "
-                "These records may require educator review."
-            )
-
-        st.dataframe(
-            filtered_df,
-            hide_index=True,
-            use_container_width=True,
-            height=620,
-        )
-
 
 elif page == "Model Results":
     st.subheader("Model Evaluation Dashboard")
