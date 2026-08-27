@@ -2704,25 +2704,25 @@ elif page == "Prediction" and st.session_state.get("prediction_mode") == "indivi
         # All inputs are outside st.form so that changes refresh immediately.
         name = st.text_input("Student Name", key="student_name")
 
+        # Name validation directly below Name input
+        name_valid = True
+        if name.strip():
+            name_valid = bool(re.fullmatch(r"[A-Za-z ]+", name.strip()))
+            if not name_valid:
+                st.error("❌ Student Name can only contain English letters.")
+
         student_id = st.text_input(
             "Student ID",
             key="student_id",
             placeholder="Enter 7-digit Student ID"
         )
 
-# Student ID validation
-if student_id.strip():
-    if not student_id.isdigit():
-        st.error("❌ Student ID must contain numbers only.")
-    elif len(student_id.strip()) != 7:
-        st.error("❌ Student ID must contain exactly 7 digits.")
-
-
-        # Real-time input validation
-        name_valid = bool(re.fullmatch(r"[A-Za-z ]+", name.strip()))
-
-        if student_id.strip() and not id_valid:
-            st.error("❌ Student ID must contain exactly 7 digits.")
+        # ID validation directly below ID input
+        id_valid = True
+        if student_id.strip():
+            id_valid = student_id.isdigit() and len(student_id.strip()) == 7
+            if not id_valid:
+                st.error("❌ Student ID must contain exactly 7 digits.")
 
         number_of_subjects = st.slider(
             "Number of Subjects",
@@ -2747,22 +2747,13 @@ if student_id.strip():
                     key=f"subject_{i}"
                 )
 
-                # Automatically round every entered score to nearest 0.5
                 if score is not None:
+                    # nearest 0.5 rounding
                     score = round(score * 2) / 2
                     if score < 0.5:
                         score = 0.0
 
                 scores.append(score)
-
-        valid_scores = [s for s in scores if s is not None]
-
-        if len(valid_scores) == number_of_subjects:
-            average_score = sum(valid_scores) / len(valid_scores)
-            st.info(f"Calculated Average Score: {average_score:.2f}")
-        else:
-            average_score = None
-            st.warning("Please enter all subject scores before prediction.")
 
         attendance = st.slider(
             "Attendance Rate (%)",
