@@ -101,18 +101,19 @@ st.markdown("""
 
 /* Sidebar */
 [data-testid="stSidebar"] {
-    width: var(--sidebar-width) !important;
-    min-width: var(--sidebar-width) !important;
+    width: 230px !important;
+    min-width: 230px !important;
+
     background:
-        radial-gradient(circle at 15% 8%, rgba(99, 102, 241, 0.24), transparent 26%),
-        linear-gradient(180deg, #0b1220 0%, #111827 48%, #172554 100%);
+        radial-gradient(circle at top left, rgba(99,102,241,0.25), transparent 30%),
+        linear-gradient(180deg, #0b1220 0%, #111827 55%, #172554 100%);
+
     border-right: 1px solid rgba(255,255,255,0.08);
-    box-shadow: 10px 0 40px rgba(2, 6, 23, 0.18);
 }
 
 [data-testid="stSidebar"] > div:first-child {
-    width: var(--sidebar-width) !important;
-    padding: 1.25rem 1rem 1.5rem 1rem;
+    width: 230px !important;
+    padding: 1.5rem 1rem 8rem 1rem !important;
 }
 
 [data-testid="stSidebar"] * {
@@ -120,102 +121,66 @@ st.markdown("""
 }
 
 [data-testid="stSidebar"] h1 {
-    font-size: 1.35rem !important;
-    font-weight: 800 !important;
-    letter-spacing: -0.02em;
-    margin-bottom: 1.35rem !important;
-}
-
-[data-testid="stSidebar"] [data-testid="stMarkdownContainer"] p {
-    font-size: 0.78rem !important;
-    font-weight: 800 !important;
+    font-size: 1.8rem !important;
+    font-weight: 900 !important;
+    text-align: center;
+    margin-bottom: 2rem !important;
 }
 
 [data-testid="stSidebar"] div[role="radiogroup"] {
-    gap: 0.6rem;
+    gap: 0.85rem !important;
 }
 
 [data-testid="stSidebar"] div[role="radiogroup"] label {
-    background: rgba(255,255,255,0.045);
-    border: 1px solid rgba(255,255,255,0.06);
-    border-radius: 14px;
-    padding: 0.50rem 0.65rem;
-    transition: all 0.18s ease;
-    min-height: 36px;
-}
+    width: 100%;
+    min-height: 55px;
+    display: flex;
+    align-items: center;
 
-[data-testid="stSidebar"] div[role="radiogroup"] label:hover {
-    background: rgba(255,255,255,0.10);
-    transform: translateX(3px);
-}
+    padding: 0.75rem 0.9rem;
 
-[data-testid="stSidebar"] div[role="radiogroup"] label:has(input:checked) {
-    background: linear-gradient(90deg, rgba(37,99,235,0.95), rgba(124,58,237,0.95));
-    border-color: rgba(255,255,255,0.18);
-    box-shadow: 0 10px 26px rgba(37,99,235,0.22);
+    border-radius: 18px;
+    background: rgba(255,255,255,0.06);
+    border: 1px solid rgba(255,255,255,0.08);
+
+    transition: .2s ease;
 }
 
 [data-testid="stSidebar"] div[role="radiogroup"] label p {
-    font-size: 0.72rem !important;
-    font-weight: 700 !important;
+    font-size: 0.95rem !important;
+    font-weight: 750 !important;
+    white-space: nowrap !important;
     margin: 0 !important;
 }
 
-/* Sidebar footer */
+[data-testid="stSidebar"] div[role="radiogroup"] label:hover {
+    transform: translateX(5px);
+    background: rgba(255,255,255,0.13);
+}
+
+[data-testid="stSidebar"] div[role="radiogroup"] label:has(input:checked) {
+    background: linear-gradient(135deg,#2563eb,#7c3aed);
+    box-shadow: 0 12px 30px rgba(37,99,235,.35);
+}
+
 .sidebar-footer {
-    position: fixed;
-    left: 12px;
-    bottom: 4px;
-    width: calc(var(--sidebar-width) - 24px);
-    padding: 0.80rem 0.8rem 0.35rem;
-    border-top: 1px solid rgba(255,255,255,0.10);
+    position: absolute !important;
+    bottom: 20px;
+    left: 15px;
+    width: 200px;
     text-align: center;
-    line-height: 1.55;
-    z-index: 1000;
 }
 
 .sidebar-footer .footer-brand {
-    color: #ffffff;
-    font-size: 0.98rem;
-    font-weight: 800;
-    letter-spacing: -0.01em;
+    font-size: 1rem;
 }
 
 .sidebar-footer .footer-subtitle {
-    color: #b8c7e8;
-    font-size: 0.68rem;
-    font-weight: 600;
-    margin-top: 0.12rem;
+    font-size: .72rem;
 }
 
 .sidebar-footer .footer-powered {
-    color: #8fa2c7;
-    font-size: 0.66rem;
-    margin-top: 0.28rem;
-}
-
-.sidebar-footer .footer-version {
-    color: #7e93ba;
-    font-size: 0.64rem;
-    margin-top: 0.65rem;
-}
-
-.sidebar-footer .footer-group {
-    color: #afc6ff;
-    font-size: 0.69rem;
-    font-weight: 700;
-    margin-top: 0.15rem;
-}
-
-.sidebar-footer .footer-copyright {
-    color: #6e82a8;
-    font-size: 0.61rem;
-    margin-top: 0.5rem;
-}
-
-/* Leave enough space so navigation never overlaps the footer */
-[data-testid="stSidebar"] > div:first-child {
-    padding-bottom: 12.5rem !important;
+    font-size: .68rem;
 }
 
 /* Main hero */
