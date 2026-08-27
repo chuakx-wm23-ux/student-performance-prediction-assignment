@@ -1,8 +1,10 @@
+# FINAL VERSION - 4 ML FEATURES + VALIDATION READY
 from pathlib import Path
 from io import BytesIO
 from datetime import datetime
 import joblib
 import pandas as pd
+import re
 import plotly.express as px
 import streamlit as st
 from openpyxl.styles import Alignment, Border, Font, PatternFill, Side
@@ -2535,7 +2537,7 @@ elif page == "Prediction" and not st.session_state.get("prediction_mode"):
     stat_col1, stat_col2, stat_col3, stat_col4 = st.columns(4, gap="small")
     stat_col1.metric("🏆 Best Model", str(best_row["Model"]))
     stat_col2.metric("🎯 Best Accuracy", f"{best_row['Accuracy']:.1%}")
-    stat_col3.metric("📚 Input Features", "5")
+    stat_col3.metric("📚 Input Features", "4")
     stat_col4.metric("🤖 ML Models", "3")
 
     card_col1, card_col2 = st.columns(2, gap="small")
@@ -2691,6 +2693,18 @@ elif page == "Prediction" and st.session_state.get("prediction_mode") == "indivi
         name = st.text_input("Student Name", key="student_name")
         student_id = st.text_input("Student ID", key="student_id")
 
+        # Live input validation
+        name_error = False
+        id_error = False
+
+        if name and not re.fullmatch(r"[A-Za-z ]+", name):
+            st.error("❌ Student Name can only contain letters and spaces.")
+            name_error = True
+
+        if student_id and (not student_id.isdigit() or len(student_id) != 7):
+            st.error("❌ Student ID must contain exactly 7 digits.")
+            id_error = True
+
         number_of_subjects = st.slider(
             "Number of Subjects",
             min_value=1,
@@ -2708,8 +2722,8 @@ elif page == "Prediction" and st.session_state.get("prediction_mode") == "indivi
                     f"Subject {i + 1} Score",
                     min_value=0.0,
                     max_value=100.0,
-                    value=75.0,
-                    step=1.0,
+                    value=None,
+                    step=0.5,
                     key=f"subject_{i}"
                 )
                 scores.append(score)
@@ -2744,6 +2758,12 @@ elif page == "Prediction" and st.session_state.get("prediction_mode") == "indivi
             key="previous_cgpa"
         )
 
+        score_error = False
+        for s in scores:
+            if s is not None and (round(s * 2) / 2 != s):
+                score_error = True
+                st.error("❌ Subject scores must use 0.5 intervals only.")
+
         submit = st.button(
             "Predict",
             use_container_width=True,
@@ -2751,6 +2771,11 @@ elif page == "Prediction" and st.session_state.get("prediction_mode") == "indivi
         )
 
         if submit:
+            if not name or name_error or not student_id or id_error or score_error:
+                st.warning("⚠️ Please complete all required fields before prediction.")
+                st.stop()
+
+            name = name.title()
             input_df = pd.DataFrame([{
                 "Average_Score": average_score,
                 "Attendance_Pct": attendance,
@@ -3988,7 +4013,7 @@ else:
     with overview_col4:
         st.metric("Features", "4")
 
-    st.markdown("### 📊 Input Features and Models")
+    st.markdown("### 📊 Selected ML Features and Models")
 
     left_col, right_col = st.columns(2)
 
