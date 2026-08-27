@@ -2550,7 +2550,7 @@ elif page == "Prediction" and not st.session_state.get("prediction_mode"):
     stat_col1, stat_col2, stat_col3, stat_col4 = st.columns(4, gap="small")
     stat_col1.metric("🏆 Best Model", str(best_row["Model"]))
     stat_col2.metric("🎯 Best Accuracy", f"{best_row['Accuracy']:.1%}")
-    stat_col3.metric("📚 Input Features", "5")
+    stat_col3.metric("📚 Input Features", "4")
     stat_col4.metric("🤖 ML Models", "3")
 
     card_col1, card_col2 = st.columns(2, gap="small")
@@ -4165,11 +4165,10 @@ elif page == "About":
             """
 <div class="about-card about-blue">
     <h4>📋 Input Features</h4>
-    <div class="about-list-item">1. Number of Subjects</div>
-    <div class="about-list-item">2. Average Score</div>
-    <div class="about-list-item">3. Attendance Rate</div>
-    <div class="about-list-item">4. Study Hours Per Day</div>
-    <div class="about-list-item">5. Previous CGPA</div>
+    <div class="about-list-item">1. Average Score</div>
+    <div class="about-list-item">2. Attendance Rate</div>
+    <div class="about-list-item">3. Study Hours Per Day</div>
+    <div class="about-list-item">4. Previous CGPA</div>
 </div>
 """,
             unsafe_allow_html=True
