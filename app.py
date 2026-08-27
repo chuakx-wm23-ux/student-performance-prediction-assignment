@@ -168,7 +168,7 @@ st.markdown("""
     box-shadow: 0 10px 25px rgba(124,58,237,.35);
 }
 
-/* Sidebar buttons */
+/* Logout button only */
 [data-testid="stSidebar"] .stButton button {
     min-height: 34px !important;
     height: 34px !important;
@@ -552,10 +552,7 @@ h1, h2, h3 {
     border: 1px solid #e2e8f0;
     border-radius: 22px;
     padding: .82rem .92rem .68rem;
-    min-height: 245px;
-    height: 245px;
-    display: flex;
-    flex-direction: column;
+    min-height: 176px;
     box-shadow: 0 16px 38px rgba(15,23,42,.07);
     margin-bottom: .8rem;
     transition: transform .22s ease, box-shadow .22s ease, border-color .22s ease;
@@ -931,6 +928,44 @@ h1, h2, h3 {
 
 
 
+/* Premium Login Screen */
+.login-shell {
+    max-width: 460px;
+    margin: 5rem auto;
+    padding: 2.4rem;
+    border-radius: 32px;
+    background: rgba(255,255,255,0.88);
+    backdrop-filter: blur(20px);
+    border: 1px solid rgba(148,163,184,.25);
+    box-shadow: 0 30px 70px rgba(15,23,42,.18);
+    text-align:center;
+}
+
+.login-logo {
+    font-size:3.2rem;
+    margin-bottom:.4rem;
+}
+
+.login-title {
+    font-size:2rem;
+    font-weight:900;
+    background:linear-gradient(135deg,#2563eb,#7c3aed);
+    -webkit-background-clip:text;
+    color:transparent;
+}
+
+.login-subtitle {
+    color:#64748b;
+    margin-bottom:1.8rem;
+}
+
+.auth-switch {
+    color:#475569;
+    font-size:.9rem;
+}
+
+
+
 /* ===== PREMIUM SIDEBAR V2 ===== */
 
 [data-testid="stSidebar"] {
@@ -982,7 +1017,7 @@ h1, h2, h3 {
 /* Logout */
 [data-testid="stSidebar"] button {
     border-radius: 12px !important;
-    min-height: 46px !important;
+    min-height: 36px !important;
     font-size: 0.75rem !important;
 }
 
@@ -1015,14 +1050,14 @@ h1, h2, h3 {
 }
 
 [data-testid="stSidebar"] div[role="radiogroup"] label {
-    min-height: 56px !important;
-    height: 56px !important;
+    min-height: 36px !important;
+    height: 36px !important;
     padding: 0.15rem 0.5rem !important;
     border-radius: 12px !important;
 }
 
 [data-testid="stSidebar"] div[role="radiogroup"] label p {
-    font-size: 0.88rem !important;
+    font-size: 0.74rem !important;
     font-weight: 750 !important;
 }
 
@@ -1053,6 +1088,21 @@ h1, h2, h3 {
 
 
 
+/* FINAL FOOTER CLEAN */
+.sidebar-footer {
+    position: fixed !important;
+    bottom: 12px !important;
+    left: 10px !important;
+    width: 230px !important;
+    text-align: center !important;
+    white-space: nowrap !important;
+    overflow: hidden !important;
+    z-index: 10 !important;
+    font-size: 0.55rem !important;
+    line-height: 1 !important;
+}
+
+
 /* FINAL COMPACT SIDEBAR FOOTER */
 .sidebar-footer {
     position: fixed !important;
@@ -1069,77 +1119,59 @@ h1, h2, h3 {
 }
 
 
-
-/* ===== FIXED SIDEBAR NAVIGATION ===== */
-
-[data-testid="stSidebar"] {
-    position: fixed !important;
-    height: 100vh !important;
-    overflow: hidden !important;
+/* ===== PREMIUM ROLE LOGIN ===== */
+.login-premium {
+    max-width: 900px;
+    margin: 4rem auto;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 2rem;
+    align-items: center;
 }
 
-[data-testid="stSidebar"] > div:first-child {
-    height: 100vh !important;
-    overflow: hidden !important;
+.login-ai-card {
+    min-height: 430px;
+    border-radius: 36px;
+    background:
+        radial-gradient(circle at top, rgba(37,99,235,.35), transparent 35%),
+        linear-gradient(145deg,#020617,#172554,#312e81);
+    display:flex;
+    flex-direction:column;
+    justify-content:center;
+    align-items:center;
+    color:white;
+    box-shadow:0 30px 80px rgba(15,23,42,.35);
 }
 
-/* Keep navigation area stable */
-[data-testid="stSidebar"] div[role="radiogroup"] {
-    overflow: hidden !important;
+.login-ai-head {
+    width:180px;
+    height:180px;
+    border-radius:50%;
+    background:linear-gradient(145deg,#e0f2fe,#bfdbfe);
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    font-size:90px;
+    box-shadow:0 0 50px rgba(96,165,250,.65);
 }
 
-/* Keep footer fixed */
-.sidebar-footer {
-    position: fixed !important;
-    bottom: 12px !important;
+.login-role-card {
+    background:rgba(255,255,255,.9);
+    backdrop-filter:blur(20px);
+    border-radius:32px;
+    padding:2.2rem;
+    box-shadow:0 30px 70px rgba(15,23,42,.18);
 }
 
-
-.batch-card-added {
-    background: rgba(255,255,255,0.96);
-    border-radius: 22px;
-    padding: 1.2rem;
-    box-shadow: 0 16px 38px rgba(15,23,42,.08);
-    border: 1px solid #e2e8f0;
-}
-.batch-card-added h3 {
-    color:#172033;
-}
-.batch-card-added p {
-    color:#64748b;
-}
-
-/* FINAL SIZE ALIGNMENT ONLY - Individual & Batch Prediction cards */
-.prediction-mode-card {
-    height: 245px !important;
-    min-height: 245px !important;
-    display: flex !important;
-    flex-direction: column !important;
-    justify-content: flex-start !important;
-}
-
-.prediction-mode-desc {
-    min-height: 52px !important;
-}
-
-.prediction-feature-row {
-    min-height: 32px !important;
-}
-
-
-/* FINAL BUTTON SIZE BOOST */
-.stButton > button,
-.stDownloadButton > button,
-[data-testid="stFormSubmitButton"] > button {
-    min-height: 54px !important;
-    font-size: 0.95rem !important;
+@media(max-width:800px){
+    .login-premium{grid-template-columns:1fr;}
 }
 
 </style>
 """, unsafe_allow_html=True)
 
 
-@st.cache_data(show_spinner=False)
+@st.cache_data
 def load_data():
     df = pd.read_csv(DATA)
 
@@ -1153,7 +1185,7 @@ def load_data():
     return df
 
 
-@st.cache_resource(show_spinner=False)
+@st.cache_resource
 def load_models():
     return {
         "KNN": joblib.load(MODELS / "knn_model.joblib"),
@@ -2664,28 +2696,55 @@ CGPA below 2.50
 
 
 
+# ---------------- AUTHENTICATION MODULE ----------------
+from login import login_screen
+
+if "authenticated" not in st.session_state:
+    st.session_state.authenticated = False
+
+if not st.session_state.authenticated:
+    login_screen()
+    st.stop()
+
+
 df = load_data()
 models = load_models()
 evaluation = pd.read_csv(RESULTS / "evaluation.csv")
 
 st.sidebar.title("🎓 Student AI")
 
+st.sidebar.markdown(
+    f"""
+    <div class="sidebar-user-card">
+        <div class="sidebar-user-name">
+            👤 {st.session_state.get('username','User')}
+        </div>
+        <div class="sidebar-user-role">
+            {st.session_state.get('role','Lecturer')}
+        </div>
+    </div>
+    """,
+    unsafe_allow_html=True
+)
 
-# Single user navigation (no login / no role restriction)
-navigation_options = [
-    "🏠 Home",
-    "🎯 Prediction",
-    "📊 Model Results",
-    "🔗 Correlation",
-    "📈 Dataset",
-    "⭐ Feature Analysis",
-    "ℹ️ About"
-]
+if st.sidebar.button("🚪 Logout", use_container_width=True):
+    st.session_state.authenticated = False
+    st.session_state.pop("username", None)
+    st.session_state.pop("role", None)
+    st.rerun()
 
-
+st.sidebar.markdown("### Navigation")
 page = st.sidebar.radio(
-    "Navigation",
-    navigation_options,
+    "Navigation Menu",
+    [
+        "🏠 Home",
+        "🎯 Prediction",
+        "📊 Model Results",
+        "🔗 Correlation",
+        "📈 Dataset",
+        "⭐ Feature Analysis",
+        "ℹ️ About"
+    ],
     label_visibility="collapsed"
 )
 
@@ -2741,7 +2800,6 @@ if page == "Home":
         margin=dict(l=20, r=20, t=75, b=20),
     )
 
-    fig.update_layout(title_x=0.5)
     st.plotly_chart(fig, use_container_width=True)
 
 
@@ -2757,7 +2815,8 @@ elif page == "Prediction" and not st.session_state.get("prediction_mode"):
     <h2>Student Performance Prediction System</h2>
     <p>
         Predict student academic performance using KNN, SVM and ANN.
-        Analyse individual student performance and generate AI-based insights.
+        Choose individual analysis or batch processing to identify at-risk
+        students and support faster academic decisions.
     </p>
     <p><b>Select a prediction mode below to begin.</b></p>
 </div>
@@ -2771,7 +2830,7 @@ elif page == "Prediction" and not st.session_state.get("prediction_mode"):
     stat_col3.metric("📚 Input Features", "4")
     stat_col4.metric("🤖 ML Models", "3")
 
-    card_col1, card_col2 = st.columns(2, gap="large")
+    card_col1, card_col2 = st.columns(2, gap="small")
 
     with card_col1:
         st.markdown(
@@ -2780,7 +2839,8 @@ elif page == "Prediction" and not st.session_state.get("prediction_mode"):
     <div class="prediction-mode-icon">👤</div>
     <div class="prediction-mode-title">Individual Prediction</div>
     <div class="prediction-mode-desc">
-        Predict one student's academic performance using KNN, SVM and ANN models.
+        Predict the academic performance of one student using manually entered
+        information and review the outputs generated by all three models.
     </div>
     <div class="prediction-feature-row">
         <div class="prediction-feature-chip">✓ Real-time</div>
@@ -2791,8 +2851,12 @@ elif page == "Prediction" and not st.session_state.get("prediction_mode"):
 """,
             unsafe_allow_html=True,
         )
-        if st.button("🚀 Start Individual Prediction", key="start_individual_prediction",
-                     type="primary", use_container_width=True):
+        if st.button(
+            "🚀 Start Individual Prediction",
+            key="start_individual_prediction",
+            type="primary",
+            use_container_width=True,
+        ):
             st.session_state["prediction_mode"] = "individual"
             st.rerun()
 
@@ -2800,23 +2864,27 @@ elif page == "Prediction" and not st.session_state.get("prediction_mode"):
         st.markdown(
             """
 <div class="prediction-mode-card">
-    <div class="prediction-mode-icon">📁</div>
+    <div class="prediction-mode-icon">📂</div>
     <div class="prediction-mode-title">Batch Prediction</div>
     <div class="prediction-mode-desc">
-        Upload Excel or CSV files to predict multiple students simultaneously.
-        Generate reports and identify at-risk students.
+        Upload an Excel or CSV file to predict multiple students simultaneously,
+        identify at-risk students and export a professional analytical workbook.
     </div>
     <div class="prediction-feature-row">
         <div class="prediction-feature-chip">✓ Excel / CSV</div>
         <div class="prediction-feature-chip">✓ Dashboard</div>
-        <div class="prediction-feature-chip">✓ Risk Detection</div>
+        <div class="prediction-feature-chip">✓ At-risk detection</div>
     </div>
 </div>
 """,
             unsafe_allow_html=True,
         )
-        if st.button("📂 Start Batch Prediction", key="start_batch_prediction",
-                     type="primary", use_container_width=True):
+        if st.button(
+            "📂 Start Batch Prediction",
+            key="start_batch_prediction",
+            type="primary",
+            use_container_width=True,
+        ):
             st.session_state["prediction_mode"] = "batch"
             st.rerun()
 
@@ -2841,188 +2909,6 @@ elif page == "Prediction" and not st.session_state.get("prediction_mode"):
 """,
         unsafe_allow_html=True,
     )
-
-
-
-
-
-def create_batch_template():
-    """Create Excel template for batch prediction upload."""
-    template_df = pd.DataFrame({
-        "Student_ID": ["1234567"],
-        "Student_Name": ["Sample Student"],
-        "Average_Score": [75.0],
-        "Attendance_Pct": [90.0],
-        "Study_Hours_Per_Day": [3.0],
-        "Previous_CGPA": [3.20],
-    })
-
-    output = BytesIO()
-    with pd.ExcelWriter(output, engine="openpyxl") as writer:
-        template_df.to_excel(writer, index=False, sheet_name="Student Data")
-
-    output.seek(0)
-    return output.getvalue()
-
-
-if page == "Prediction" and st.session_state.get("prediction_mode") == "batch":
-
-    st.markdown(
-        """
-<div class="mode-page-hero">
-    <div class="mode-page-eyebrow">Multiple Student Analysis</div>
-    <h2>📁 Batch Prediction</h2>
-    <p>
-        Upload student data in Excel or CSV format to generate predictions for multiple students.
-    </p>
-</div>
-""",
-        unsafe_allow_html=True,
-    )
-
-    if st.button("← Back to Prediction Modes", key="back_from_batch", type="secondary"):
-        st.session_state.pop("prediction_mode", None)
-        st.rerun()
-
-    st.download_button(
-        "📄 Download Excel Template",
-        data=make_template_bytes(),
-        file_name="student_batch_prediction_template.xlsx",
-        mime="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
-    )
-
-    uploaded_file = st.file_uploader(
-        "Upload Excel or CSV file",
-        type=["xlsx", "csv"]
-    )
-
-    if uploaded_file:
-        if uploaded_file.name.endswith(".csv"):
-            batch_df = pd.read_csv(uploaded_file)
-        else:
-            batch_df = pd.read_excel(uploaded_file)
-
-        st.markdown("### 👀 Preview Uploaded Data")
-        st.dataframe(
-            batch_df.head(100),
-            hide_index=True,
-            use_container_width=True
-        )
-
-        errors = validate_batch_data(batch_df)
-
-        if errors:
-            for error in errors:
-                st.error(error)
-        else:
-            if st.button("🚀 Run Batch Prediction", key="run_batch_prediction", use_container_width=True):
-                result = predict_batch(batch_df)
-                st.session_state["batch_result"] = result
-                st.session_state["batch_uploaded_file"] = uploaded_file.name
-                st.success("Batch prediction completed successfully!")
-
-    if "batch_result" in st.session_state:
-        result = st.session_state["batch_result"]
-
-        # ===== Batch AI Dashboard =====
-        st.markdown("### 📊 Batch Prediction Dashboard")
-
-        if "Final_Prediction" in result.columns:
-            prediction_col = "Final_Prediction"
-        elif "FINAL PREDICTION" in result.columns:
-            prediction_col = "FINAL PREDICTION"
-        else:
-            prediction_col = None
-
-        if prediction_col:
-            total = len(result)
-            counts = result[prediction_col].value_counts()
-
-            c1, c2, c3, c4 = st.columns(4)
-            c1.metric("Total Students", total)
-            c2.metric("Excellent", int(counts.get("Excellent", 0)))
-            c3.metric("Good", int(counts.get("Good", 0)))
-            c4.metric("At Risk", int(counts.get("At Risk", 0)))
-
-            # ===== Large Dashboard Graph =====
-            performance_df = counts.reset_index()
-            performance_df.columns = ["Performance", "Students"]
-
-            large_fig = px.bar(
-                performance_df,
-                x="Performance",
-                y="Students",
-                title="Overall Student Performance Distribution",
-                text="Students",
-                template="plotly_white",
-            )
-            large_fig.update_layout(
-                height=520,
-                xaxis_title="Performance Category",
-                yaxis_title="Number of Students",
-                title_x=0.5,
-            )
-            st.plotly_chart(
-                large_fig,
-                use_container_width=True,
-            )
-
-            chart_col1, chart_col2 = st.columns(2)
-
-            with chart_col1:
-                pie_df = counts.reset_index()
-                pie_df.columns = ["Performance", "Students"]
-                fig = px.pie(
-                    pie_df,
-                    values="Students",
-                    names="Performance",
-                    title="Prediction Distribution",
-                    hole=0.45,
-                )
-                fig.update_layout(title_x=0.5)
-                st.plotly_chart(fig, use_container_width=True)
-
-            with chart_col2:
-                bar_df = counts.reset_index()
-                bar_df.columns = ["Performance", "Students"]
-                fig2 = px.bar(
-                    bar_df,
-                    x="Performance",
-                    y="Students",
-                    title="Student Performance Category",
-                    text="Students",
-                )
-                fig2.update_layout(title_x=0.5)
-                st.plotly_chart(fig2, use_container_width=True)
-
-            st.markdown("### 📋 Detailed Prediction Results")
-
-        st.dataframe(result, hide_index=True, use_container_width=True)
-
-        excel = make_batch_excel_bytes(result)
-
-        button_col1, button_col2 = st.columns(2, gap="large")
-
-        with button_col1:
-            st.download_button(
-                "📥 Download Batch Report",
-                data=excel,
-                file_name="Batch_Prediction_Report.xlsx",
-                mime="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
-                use_container_width=True,
-            )
-
-        with button_col2:
-            if st.button(
-                "🔄 Make Another Prediction",
-                key="make_another_batch",
-                type="secondary",
-                use_container_width=True,
-            ):
-                st.session_state.pop("batch_result", None)
-                st.session_state.pop("batch_uploaded_file", None)
-                st.rerun()
-
 
 
 elif page == "Prediction" and st.session_state.get("prediction_mode") == "individual":
@@ -3297,6 +3183,322 @@ elif page == "Prediction" and st.session_state.get("prediction_mode") == "indivi
             }
 
             st.rerun()
+
+elif page == "Prediction" and st.session_state.get("prediction_mode") == "batch":
+    st.markdown(
+        """
+<div class="mode-page-hero">
+    <div class="mode-page-eyebrow">Multi-Student Analysis</div>
+    <h2>📂 Batch Prediction</h2>
+    <p>
+        Upload an Excel or CSV file to predict multiple students simultaneously,
+        identify at-risk students and export a professional Excel dashboard.
+    </p>
+</div>
+""",
+        unsafe_allow_html=True,
+    )
+
+    if st.button(
+        "← Back to Prediction Modes",
+        key="back_from_batch",
+        type="secondary",
+    ):
+        st.session_state.pop("prediction_mode", None)
+        st.session_state.pop("batch_prediction_result", None)
+        st.rerun()
+
+    template_col, note_col = st.columns([1, 2])
+    with template_col:
+        st.download_button(
+            "⬇️ Download Excel Template",
+            data=make_template_bytes(),
+            file_name="student_batch_prediction_template.xlsx",
+            mime="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+            use_container_width=True,
+        )
+    with note_col:
+        st.markdown(
+            """
+<div class="batch-help-box">
+    <b>Required columns:</b> Average_Score,
+    Attendance_Pct, Study_Hours_Per_Day and Previous_CGPA.<br>
+    <span style="color:#64748b;">Student_ID and Student_Name are optional.</span>
+</div>
+""",
+            unsafe_allow_html=True,
+        )
+
+    uploaded_file = st.file_uploader(
+        "Upload completed Excel or CSV file",
+        type=["xlsx", "xls", "csv"],
+    )
+
+    if uploaded_file is not None:
+        try:
+            if uploaded_file.name.lower().endswith(".csv"):
+                batch_df = pd.read_csv(uploaded_file)
+            else:
+                batch_df = pd.read_excel(uploaded_file)
+
+            errors = validate_batch_data(batch_df)
+            if errors:
+                st.error("The uploaded file cannot be processed.")
+                for error in errors:
+                    st.write(f"• {error}")
+            else:
+                required = [
+                    "Number_of_Subjects",
+                    "Average_Score",
+                    "Attendance_Pct",
+                    "Study_Hours_Per_Day",
+                    "Previous_CGPA",
+                ]
+                for column in required:
+                    batch_df[column] = pd.to_numeric(batch_df[column])
+
+                st.success(f"{len(batch_df):,} student records loaded successfully.")
+                c1, c2, c3 = st.columns(3)
+                c1.metric("Uploaded Students", f"{len(batch_df):,}")
+                c2.metric("Required Features", "5")
+                c3.metric("Final Model", str(evaluation.iloc[0]["Model"]))
+
+                st.markdown("#### Uploaded Data Preview")
+                st.dataframe(batch_df.head(50), hide_index=True, use_container_width=True)
+
+                if st.button("Predict All Students", type="primary", use_container_width=True):
+                    with st.spinner("Generating batch predictions..."):
+                        st.session_state["batch_prediction_result"] = predict_batch(batch_df)
+                    st.rerun()
+
+        except ImportError:
+            st.error("Excel support is unavailable. Add openpyxl to requirements.txt and redeploy.")
+        except Exception as error:
+            st.error(f"Unable to process the uploaded file: {error}")
+
+    if "batch_prediction_result" in st.session_state:
+        result_df = st.session_state["batch_prediction_result"]
+        st.success(f"Batch prediction completed for {len(result_df):,} students.")
+
+        order = ["At Risk", "Average", "Good", "Excellent"]
+        counts = result_df["Final_Prediction"].value_counts().reindex(order, fill_value=0)
+        summary_cols = st.columns(4)
+        for col, category in zip(summary_cols, order):
+            col.metric(category, int(counts[category]))
+
+        summary_df = counts.rename_axis("Performance Category").reset_index(name="Students")
+        fig = px.bar(
+            summary_df,
+            x="Performance Category",
+            y="Students",
+            text="Students",
+            title="Batch Prediction Distribution",
+            category_orders={"Performance Category": order},
+        )
+        fig.update_traces(textposition="outside")
+        fig.update_layout(
+            title=dict(
+                x=0.5,
+                xanchor="center",
+                y=0.96,
+                yanchor="top",
+            ),
+            height=390,
+            margin=dict(l=20, r=20, t=75, b=20),
+        )
+        st.plotly_chart(fig, use_container_width=True)
+
+        display_df = result_df.copy()
+        for column in ["KNN_Confidence", "SVM_Confidence", "ANN_Confidence", "Final_Confidence"]:
+            display_df[column] = display_df[column].map(lambda value: f"{value:.1%}")
+
+        st.markdown("#### Batch Prediction Insights")
+
+        insight_col1, insight_col2 = st.columns(2)
+
+        with insight_col1:
+            bar_fig = px.bar(
+                summary_df,
+                x="Performance Category",
+                y="Students",
+                text="Students",
+                title="Students by Predicted Category",
+                category_orders={"Performance Category": order},
+            )
+            bar_fig.update_traces(textposition="outside")
+            bar_fig.update_layout(
+                title=dict(
+                    x=0.5,
+                    xanchor="center",
+                    y=0.96,
+                    yanchor="top",
+                ),
+                height=390,
+                margin=dict(l=20, r=20, t=75, b=20),
+            )
+            st.plotly_chart(bar_fig, use_container_width=True)
+
+        with insight_col2:
+            pie_fig = px.pie(
+                summary_df,
+                names="Performance Category",
+                values="Students",
+                title="Prediction Distribution",
+                hole=0.42,
+            )
+            pie_fig.update_layout(
+                title=dict(
+                    x=0.5,
+                    xanchor="center",
+                    y=0.96,
+                    yanchor="top",
+                ),
+                height=390,
+                margin=dict(l=20, r=20, t=75, b=20),
+            )
+            st.plotly_chart(pie_fig, use_container_width=True)
+
+        at_risk_df = result_df[
+            result_df["Final_Prediction"] == "At Risk"
+        ].copy()
+
+        st.markdown("#### ⚠️ At-Risk Student Dashboard")
+
+        risk_col1, risk_col2, risk_col3 = st.columns(3)
+        risk_col1.metric("Students Requiring Intervention", len(at_risk_df))
+        risk_col2.metric(
+            "At-Risk Percentage",
+            f"{(len(at_risk_df) / len(result_df)):.1%}" if len(result_df) else "0.0%",
+        )
+        risk_col3.metric("Recommended Action", "Early Support")
+
+        if at_risk_df.empty:
+            st.success("No students were classified as At Risk in this batch.")
+        else:
+            st.warning(
+                f"{len(at_risk_df):,} student(s) were classified as At Risk. "
+                "Early academic intervention is recommended."
+            )
+
+            risk_columns = [
+                column for column in [
+                    "Student_ID",
+                    "Student_Name",
+                    "Average_Score",
+                    "Attendance_Pct",
+                    "Study_Hours_Per_Day",
+                    "Previous_CGPA",
+                    "Final_Prediction",
+                    "Final_Confidence",
+                ]
+                if column in at_risk_df.columns
+            ]
+
+            at_risk_display = at_risk_df[risk_columns].copy()
+
+            if "Final_Confidence" in at_risk_display.columns:
+                at_risk_display["Final_Confidence"] = (
+                    at_risk_display["Final_Confidence"]
+                    .map(lambda value: f"{value:.1%}")
+                )
+
+            st.dataframe(
+                at_risk_display,
+                hide_index=True,
+                use_container_width=True,
+            )
+
+        st.markdown("#### Complete Prediction Results")
+
+        filter_col1, filter_col2 = st.columns([2, 1])
+
+        with filter_col1:
+            search_text = st.text_input(
+                "Search by Student ID or Student Name",
+                placeholder="Type a student ID or name...",
+                key="batch_result_search",
+            )
+
+        with filter_col2:
+            category_filter = st.selectbox(
+                "Filter by Performance Category",
+                ["All Categories"] + order,
+                key="batch_category_filter",
+            )
+
+        filtered_df = display_df.copy()
+
+        if search_text.strip():
+            searchable_columns = [
+                column for column in ["Student_ID", "Student_Name"]
+                if column in filtered_df.columns
+            ]
+
+            if searchable_columns:
+                search_mask = pd.Series(False, index=filtered_df.index)
+
+                for column in searchable_columns:
+                    search_mask = search_mask | filtered_df[
+                        column
+                    ].astype(str).str.contains(
+                        search_text.strip(),
+                        case=False,
+                        na=False,
+                    )
+
+                filtered_df = filtered_df[search_mask]
+
+        if category_filter != "All Categories":
+            filtered_df = filtered_df[
+                filtered_df["Final_Prediction"] == category_filter
+            ]
+
+        st.caption(
+            f"Showing {len(filtered_df):,} of {len(display_df):,} predicted records."
+        )
+
+        # Keep the report download controls visible above the large results table.
+        # This is especially important for mobile users and batches with thousands
+        # of records, where the table would otherwise push the buttons far below.
+        download_col, clear_col = st.columns(2)
+
+        with download_col:
+            st.download_button(
+                "⬇️ Download Predicted Excel",
+                data=make_batch_excel_bytes(result_df),
+                file_name="student_batch_predictions.xlsx",
+                mime="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+                use_container_width=True,
+                key="download_batch_prediction_excel",
+            )
+
+        with clear_col:
+            if st.button(
+                "↻ Upload Another File",
+                type="secondary",
+                use_container_width=True,
+                key="clear_batch_prediction_result",
+            ):
+                del st.session_state["batch_prediction_result"]
+                st.rerun()
+
+        low_confidence_count = int(
+            (result_df["Final_Confidence"] < 0.60).sum()
+        )
+
+        if low_confidence_count > 0:
+            st.info(
+                f"{low_confidence_count:,} prediction(s) have confidence below 60%. "
+                "These records may require lecturer review."
+            )
+
+        st.dataframe(
+            filtered_df,
+            hide_index=True,
+            use_container_width=True,
+            height=620,
+        )
+
 
 elif page == "Model Results":
     st.subheader("Model Evaluation Dashboard")
@@ -3573,7 +3775,6 @@ elif page == "Correlation":
             with st.expander("View Overall Correlation Values"):
                 st.dataframe(
                     overall_corr,
-                    hide_index=True,
                     use_container_width=True,
                 )
 
@@ -4075,8 +4276,7 @@ elif page == "Dataset":
             ),
             margin=dict(l=20, r=20, t=75, b=20),
         )
-        fig.update_layout(title_x=0.5)
-    st.plotly_chart(fig, use_container_width=True)
+        st.plotly_chart(fig, use_container_width=True)
 
     with c2:
         fig = px.scatter(
@@ -4095,8 +4295,7 @@ elif page == "Dataset":
             ),
             margin=dict(l=20, r=20, t=75, b=20),
         )
-        fig.update_layout(title_x=0.5)
-    st.plotly_chart(fig, use_container_width=True)
+        st.plotly_chart(fig, use_container_width=True)
 
     st.markdown("### Complete Student Dataset")
 
@@ -4216,7 +4415,6 @@ Represents student's daily learning effort and study habits.
         yaxis_title=""
     )
 
-    fig.update_layout(title_x=0.5)
     st.plotly_chart(fig, use_container_width=True)
 
 elif page == "About":
