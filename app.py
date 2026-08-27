@@ -885,30 +885,70 @@ h1, h2, h3 {
 }
 
 
-/* FINAL COMPACT SIDEBAR OVERRIDE */
+/* FINAL AI DASHBOARD SIDEBAR OVERRIDE */
 [data-testid="stSidebar"] {
     width: 230px !important;
     min-width: 230px !important;
 }
 
+[data-testid="stSidebar"] > div:first-child {
+    width: 230px !important;
+    padding: 1.45rem 0.9rem 7rem 0.9rem !important;
+}
+
+/* Navigation spacing */
+[data-testid="stSidebar"] div[role="radiogroup"] {
+    gap: 0.65rem !important;
+}
+
+/* Navigation cards */
 [data-testid="stSidebar"] div[role="radiogroup"] label {
-    min-height: 34px !important;
-    padding: 0.25rem 0.45rem !important;
-    border-radius: 10px !important;
+    min-height: 42px !important;
+    padding: 0.35rem 0.55rem !important;
+    border-radius: 14px !important;
+    display: flex !important;
+    align-items: center !important;
 }
 
+/* Navigation text */
 [data-testid="stSidebar"] div[role="radiogroup"] label p {
-    font-size: 0.65rem !important;
-    font-weight: 700 !important;
+    font-size: 0.78rem !important;
+    font-weight: 750 !important;
+    white-space: nowrap !important;
+    margin: 0 !important;
 }
 
+/* Selected navigation */
+[data-testid="stSidebar"] div[role="radiogroup"] label:has(input:checked) {
+    background: linear-gradient(135deg,#2563eb,#7c3aed) !important;
+    box-shadow: 0 10px 25px rgba(124,58,237,.35) !important;
+}
+
+/* Hover */
+[data-testid="stSidebar"] div[role="radiogroup"] label:hover {
+    transform: translateX(4px);
+    background: rgba(255,255,255,0.12);
+}
+
+/* Footer */
 .sidebar-footer {
-    width: 170px !important;
+    width: 200px !important;
     left: 15px !important;
+    bottom: 20px !important;
 }
 
-.sidebar-footer * {
-    transform: scale(1);
+.sidebar-footer .footer-brand {
+    font-size: 0.68rem !important;
+    font-weight: 800 !important;
+}
+
+.sidebar-footer .footer-subtitle,
+.sidebar-footer .footer-powered,
+.sidebar-footer .footer-version,
+.sidebar-footer .footer-group,
+.sidebar-footer .footer-copyright {
+    font-size: 0.60rem !important;
+    line-height: 1.35 !important;
 }
 
 </style>
