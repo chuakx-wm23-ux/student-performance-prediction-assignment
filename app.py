@@ -20,9 +20,6 @@ from pathlib import Path
 def validate_student_inputs(name, student_id):
     errors = []
 
-    if name.strip() and not re.fullmatch(r"[A-Za-z ]+", name.strip()):
-        errors.append("❌ Student Name can only contain English letters.")
-
     if student_id.strip():
         if not student_id.isdigit():
             errors.append("❌ Student ID must contain numbers only.")
@@ -2713,12 +2710,16 @@ elif page == "Prediction" and st.session_state.get("prediction_mode") == "indivi
             placeholder="Enter 7-digit Student ID"
         )
 
-        # Real-time input validation
-        name_valid = bool(re.fullmatch(r"[A-Za-z ]+", name.strip())) if name.strip() else False
-        id_valid = bool(re.fullmatch(r"\d{7}", student_id.strip())) if student_id.strip() else False
+# Student ID validation
+if student_id.strip():
+    if not student_id.isdigit():
+        st.error("❌ Student ID must contain numbers only.")
+    elif len(student_id.strip()) != 7:
+        st.error("❌ Student ID must contain exactly 7 digits.")
 
-        if name.strip() and not name_valid:
-            st.error("❌ Student Name can only contain English letters.")
+
+        # Real-time input validation
+        name_valid = bool(re.fullmatch(r"[A-Za-z ]+", name.strip()))
 
         if student_id.strip() and not id_valid:
             st.error("❌ Student ID must contain exactly 7 digits.")
