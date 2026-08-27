@@ -20,6 +20,9 @@ from pathlib import Path
 def validate_student_inputs(name, student_id):
     errors = []
 
+    if name.strip() and not re.fullmatch(r"[A-Za-z ]+", name.strip()):
+        errors.append("❌ Student Name can only contain English letters.")
+
     if student_id.strip():
         if not student_id.isdigit():
             errors.append("❌ Student ID must contain numbers only.")
@@ -43,7 +46,7 @@ st.set_page_config(
 st.markdown("""
 <style>
 :root {
-    --sidebar-width: 165px;
+    --sidebar-width: 235px;
     --navy: #0f172a;
     --navy-soft: #172554;
     --blue: #2563eb;
@@ -120,14 +123,14 @@ st.markdown("""
 }
 
 [data-testid="stSidebar"] h1 {
-    font-size: 1.35rem !important;
+    font-size: 1.65rem !important;
     font-weight: 800 !important;
     letter-spacing: -0.02em;
     margin-bottom: 1.35rem !important;
 }
 
 [data-testid="stSidebar"] [data-testid="stMarkdownContainer"] p {
-    font-size: 0.78rem !important;
+    font-size: 0.95rem !important;
     font-weight: 800 !important;
 }
 
@@ -139,9 +142,9 @@ st.markdown("""
     background: rgba(255,255,255,0.045);
     border: 1px solid rgba(255,255,255,0.06);
     border-radius: 14px;
-    padding: 0.50rem 0.65rem;
+    padding: 0.72rem 0.85rem;
     transition: all 0.18s ease;
-    min-height: 36px;
+    min-height: 44px;
 }
 
 [data-testid="stSidebar"] div[role="radiogroup"] label:hover {
@@ -156,7 +159,7 @@ st.markdown("""
 }
 
 [data-testid="stSidebar"] div[role="radiogroup"] label p {
-    font-size: 0.82rem !important;
+    font-size: 0.98rem !important;
     font-weight: 700 !important;
     margin: 0 !important;
 }
@@ -164,9 +167,9 @@ st.markdown("""
 /* Sidebar footer */
 .sidebar-footer {
     position: fixed;
-    left: 12px;
+    left: 18px;
     bottom: 4px;
-    width: calc(var(--sidebar-width) - 24px);
+    width: calc(var(--sidebar-width) - 36px);
     padding: 0.80rem 0.8rem 0.35rem;
     border-top: 1px solid rgba(255,255,255,0.10);
     text-align: center;
@@ -2704,23 +2707,21 @@ elif page == "Prediction" and st.session_state.get("prediction_mode") == "indivi
         # All inputs are outside st.form so that changes refresh immediately.
         name = st.text_input("Student Name", key="student_name")
 
-        name_valid = True
-        if name.strip():
-            name_valid = bool(re.fullmatch(r"[A-Za-z ]+", name.strip()))
-            if not name_valid:
-                st.error("❌ Student Name can only contain English letters.")
-
         student_id = st.text_input(
             "Student ID",
             key="student_id",
             placeholder="Enter 7-digit Student ID"
         )
 
-        id_valid = True
-        if student_id.strip():
-            id_valid = student_id.isdigit() and len(student_id.strip()) == 7
-            if not id_valid:
-                st.error("❌ Student ID must contain exactly 7 digits.")
+        # Real-time input validation
+        name_valid = bool(re.fullmatch(r"[A-Za-z ]+", name.strip())) if name.strip() else False
+        id_valid = bool(re.fullmatch(r"\d{7}", student_id.strip())) if student_id.strip() else False
+
+        if name.strip() and not name_valid:
+            st.error("❌ Student Name can only contain English letters.")
+
+        if student_id.strip() and not id_valid:
+            st.error("❌ Student ID must contain exactly 7 digits.")
 
         number_of_subjects = st.slider(
             "Number of Subjects",
@@ -2730,16 +2731,6 @@ elif page == "Prediction" and st.session_state.get("prediction_mode") == "indivi
             key="number_of_subjects"
         )
 
-        # Convert entered score immediately using 0.5 threshold rule
-        def normalize_score(index):
-            key = f"subject_{index}"
-            value = st.session_state.get(key)
-
-            if value is not None:
-                converted = math.floor(float(value) + 0.5)
-                converted = max(0, min(5, converted))
-                st.session_state[key] = converted
-
         scores = []
         columns = st.columns(2)
 
@@ -2748,26 +2739,29 @@ elif page == "Prediction" and st.session_state.get("prediction_mode") == "indivi
                 score = st.number_input(
                     f"Subject {i + 1} Score",
                     min_value=0.0,
-                    max_value=5.0,
+                    max_value=100.0,
                     value=None,
                     placeholder="Enter score",
                     step=0.1,
-                    key=f"subject_{i}",
-                    on_change=normalize_score,
-                    args=(i,)
+                    key=f"subject_{i}"
                 )
+
+                # Automatically round every entered score to nearest 0.5
+                if score is not None:
+                    score = round(score * 2) / 2
+                    if score < 0.5:
+                        score = 0.0
 
                 scores.append(score)
 
         valid_scores = [s for s in scores if s is not None]
 
         if len(valid_scores) == number_of_subjects:
-            raw_average = sum(valid_scores) / len(valid_scores)
-            average_score = math.floor(raw_average + 0.5)
-            st.info(f"Calculated Average Score: {average_score}")
+            average_score = sum(valid_scores) / len(valid_scores)
+            st.info(f"Calculated Average Score: {average_score:.2f}")
         else:
             average_score = None
-            st.warning("⚠️ Please complete all subject scores before prediction.")
+            st.warning("Please enter all subject scores before prediction.")
 
         attendance = st.slider(
             "Attendance Rate (%)",
@@ -2804,7 +2798,6 @@ elif page == "Prediction" and st.session_state.get("prediction_mode") == "indivi
 
         if submit:
 
-
             if not name.strip():
                 st.error("❌ Student Name is required.")
                 st.stop()
@@ -2824,7 +2817,6 @@ elif page == "Prediction" and st.session_state.get("prediction_mode") == "indivi
             if average_score is None:
                 st.error("Please complete all subject scores.")
                 st.stop()
-
 
             input_df = pd.DataFrame([{
                 "Average_Score": average_score,
