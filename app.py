@@ -928,44 +928,6 @@ h1, h2, h3 {
 
 
 
-/* Premium Login Screen */
-.login-shell {
-    max-width: 460px;
-    margin: 5rem auto;
-    padding: 2.4rem;
-    border-radius: 32px;
-    background: rgba(255,255,255,0.88);
-    backdrop-filter: blur(20px);
-    border: 1px solid rgba(148,163,184,.25);
-    box-shadow: 0 30px 70px rgba(15,23,42,.18);
-    text-align:center;
-}
-
-.login-logo {
-    font-size:3.2rem;
-    margin-bottom:.4rem;
-}
-
-.login-title {
-    font-size:2rem;
-    font-weight:900;
-    background:linear-gradient(135deg,#2563eb,#7c3aed);
-    -webkit-background-clip:text;
-    color:transparent;
-}
-
-.login-subtitle {
-    color:#64748b;
-    margin-bottom:1.8rem;
-}
-
-.auth-switch {
-    color:#475569;
-    font-size:.9rem;
-}
-
-
-
 /* ===== PREMIUM SIDEBAR V2 ===== */
 
 [data-testid="stSidebar"] {
@@ -1088,21 +1050,6 @@ h1, h2, h3 {
 
 
 
-/* FINAL FOOTER CLEAN */
-.sidebar-footer {
-    position: fixed !important;
-    bottom: 12px !important;
-    left: 10px !important;
-    width: 230px !important;
-    text-align: center !important;
-    white-space: nowrap !important;
-    overflow: hidden !important;
-    z-index: 10 !important;
-    font-size: 0.55rem !important;
-    line-height: 1 !important;
-}
-
-
 /* FINAL COMPACT SIDEBAR FOOTER */
 .sidebar-footer {
     position: fixed !important;
@@ -1118,54 +1065,6 @@ h1, h2, h3 {
     z-index: 5 !important;
 }
 
-
-/* ===== PREMIUM ROLE LOGIN ===== */
-.login-premium {
-    max-width: 900px;
-    margin: 4rem auto;
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 2rem;
-    align-items: center;
-}
-
-.login-ai-card {
-    min-height: 430px;
-    border-radius: 36px;
-    background:
-        radial-gradient(circle at top, rgba(37,99,235,.35), transparent 35%),
-        linear-gradient(145deg,#020617,#172554,#312e81);
-    display:flex;
-    flex-direction:column;
-    justify-content:center;
-    align-items:center;
-    color:white;
-    box-shadow:0 30px 80px rgba(15,23,42,.35);
-}
-
-.login-ai-head {
-    width:180px;
-    height:180px;
-    border-radius:50%;
-    background:linear-gradient(145deg,#e0f2fe,#bfdbfe);
-    display:flex;
-    align-items:center;
-    justify-content:center;
-    font-size:90px;
-    box-shadow:0 0 50px rgba(96,165,250,.65);
-}
-
-.login-role-card {
-    background:rgba(255,255,255,.9);
-    backdrop-filter:blur(20px);
-    border-radius:32px;
-    padding:2.2rem;
-    box-shadow:0 30px 70px rgba(15,23,42,.18);
-}
-
-@media(max-width:800px){
-    .login-premium{grid-template-columns:1fr;}
-}
 
 </style>
 """, unsafe_allow_html=True)
