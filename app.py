@@ -4051,7 +4051,81 @@ elif page == "Dataset":
     )
 
 
-else:
+
+elif page == "Feature Analysis":
+
+    st.markdown(
+        """
+<div class="mode-page-hero">
+    <div class="mode-page-eyebrow">
+        Feature Engineering
+    </div>
+    <h2>⭐ Feature Analysis</h2>
+    <p>
+    Analysis of the selected machine learning input features used
+    for student performance prediction.
+    </p>
+</div>
+""",
+        unsafe_allow_html=True
+    )
+
+    st.subheader("📊 Feature Importance & Relationship Analysis")
+
+    feature_cols = [
+        "Average_Score",
+        "Attendance_Pct",
+        "Study_Hours_Per_Day",
+        "Previous_CGPA"
+    ]
+
+    available_features = [
+        col for col in feature_cols if col in df.columns
+    ]
+
+    if available_features:
+        corr_df = df[available_features].corr()
+
+        fig = px.imshow(
+            corr_df,
+            text_auto=True,
+            title="Feature Correlation Heatmap",
+            color_continuous_scale="Blues"
+        )
+
+        fig.update_layout(
+            title=dict(
+                x=0.5,
+                xanchor="center"
+            )
+        )
+
+        st.plotly_chart(fig, use_container_width=True)
+
+    st.markdown("### 🔍 Selected Model Features")
+
+    feature_col1, feature_col2 = st.columns(2)
+
+    with feature_col1:
+        st.markdown("""
+<div class="about-card about-blue">
+<h4>Academic Performance</h4>
+<div class="about-list-item">Average Score</div>
+<div class="about-list-item">Previous CGPA</div>
+</div>
+""", unsafe_allow_html=True)
+
+    with feature_col2:
+        st.markdown("""
+<div class="about-card about-purple">
+<h4>Learning Behaviour</h4>
+<div class="about-list-item">Attendance Rate</div>
+<div class="about-list-item">Study Hours Per Day</div>
+</div>
+""", unsafe_allow_html=True)
+
+
+elif page == "About":
     st.subheader("About This Assignment")
 
     st.markdown(
