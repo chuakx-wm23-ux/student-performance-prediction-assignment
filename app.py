@@ -2731,8 +2731,9 @@ elif page == "Prediction" and st.session_state.get("prediction_mode") == "indivi
             key="number_of_subjects"
         )
 
-        # Subject scores: 0-100 scale, convert decimals using 0.5 rule
-        # Example: 44.4 -> 44, 44.5 -> 45, 87.8 -> 88
+        # Subject scores: 0-100 scale
+        # Keep .5 values (81.5 stays 81.5), but normal round other decimals
+        # Example: 44.4 -> 44, 44.5 -> 44.5, 81.6 -> 82
         def normalize_score(index):
             key = f"subject_{index}"
             value = st.session_state.get(key)
@@ -2740,7 +2741,13 @@ elif page == "Prediction" and st.session_state.get("prediction_mode") == "indivi
             if value is not None:
                 try:
                     value = float(value)
-                    converted = int(math.floor(value + 0.5))
+                    decimal = value % 1
+
+                    if abs(decimal - 0.5) < 0.001:
+                        converted = value
+                    else:
+                        converted = round(value)
+
                     converted = max(0, min(100, converted))
                     st.session_state[key] = converted
                 except:
@@ -2772,7 +2779,7 @@ elif page == "Prediction" and st.session_state.get("prediction_mode") == "indivi
 
         if len(valid_scores) == number_of_subjects:
             rounded_scores = [
-                int(math.floor(float(s) + 0.5))
+                s if abs(float(s) % 1 - 0.5) < 0.001 else round(float(s))
                 for s in valid_scores
             ]
 
