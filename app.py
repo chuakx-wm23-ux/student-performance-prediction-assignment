@@ -35,6 +35,9 @@ DATA = ROOT / "dataset" / "Student_data.csv"
 MODELS = ROOT / "models"
 RESULTS = ROOT / "results"
 
+BATCH_TEMPLATE_FILE = ROOT / "template" / "student_batch_prediction_template.xlsx"
+
+
 
 st.set_page_config(
     page_title="Student Performance Prediction",
@@ -299,7 +302,7 @@ div[data-testid="stButton"] button[kind="secondary"]:hover {
 }
 
 [data-testid="stMetricLabel"] p {
-    font-size: 0.88rem !important;
+    font-size: 0.95rem !important;
 }
 
 h2 {
@@ -1012,14 +1015,14 @@ h1, h2, h3 {
 }
 
 [data-testid="stSidebar"] div[role="radiogroup"] label {
-    min-height: 56px !important;
-    height: 56px !important;
+    min-height: 60px !important;
+    height: 60px !important;
     padding: 0.15rem 0.5rem !important;
     border-radius: 12px !important;
 }
 
 [data-testid="stSidebar"] div[role="radiogroup"] label p {
-    font-size: 0.88rem !important;
+    font-size: 0.95rem !important;
     font-weight: 750 !important;
 }
 
