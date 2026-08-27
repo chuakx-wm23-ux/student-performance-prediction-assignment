@@ -2908,6 +2908,55 @@ if page == "Prediction" and st.session_state.get("prediction_mode") == "batch":
 
     if "batch_result" in st.session_state:
         result = st.session_state["batch_result"]
+
+        # ===== Batch AI Dashboard =====
+        st.markdown("### 📊 Batch Prediction Dashboard")
+
+        if "Final_Prediction" in result.columns:
+            prediction_col = "Final_Prediction"
+        elif "FINAL PREDICTION" in result.columns:
+            prediction_col = "FINAL PREDICTION"
+        else:
+            prediction_col = None
+
+        if prediction_col:
+            total = len(result)
+            counts = result[prediction_col].value_counts()
+
+            c1, c2, c3, c4 = st.columns(4)
+            c1.metric("Total Students", total)
+            c2.metric("Excellent", int(counts.get("Excellent", 0)))
+            c3.metric("Good", int(counts.get("Good", 0)))
+            c4.metric("At Risk", int(counts.get("At Risk", 0)))
+
+            chart_col1, chart_col2 = st.columns(2)
+
+            with chart_col1:
+                pie_df = counts.reset_index()
+                pie_df.columns = ["Performance", "Students"]
+                fig = px.pie(
+                    pie_df,
+                    values="Students",
+                    names="Performance",
+                    title="Prediction Distribution",
+                    hole=0.45,
+                )
+                st.plotly_chart(fig, use_container_width=True)
+
+            with chart_col2:
+                bar_df = counts.reset_index()
+                bar_df.columns = ["Performance", "Students"]
+                fig2 = px.bar(
+                    bar_df,
+                    x="Performance",
+                    y="Students",
+                    title="Student Performance Category",
+                    text="Students",
+                )
+                st.plotly_chart(fig2, use_container_width=True)
+
+            st.markdown("### 📋 Detailed Prediction Results")
+
         st.dataframe(result, use_container_width=True)
 
         excel = make_batch_excel_bytes(result)
