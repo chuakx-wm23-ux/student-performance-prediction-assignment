@@ -1118,6 +1118,55 @@ h1, h2, h3 {
     z-index: 5 !important;
 }
 
+
+/* ===== PREMIUM ROLE LOGIN ===== */
+.login-premium {
+    max-width: 900px;
+    margin: 4rem auto;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 2rem;
+    align-items: center;
+}
+
+.login-ai-card {
+    min-height: 430px;
+    border-radius: 36px;
+    background:
+        radial-gradient(circle at top, rgba(37,99,235,.35), transparent 35%),
+        linear-gradient(145deg,#020617,#172554,#312e81);
+    display:flex;
+    flex-direction:column;
+    justify-content:center;
+    align-items:center;
+    color:white;
+    box-shadow:0 30px 80px rgba(15,23,42,.35);
+}
+
+.login-ai-head {
+    width:180px;
+    height:180px;
+    border-radius:50%;
+    background:linear-gradient(145deg,#e0f2fe,#bfdbfe);
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    font-size:90px;
+    box-shadow:0 0 50px rgba(96,165,250,.65);
+}
+
+.login-role-card {
+    background:rgba(255,255,255,.9);
+    backdrop-filter:blur(20px);
+    border-radius:32px;
+    padding:2.2rem;
+    box-shadow:0 30px 70px rgba(15,23,42,.18);
+}
+
+@media(max-width:800px){
+    .login-premium{grid-template-columns:1fr;}
+}
+
 </style>
 """, unsafe_allow_html=True)
 
@@ -2671,13 +2720,13 @@ def save_users(users):
 
 def login_screen():
     st.markdown("""
-    <div class="login-shell">
-        <div class="login-logo">🎓</div>
-        <div class="login-title">Student AI</div>
-        <div class="login-subtitle">
-        Intelligent Student Performance Prediction System
+    <div class="login-premium">
+        <div class="login-ai-card">
+            <div class="login-ai-head">🤖</div>
+            <h2 style="color:white;margin-top:25px;">Student AI</h2>
+            <p style="color:#cbd5e1;">Intelligent Performance Prediction System</p>
         </div>
-    </div>
+        <div class="login-role-card">
     """, unsafe_allow_html=True)
 
     users = load_users()
@@ -2685,21 +2734,34 @@ def login_screen():
     tab1, tab2 = st.tabs(["🔐 Login", "📝 Register"])
 
     with tab1:
+        role = st.selectbox(
+            "Login As",
+            ["Student", "Lecturer"]
+        )
+
         username = st.text_input("Username", key="login_user")
         password = st.text_input("Password", type="password", key="login_pass")
 
-        if st.button("Login", use_container_width=True):
+        if st.button("🚀 Login", use_container_width=True):
             if username in users and users[username]["password"] == hash_password(password):
-                st.session_state.authenticated = True
-                st.session_state.username = username
-                st.session_state.role = users[username]["role"]
-                st.rerun()
+                if users[username]["role"] == role:
+                    st.session_state.authenticated = True
+                    st.session_state.username = username
+                    st.session_state.role = role
+                    st.rerun()
+                else:
+                    st.error("Account role does not match selected login type.")
             else:
                 st.error("Invalid username or password.")
 
     with tab2:
         new_user = st.text_input("Create Username", key="reg_user")
         new_pass = st.text_input("Create Password", type="password", key="reg_pass")
+        new_role = st.selectbox(
+            "Register As",
+            ["Student", "Lecturer"],
+            key="reg_role"
+        )
 
         if st.button("Create Account", use_container_width=True):
             if new_user in users:
@@ -2709,10 +2771,13 @@ def login_screen():
             else:
                 users[new_user] = {
                     "password": hash_password(new_pass),
-                    "role": "Lecturer"
+                    "role": new_role
                 }
                 save_users(users)
                 st.success("Account created. Please login.")
+
+    st.markdown("</div></div>", unsafe_allow_html=True)
+
 
 if "authenticated" not in st.session_state:
     st.session_state.authenticated = False
