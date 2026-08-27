@@ -1,11 +1,8 @@
-# FINAL FIXED VERSION - VALIDATION + NO EMPTY SCORE CRASH
-# FINAL VERSION - 4 ML FEATURES + VALIDATION READY
 from pathlib import Path
 from io import BytesIO
 from datetime import datetime
 import joblib
 import pandas as pd
-import re
 import plotly.express as px
 import streamlit as st
 from openpyxl.styles import Alignment, Border, Font, PatternFill, Side
@@ -2379,10 +2376,9 @@ def predict_batch(batch_df):
     for model_name, bundle in models.items():
         model = bundle["model"]
         label_encoder = bundle["label_encoder"]
-        model_input = batch_df[model.feature_names_in_]
-        encoded = model.predict(model_input).astype(int)
+        encoded = model.predict(batch_df[features]).astype(int)
         labels = label_encoder.inverse_transform(encoded)
-        probabilities = model.predict_proba(model_input)
+        probabilities = model.predict_proba(batch_df[features])
         confidence = probabilities.max(axis=1)
         result[f"{model_name}_Prediction"] = labels
         result[f"{model_name}_Confidence"] = confidence
@@ -2538,7 +2534,7 @@ elif page == "Prediction" and not st.session_state.get("prediction_mode"):
     stat_col1, stat_col2, stat_col3, stat_col4 = st.columns(4, gap="small")
     stat_col1.metric("🏆 Best Model", str(best_row["Model"]))
     stat_col2.metric("🎯 Best Accuracy", f"{best_row['Accuracy']:.1%}")
-    stat_col3.metric("📚 Input Features", "4")
+    stat_col3.metric("📚 Input Features", "5")
     stat_col4.metric("🤖 ML Models", "3")
 
     card_col1, card_col2 = st.columns(2, gap="small")
@@ -2694,18 +2690,6 @@ elif page == "Prediction" and st.session_state.get("prediction_mode") == "indivi
         name = st.text_input("Student Name", key="student_name")
         student_id = st.text_input("Student ID", key="student_id")
 
-        # Live input validation
-        name_error = False
-        id_error = False
-
-        if name and not re.fullmatch(r"[A-Za-z ]+", name):
-            st.error("❌ Student Name can only contain letters and spaces.")
-            name_error = True
-
-        if student_id and (not student_id.isdigit() or len(student_id) != 7):
-            st.error("❌ Student ID must contain exactly 7 digits.")
-            id_error = True
-
         number_of_subjects = st.slider(
             "Number of Subjects",
             min_value=1,
@@ -2724,20 +2708,20 @@ elif page == "Prediction" and st.session_state.get("prediction_mode") == "indivi
                     min_value=0.0,
                     max_value=100.0,
                     value=None,
-                    step=0.5,
+                    placeholder="Enter score",
+                    step=1.0,
                     key=f"subject_{i}"
                 )
                 scores.append(score)
 
         valid_scores = [s for s in scores if s is not None]
 
-        if len(valid_scores) > 0:
+        if len(valid_scores) == number_of_subjects:
             average_score = sum(valid_scores) / len(valid_scores)
             st.info(f"Calculated Average Score: {average_score:.2f}")
         else:
             average_score = None
-            st.info("Please enter subject scores to calculate average score.")
-        st.info(f"Calculated Average Score: {average_score:.2f}")
+            st.warning("Please enter all subject scores before prediction.")
 
         attendance = st.slider(
             "Attendance Rate (%)",
@@ -2766,12 +2750,6 @@ elif page == "Prediction" and st.session_state.get("prediction_mode") == "indivi
             key="previous_cgpa"
         )
 
-        score_error = False
-        for s in scores:
-            if s is not None and (round(s * 2) / 2 != s):
-                score_error = True
-                st.error("❌ Subject scores must use 0.5 intervals only.")
-
         submit = st.button(
             "Predict",
             use_container_width=True,
@@ -2779,11 +2757,19 @@ elif page == "Prediction" and st.session_state.get("prediction_mode") == "indivi
         )
 
         if submit:
-            if not name or name_error or not student_id or id_error or score_error:
-                st.warning("⚠️ Please complete all required fields before prediction.")
+
+            if not name.strip():
+                st.error("Student Name is required.")
                 st.stop()
 
-            name = name.title()
+            if not student_id.strip():
+                st.error("Student ID is required.")
+                st.stop()
+
+            if average_score is None:
+                st.error("Please complete all subject scores.")
+                st.stop()
+
             input_df = pd.DataFrame([{
                 "Average_Score": average_score,
                 "Attendance_Pct": attendance,
@@ -2798,12 +2784,10 @@ elif page == "Prediction" and st.session_state.get("prediction_mode") == "indivi
                 model = bundle["model"]
                 label_encoder = bundle["label_encoder"]
 
-                # Ensure prediction input matches the trained model features
-                model_input = input_df[bundle["model"].feature_names_in_]
-                pred_code = int(model.predict(model_input)[0])
+                pred_code = int(model.predict(input_df)[0])
                 pred_label = label_encoder.inverse_transform([pred_code])[0]
 
-                probabilities = model.predict_proba(model_input)[0]
+                probabilities = model.predict_proba(input_df)[0]
                 confidence = float(probabilities[pred_code])
 
                 predictions.append({
@@ -2922,7 +2906,7 @@ elif page == "Prediction" and st.session_state.get("prediction_mode") == "batch"
                 st.success(f"{len(batch_df):,} student records loaded successfully.")
                 c1, c2, c3 = st.columns(3)
                 c1.metric("Uploaded Students", f"{len(batch_df):,}")
-                c2.metric("Required Features", "4")
+                c2.metric("Required Features", "5")
                 c3.metric("Final Model", str(evaluation.iloc[0]["Model"]))
 
                 st.markdown("#### Uploaded Data Preview")
@@ -4021,7 +4005,7 @@ else:
     with overview_col4:
         st.metric("Features", "4")
 
-    st.markdown("### 📊 Selected ML Features and Models")
+    st.markdown("### 📊 Input Features and Models")
 
     left_col, right_col = st.columns(2)
 
