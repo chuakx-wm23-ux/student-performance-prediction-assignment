@@ -14,6 +14,8 @@ from openpyxl.drawing.image import Image as XLImage
 import matplotlib.pyplot as plt
 import re
 import math
+import json
+import hashlib
 
 from pathlib import Path
 
@@ -113,33 +115,36 @@ st.markdown("""
 
 [data-testid="stSidebar"] > div:first-child {
     width: 230px !important;
-    padding: 1.5rem 1rem 8rem 1rem !important;
+    padding: 1.3rem 0.85rem 7rem 0.85rem !important;
 }
 
 [data-testid="stSidebar"] * {
     color: white;
 }
 
+/* Brand */
 [data-testid="stSidebar"] h1 {
-    font-size: 1.8rem !important;
+    font-size: 1.55rem !important;
     font-weight: 900 !important;
     text-align: center;
-    margin-bottom: 2rem !important;
+    margin-bottom: 1.5rem !important;
 }
 
+/* Navigation spacing */
 [data-testid="stSidebar"] div[role="radiogroup"] {
-    gap: 0.85rem !important;
+    gap: 0.45rem !important;
 }
 
+/* Navigation buttons */
 [data-testid="stSidebar"] div[role="radiogroup"] label {
     width: 100%;
-    min-height: 55px;
-    display: flex;
-    align-items: center;
+    min-height: 38px !important;
+    display: flex !important;
+    align-items: center !important;
 
-    padding: 0.30rem 0.45rem;
+    padding: 0.2rem 0.55rem !important;
 
-    border-radius: 10px;
+    border-radius: 12px !important;
     background: rgba(255,255,255,0.06);
     border: 1px solid rgba(255,255,255,0.08);
 
@@ -147,49 +152,52 @@ st.markdown("""
 }
 
 [data-testid="stSidebar"] div[role="radiogroup"] label p {
-    font-size: 0.95rem !important;
+    font-size: 0.78rem !important;
     font-weight: 750 !important;
     white-space: nowrap !important;
     margin: 0 !important;
 }
 
 [data-testid="stSidebar"] div[role="radiogroup"] label:hover {
-    transform: translateX(5px);
-    background: rgba(255,255,255,0.13);
+    transform: translateX(4px);
+    background: rgba(255,255,255,0.12);
 }
 
 [data-testid="stSidebar"] div[role="radiogroup"] label:has(input:checked) {
     background: linear-gradient(135deg,#2563eb,#7c3aed);
-    box-shadow: 0 12px 30px rgba(37,99,235,.35);
+    box-shadow: 0 10px 25px rgba(124,58,237,.35);
 }
 
+/* Logout button only */
+[data-testid="stSidebar"] .stButton button {
+    min-height: 34px !important;
+    height: 34px !important;
+    border-radius: 10px !important;
+    font-size: 0.72rem !important;
+    font-weight: 750 !important;
+}
+
+/* Footer */
 .sidebar-footer {
     position: fixed !important;
-    bottom: 18px !important;
-    left: 25px !important;
-    width: 230px !important;
+    bottom: 16px !important;
+    left: 18px !important;
+    width: 210px !important;
     text-align: center !important;
     z-index: 999 !important;
 }
 
 .sidebar-footer .footer-brand {
-    font-size: 0.52rem !important;
-    font-weight: 700 !important;
-    margin-bottom: 4px !important;
+    font-size: 0.62rem !important;
 }
 
-.sidebar-footer .footer-subtitle {
-    font-size: 0.52rem !important;
-    line-height: 1.2 !important;
-}
-
+.sidebar-footer .footer-subtitle,
 .sidebar-footer .footer-powered,
 .sidebar-footer .footer-version,
 .sidebar-footer .footer-group,
 .sidebar-footer .footer-copyright {
-    font-size: 0.48rem !important;
-    line-height: 1.2 !important;
-    opacity: 0.85;
+    font-size: 0.55rem !important;
+    line-height: 1.25 !important;
 }
 
 /* Main hero */
@@ -949,6 +957,177 @@ h1, h2, h3 {
 .sidebar-footer .footer-copyright {
     font-size: 0.60rem !important;
     line-height: 1.35 !important;
+}
+
+
+/* Premium Login Screen */
+.login-shell {
+    max-width: 460px;
+    margin: 5rem auto;
+    padding: 2.4rem;
+    border-radius: 32px;
+    background: rgba(255,255,255,0.88);
+    backdrop-filter: blur(20px);
+    border: 1px solid rgba(148,163,184,.25);
+    box-shadow: 0 30px 70px rgba(15,23,42,.18);
+    text-align:center;
+}
+
+.login-logo {
+    font-size:3.2rem;
+    margin-bottom:.4rem;
+}
+
+.login-title {
+    font-size:2rem;
+    font-weight:900;
+    background:linear-gradient(135deg,#2563eb,#7c3aed);
+    -webkit-background-clip:text;
+    color:transparent;
+}
+
+.login-subtitle {
+    color:#64748b;
+    margin-bottom:1.8rem;
+}
+
+.auth-switch {
+    color:#475569;
+    font-size:.9rem;
+}
+
+
+
+/* ===== PREMIUM SIDEBAR V2 ===== */
+
+[data-testid="stSidebar"] {
+    width: 250px !important;
+    min-width: 250px !important;
+}
+
+[data-testid="stSidebar"] > div:first-child {
+    padding: 1.2rem 0.9rem 6.5rem 0.9rem !important;
+}
+
+/* User area */
+.sidebar-user-card {
+    margin-top: 0.8rem;
+    margin-bottom: 1.2rem;
+    padding: 10px 14px;
+    border-radius: 14px;
+    background: rgba(255,255,255,0.08);
+    border: 1px solid rgba(255,255,255,0.12);
+}
+
+.sidebar-user-name {
+    font-size: 0.82rem;
+    font-weight: 750;
+    color: white;
+}
+
+.sidebar-user-role {
+    font-size: 0.68rem;
+    color: #cbd5e1;
+}
+
+/* Navigation */
+[data-testid="stSidebar"] div[role="radiogroup"] {
+    gap: 0.45rem !important;
+}
+
+[data-testid="stSidebar"] div[role="radiogroup"] label {
+    min-height: 40px !important;
+    padding: 0.25rem 0.55rem !important;
+    border-radius: 13px !important;
+}
+
+[data-testid="stSidebar"] div[role="radiogroup"] label p {
+    font-size: 0.76rem !important;
+    font-weight: 750 !important;
+}
+
+/* Logout */
+[data-testid="stSidebar"] button {
+    border-radius: 12px !important;
+    min-height: 36px !important;
+    font-size: 0.75rem !important;
+}
+
+/* Footer */
+.sidebar-footer {
+    bottom: 15px !important;
+    width: 210px !important;
+    left: 18px !important;
+}
+
+.sidebar-footer * {
+    font-size: 0.62rem !important;
+    line-height: 1.35 !important;
+}
+
+
+/* ===== FINAL SIDEBAR CLEAN OVERRIDE ===== */
+
+[data-testid="stSidebar"] {
+    width: 250px !important;
+    min-width: 250px !important;
+}
+
+[data-testid="stSidebar"] > div:first-child {
+    padding: 1.2rem 0.9rem 4.2rem 0.9rem !important;
+}
+
+/* Keep Student AI brand at top */
+[data-testid="stSidebar"] h1 {
+    margin-top: 0 !important;
+    margin-bottom: 1.6rem !important;
+    font-size: 1.55rem !important;
+}
+
+/* Navigation cleaner */
+[data-testid="stSidebar"] div[role="radiogroup"] {
+    gap: 0.35rem !important;
+}
+
+[data-testid="stSidebar"] div[role="radiogroup"] label {
+    min-height: 36px !important;
+    height: 36px !important;
+    padding: 0.15rem 0.5rem !important;
+    border-radius: 12px !important;
+}
+
+[data-testid="stSidebar"] div[role="radiogroup"] label p {
+    font-size: 0.74rem !important;
+    font-weight: 750 !important;
+}
+
+/* Logout size */
+[data-testid="stSidebar"] .stButton button {
+    height: 34px !important;
+    min-height: 34px !important;
+    font-size: 0.75rem !important;
+    border-radius: 12px !important;
+}
+
+/* Footer single compact line */
+.sidebar-footer {
+    position: fixed !important;
+    bottom: 12px !important;
+    left: 15px !important;
+    width: 220px !important;
+    text-align: center !important;
+    white-space: nowrap !important;
+}
+
+.sidebar-footer > div {
+    display: inline !important;
+    font-size: 0.55rem !important;
+    line-height: 1 !important;
+}
+
+.sidebar-footer > div:not(:last-child)::after {
+    content: " • ";
+    color: rgba(255,255,255,.55);
 }
 
 </style>
@@ -2479,11 +2658,108 @@ CGPA below 2.50
     )
 
 
+
+# ---------------- AUTHENTICATION ----------------
+
+USERS_FILE = ROOT / "users.json"
+
+def hash_password(password):
+    return hashlib.sha256(password.encode()).hexdigest()
+
+def load_users():
+    if not USERS_FILE.exists():
+        USERS_FILE.write_text(
+            json.dumps({
+                "admin": {
+                    "password": hash_password("admin123"),
+                    "role": "Admin"
+                }
+            }, indent=4)
+        )
+    return json.loads(USERS_FILE.read_text())
+
+def save_users(users):
+    USERS_FILE.write_text(json.dumps(users, indent=4))
+
+def login_screen():
+    st.markdown("""
+    <div class="login-shell">
+        <div class="login-logo">🎓</div>
+        <div class="login-title">Student AI</div>
+        <div class="login-subtitle">
+        Intelligent Student Performance Prediction System
+        </div>
+    </div>
+    """, unsafe_allow_html=True)
+
+    users = load_users()
+
+    tab1, tab2 = st.tabs(["🔐 Login", "📝 Register"])
+
+    with tab1:
+        username = st.text_input("Username", key="login_user")
+        password = st.text_input("Password", type="password", key="login_pass")
+
+        if st.button("Login", use_container_width=True):
+            if username in users and users[username]["password"] == hash_password(password):
+                st.session_state.authenticated = True
+                st.session_state.username = username
+                st.session_state.role = users[username]["role"]
+                st.rerun()
+            else:
+                st.error("Invalid username or password.")
+
+    with tab2:
+        new_user = st.text_input("Create Username", key="reg_user")
+        new_pass = st.text_input("Create Password", type="password", key="reg_pass")
+
+        if st.button("Create Account", use_container_width=True):
+            if new_user in users:
+                st.warning("Username already exists.")
+            elif not new_user or not new_pass:
+                st.warning("Please complete all fields.")
+            else:
+                users[new_user] = {
+                    "password": hash_password(new_pass),
+                    "role": "Lecturer"
+                }
+                save_users(users)
+                st.success("Account created. Please login.")
+
+if "authenticated" not in st.session_state:
+    st.session_state.authenticated = False
+
+if not st.session_state.authenticated:
+    login_screen()
+    st.stop()
+
+
 df = load_data()
 models = load_models()
 evaluation = pd.read_csv(RESULTS / "evaluation.csv")
 
 st.sidebar.title("🎓 Student AI")
+
+st.sidebar.markdown(
+    f"""
+    <div class="sidebar-user-card">
+        <div class="sidebar-user-name">
+            👤 {st.session_state.get('username','User')}
+        </div>
+        <div class="sidebar-user-role">
+            {st.session_state.get('role','Lecturer')}
+        </div>
+    </div>
+    """,
+    unsafe_allow_html=True
+)
+
+if st.sidebar.button("🚪 Logout", use_container_width=True):
+    st.session_state.authenticated = False
+    st.session_state.pop("username", None)
+    st.session_state.pop("role", None)
+    st.rerun()
+
 st.sidebar.markdown("### Navigation")
 page = st.sidebar.radio(
     "Navigation Menu",
@@ -2501,14 +2777,7 @@ page = st.sidebar.radio(
 
 st.sidebar.markdown(
     """
-<div class="sidebar-footer">
-    <div class="footer-brand">🎓 Student AI</div>
-    <div class="footer-subtitle">Student Performance Prediction</div>
-    <div class="footer-powered">Powered by KNN • SVM • ANN</div>
-    <div class="footer-version">Version 1.0</div>
-    <div class="footer-group">Developed by RIS Group 5</div>
-    <div class="footer-copyright">© 2026 All Rights Reserved</div>
-</div>
+<div class="sidebar-footer"><div class="footer-brand">🎓 Student AI</div><div class="footer-subtitle">Student Performance Prediction</div><div class="footer-powered">Powered by KNN • SVM • ANN</div><div class="footer-version">Version 1.0</div><div class="footer-group">RIS Group 5</div><div class="footer-copyright">© 2026</div></div>
 """,
     unsafe_allow_html=True,
 )
