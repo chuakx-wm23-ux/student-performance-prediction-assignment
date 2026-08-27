@@ -1161,6 +1161,21 @@ h1, h2, h3 {
     color: rgba(255,255,255,.45);
 }
 
+
+/* FINAL FOOTER CLEAN */
+.sidebar-footer {
+    position: fixed !important;
+    bottom: 12px !important;
+    left: 10px !important;
+    width: 230px !important;
+    text-align: center !important;
+    white-space: nowrap !important;
+    overflow: hidden !important;
+    z-index: 10 !important;
+    font-size: 0.55rem !important;
+    line-height: 1 !important;
+}
+
 </style>
 """, unsafe_allow_html=True)
 
@@ -2806,12 +2821,7 @@ page = st.sidebar.radio(
     label_visibility="collapsed"
 )
 
-st.sidebar.markdown(
-    """
-<div class="sidebar-footer"><div class="footer-brand">🎓 Student AI</div><div class="footer-subtitle">Student Performance Prediction</div><div class="footer-powered">Powered by KNN • SVM • ANN</div><div class="footer-version">Version 1.0</div><div class="footer-group">RIS Group 5</div><div class="footer-copyright">© 2026</div></div>
-""",
-    unsafe_allow_html=True,
-)
+
 
 page = page.split(" ", 1)[1]
 
