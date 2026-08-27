@@ -137,9 +137,9 @@ st.markdown("""
     display: flex;
     align-items: center;
 
-    padding: 0.45rem 0.65rem;
+    padding: 0.30rem 0.45rem;
 
-    border-radius: 14px;
+    border-radius: 10px;
     background: rgba(255,255,255,0.06);
     border: 1px solid rgba(255,255,255,0.08);
 
@@ -173,13 +173,13 @@ st.markdown("""
 }
 
 .sidebar-footer .footer-brand {
-    font-size: 0.60rem !important;
+    font-size: 0.38rem !important;
     font-weight: 700 !important;
     margin-bottom: 4px !important;
 }
 
 .sidebar-footer .footer-subtitle {
-    font-size: 0.48rem !important;
+    font-size: 0.38rem !important;
     line-height: 1.2 !important;
 }
 
@@ -187,7 +187,7 @@ st.markdown("""
 .sidebar-footer .footer-version,
 .sidebar-footer .footer-group,
 .sidebar-footer .footer-copyright {
-    font-size: 0.45rem !important;
+    font-size: 0.35rem !important;
     line-height: 1.2 !important;
     opacity: 0.85;
 }
@@ -253,7 +253,7 @@ st.markdown("""
 [data-testid="stFormSubmitButton"] > button {
     width: 100%;
     border: none;
-    border-radius: 14px;
+    border-radius: 10px;
     font-weight: 800;
     color: white;
     min-height: 46px;
@@ -288,8 +288,8 @@ div[data-testid="stButton"] button[kind="secondary"]:hover {
 [data-testid="stMetric"] {
     background: rgba(255,255,255,0.92);
     border: 1px solid var(--border);
-    border-radius: 14px;
-    padding: 0.45rem 0.65rem;
+    border-radius: 10px;
+    padding: 0.30rem 0.45rem;
     box-shadow: 0 10px 28px rgba(15,23,42,0.05);
 }
 
@@ -331,7 +331,7 @@ h3 {
 [data-testid="stImage"],
 [data-testid="stPlotlyChart"] {
     background: white;
-    border-radius: 14px;
+    border-radius: 10px;
 }
 
 /* CGPA guide */
@@ -352,7 +352,7 @@ h3 {
 
 .cgpa-card {
     padding: 14px;
-    border-radius: 14px;
+    border-radius: 10px;
     text-align: center;
     font-size: 0.95rem;
     border: 1px solid rgba(15,23,42,0.04);
@@ -389,7 +389,7 @@ h1, h2, h3 {
 .about-hero {
     background: linear-gradient(120deg, #eef2ff, #f5f3ff);
     border: 1px solid #ddd6fe;
-    border-radius: 14px;
+    border-radius: 10px;
     padding: 18px 20px;
     margin-bottom: 14px;
     box-shadow: 0 10px 28px rgba(79, 70, 229, 0.08);
@@ -463,7 +463,7 @@ h1, h2, h3 {
 
 .about-target {
     text-align: center;
-    border-radius: 14px;
+    border-radius: 10px;
     padding: 14px 10px;
     min-height: 92px;
     border: 1px solid rgba(148,163,184,0.20);
@@ -488,7 +488,7 @@ h1, h2, h3 {
 }
 
 [data-testid="stMetricLabel"] p {
-    font-size: 0.78rem !important;
+    font-size: 0.65rem !important;
 }
 
 /* Premium Prediction Hub */
@@ -641,7 +641,7 @@ h1, h2, h3 {
 .why-item {
     background: linear-gradient(135deg, #eff6ff, #f5f3ff);
     border: 1px solid #dbeafe;
-    border-radius: 14px;
+    border-radius: 10px;
     padding: .8rem .7rem;
     text-align: center;
     font-size: .82rem;
@@ -882,6 +882,33 @@ h1, h2, h3 {
 }
 [data-testid="stMetric"]:nth-of-type(4n+4) {
     background: linear-gradient(145deg, rgba(240,253,250,0.96), rgba(204,251,241,0.82)) !important;
+}
+
+
+/* FINAL COMPACT SIDEBAR OVERRIDE */
+[data-testid="stSidebar"] {
+    width: 180px !important;
+    min-width: 180px !important;
+}
+
+[data-testid="stSidebar"] div[role="radiogroup"] label {
+    min-height: 34px !important;
+    padding: 0.25rem 0.45rem !important;
+    border-radius: 10px !important;
+}
+
+[data-testid="stSidebar"] div[role="radiogroup"] label p {
+    font-size: 0.65rem !important;
+    font-weight: 700 !important;
+}
+
+.sidebar-footer {
+    width: 145px !important;
+    left: 15px !important;
+}
+
+.sidebar-footer * {
+    transform: scale(0.85);
 }
 
 </style>
