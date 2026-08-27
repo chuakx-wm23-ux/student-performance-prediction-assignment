@@ -552,10 +552,7 @@ h1, h2, h3 {
     border: 1px solid #e2e8f0;
     border-radius: 22px;
     padding: .82rem .92rem .68rem;
-    height: 190px;
-    min-height: 190px;
-    display: flex;
-    flex-direction: column;
+    min-height: 176px;
     box-shadow: 0 16px 38px rgba(15,23,42,.07);
     margin-bottom: .8rem;
     transition: transform .22s ease, box-shadow .22s ease, border-color .22s ease;
@@ -685,10 +682,6 @@ h1, h2, h3 {
     line-height: 1.5;
 }
 
-
-.prediction-mode-card .prediction-feature-row {
-    margin-top: auto;
-}
 
 .prediction-feature-row {
     display: flex;
@@ -2820,6 +2813,27 @@ elif page == "Prediction" and not st.session_state.get("prediction_mode"):
 
 
 
+
+
+def create_batch_template():
+    """Create Excel template for batch prediction upload."""
+    template_df = pd.DataFrame({
+        "Student_ID": ["1234567"],
+        "Student_Name": ["Sample Student"],
+        "Average_Score": [75.0],
+        "Attendance_Pct": [90.0],
+        "Study_Hours_Per_Day": [3.0],
+        "Previous_CGPA": [3.20],
+    })
+
+    output = BytesIO()
+    with pd.ExcelWriter(output, engine="openpyxl") as writer:
+        template_df.to_excel(writer, index=False, sheet_name="Student Data")
+
+    output.seek(0)
+    return output.getvalue()
+
+
 elif page == "Prediction" and st.session_state.get("prediction_mode") == "batch":
 
     st.markdown(
@@ -2838,6 +2852,13 @@ elif page == "Prediction" and st.session_state.get("prediction_mode") == "batch"
     if st.button("← Back to Prediction Modes", key="back_from_batch", type="secondary"):
         st.session_state.pop("prediction_mode", None)
         st.rerun()
+
+    st.download_button(
+        "📄 Download Excel Template",
+        data=create_batch_template(),
+        file_name="Student_Batch_Template.xlsx",
+        mime="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+    )
 
     uploaded_file = st.file_uploader(
         "Upload Excel or CSV file",
