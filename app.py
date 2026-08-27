@@ -14,8 +14,6 @@ from openpyxl.drawing.image import Image as XLImage
 import matplotlib.pyplot as plt
 import re
 import math
-import json
-import hashlib
 
 from pathlib import Path
 
@@ -35,9 +33,6 @@ DATA = ROOT / "dataset" / "Student_data.csv"
 MODELS = ROOT / "models"
 RESULTS = ROOT / "results"
 
-BATCH_TEMPLATE_FILE = ROOT / "template" / "student_batch_prediction_template.xlsx"
-
-
 
 st.set_page_config(
     page_title="Student Performance Prediction",
@@ -48,7 +43,7 @@ st.set_page_config(
 st.markdown("""
 <style>
 :root {
-    --sidebar-width: 145px;
+    --sidebar-width: 235px;
     --navy: #0f172a;
     --navy-soft: #172554;
     --blue: #2563eb;
@@ -106,85 +101,122 @@ st.markdown("""
 
 /* Sidebar */
 [data-testid="stSidebar"] {
-    width: 230px !important;
-    min-width: 230px !important;
-
+    width: var(--sidebar-width) !important;
+    min-width: var(--sidebar-width) !important;
     background:
-        radial-gradient(circle at top left, rgba(99,102,241,0.25), transparent 30%),
-        linear-gradient(180deg, #0b1220 0%, #111827 55%, #172554 100%);
-
+        radial-gradient(circle at 15% 8%, rgba(99, 102, 241, 0.24), transparent 26%),
+        linear-gradient(180deg, #0b1220 0%, #111827 48%, #172554 100%);
     border-right: 1px solid rgba(255,255,255,0.08);
+    box-shadow: 10px 0 40px rgba(2, 6, 23, 0.18);
 }
 
 [data-testid="stSidebar"] > div:first-child {
-    width: 230px !important;
-    padding: 1.3rem 0.85rem 7rem 0.85rem !important;
+    width: var(--sidebar-width) !important;
+    padding: 1.25rem 1rem 1.5rem 1rem;
 }
 
 [data-testid="stSidebar"] * {
     color: white;
 }
 
-/* Brand */
 [data-testid="stSidebar"] h1 {
-    font-size: 1.55rem !important;
-    font-weight: 900 !important;
-    text-align: center;
-    margin-bottom: 1.5rem !important;
+    font-size: 1.65rem !important;
+    font-weight: 800 !important;
+    letter-spacing: -0.02em;
+    margin-bottom: 1.35rem !important;
 }
 
-/* Navigation spacing */
+[data-testid="stSidebar"] [data-testid="stMarkdownContainer"] p {
+    font-size: 0.95rem !important;
+    font-weight: 800 !important;
+}
+
 [data-testid="stSidebar"] div[role="radiogroup"] {
-    gap: 0.45rem !important;
+    gap: 0.6rem;
 }
 
-/* Navigation buttons */
 [data-testid="stSidebar"] div[role="radiogroup"] label {
-    width: 100%;
-    min-height: 38px !important;
-    display: flex !important;
-    align-items: center !important;
-
-    padding: 0.2rem 0.55rem !important;
-
-    border-radius: 12px !important;
-    background: rgba(255,255,255,0.06);
-    border: 1px solid rgba(255,255,255,0.08);
-
-    transition: .2s ease;
-}
-
-[data-testid="stSidebar"] div[role="radiogroup"] label p {
-    font-size: 0.78rem !important;
-    font-weight: 750 !important;
-    white-space: nowrap !important;
-    margin: 0 !important;
+    background: rgba(255,255,255,0.045);
+    border: 1px solid rgba(255,255,255,0.06);
+    border-radius: 14px;
+    padding: 0.72rem 0.85rem;
+    transition: all 0.18s ease;
+    min-height: 44px;
 }
 
 [data-testid="stSidebar"] div[role="radiogroup"] label:hover {
-    transform: translateX(4px);
-    background: rgba(255,255,255,0.12);
+    background: rgba(255,255,255,0.10);
+    transform: translateX(3px);
 }
 
 [data-testid="stSidebar"] div[role="radiogroup"] label:has(input:checked) {
-    background: linear-gradient(135deg,#2563eb,#7c3aed);
-    box-shadow: 0 10px 25px rgba(124,58,237,.35);
+    background: linear-gradient(90deg, rgba(37,99,235,0.95), rgba(124,58,237,0.95));
+    border-color: rgba(255,255,255,0.18);
+    box-shadow: 0 10px 26px rgba(37,99,235,0.22);
 }
 
-/* Sidebar buttons */
-[data-testid="stSidebar"] .stButton button {
-    min-height: 34px !important;
-    height: 34px !important;
-    border-radius: 10px !important;
-    font-size: 0.72rem !important;
-    font-weight: 750 !important;
+[data-testid="stSidebar"] div[role="radiogroup"] label p {
+    font-size: 0.98rem !important;
+    font-weight: 700 !important;
+    margin: 0 !important;
 }
 
+/* Sidebar footer */
+.sidebar-footer {
+    position: fixed;
+    left: 18px;
+    bottom: 4px;
+    width: calc(var(--sidebar-width) - 36px);
+    padding: 0.80rem 0.8rem 0.35rem;
+    border-top: 1px solid rgba(255,255,255,0.10);
+    text-align: center;
+    line-height: 1.55;
+    z-index: 1000;
+}
 
+.sidebar-footer .footer-brand {
+    color: #ffffff;
+    font-size: 0.98rem;
+    font-weight: 800;
+    letter-spacing: -0.01em;
+}
 
+.sidebar-footer .footer-subtitle {
+    color: #b8c7e8;
+    font-size: 0.68rem;
+    font-weight: 600;
+    margin-top: 0.12rem;
+}
 
+.sidebar-footer .footer-powered {
+    color: #8fa2c7;
+    font-size: 0.66rem;
+    margin-top: 0.28rem;
+}
 
+.sidebar-footer .footer-version {
+    color: #7e93ba;
+    font-size: 0.64rem;
+    margin-top: 0.65rem;
+}
 
+.sidebar-footer .footer-group {
+    color: #afc6ff;
+    font-size: 0.69rem;
+    font-weight: 700;
+    margin-top: 0.15rem;
+}
+
+.sidebar-footer .footer-copyright {
+    color: #6e82a8;
+    font-size: 0.61rem;
+    margin-top: 0.5rem;
+}
+
+/* Leave enough space so navigation never overlaps the footer */
+[data-testid="stSidebar"] > div:first-child {
+    padding-bottom: 12.5rem !important;
+}
 
 /* Main hero */
 .hero {
@@ -247,7 +279,7 @@ st.markdown("""
 [data-testid="stFormSubmitButton"] > button {
     width: 100%;
     border: none;
-    border-radius: 10px;
+    border-radius: 14px;
     font-weight: 800;
     color: white;
     min-height: 46px;
@@ -282,8 +314,8 @@ div[data-testid="stButton"] button[kind="secondary"]:hover {
 [data-testid="stMetric"] {
     background: rgba(255,255,255,0.92);
     border: 1px solid var(--border);
-    border-radius: 10px;
-    padding: 0.30rem 0.45rem;
+    border-radius: 18px;
+    padding: 0.75rem 0.9rem;
     box-shadow: 0 10px 28px rgba(15,23,42,0.05);
 }
 
@@ -302,7 +334,7 @@ div[data-testid="stButton"] button[kind="secondary"]:hover {
 }
 
 [data-testid="stMetricLabel"] p {
-    font-size: 0.95rem !important;
+    font-size: 0.88rem !important;
 }
 
 h2 {
@@ -325,7 +357,7 @@ h3 {
 [data-testid="stImage"],
 [data-testid="stPlotlyChart"] {
     background: white;
-    border-radius: 10px;
+    border-radius: 18px;
 }
 
 /* CGPA guide */
@@ -346,7 +378,7 @@ h3 {
 
 .cgpa-card {
     padding: 14px;
-    border-radius: 10px;
+    border-radius: 14px;
     text-align: center;
     font-size: 0.95rem;
     border: 1px solid rgba(15,23,42,0.04);
@@ -383,7 +415,7 @@ h1, h2, h3 {
 .about-hero {
     background: linear-gradient(120deg, #eef2ff, #f5f3ff);
     border: 1px solid #ddd6fe;
-    border-radius: 10px;
+    border-radius: 18px;
     padding: 18px 20px;
     margin-bottom: 14px;
     box-shadow: 0 10px 28px rgba(79, 70, 229, 0.08);
@@ -457,7 +489,7 @@ h1, h2, h3 {
 
 .about-target {
     text-align: center;
-    border-radius: 10px;
+    border-radius: 14px;
     padding: 14px 10px;
     min-height: 92px;
     border: 1px solid rgba(148,163,184,0.20);
@@ -482,7 +514,7 @@ h1, h2, h3 {
 }
 
 [data-testid="stMetricLabel"] p {
-    font-size: 0.65rem !important;
+    font-size: 0.78rem !important;
 }
 
 /* Premium Prediction Hub */
@@ -555,7 +587,8 @@ h1, h2, h3 {
     border: 1px solid #e2e8f0;
     border-radius: 22px;
     padding: .82rem .92rem .68rem;
-    min-height: 176px;
+    min-height: 220px;
+    height: 220px;
     box-shadow: 0 16px 38px rgba(15,23,42,.07);
     margin-bottom: .8rem;
     transition: transform .22s ease, box-shadow .22s ease, border-color .22s ease;
@@ -635,7 +668,7 @@ h1, h2, h3 {
 .why-item {
     background: linear-gradient(135deg, #eff6ff, #f5f3ff);
     border: 1px solid #dbeafe;
-    border-radius: 10px;
+    border-radius: 14px;
     padding: .8rem .7rem;
     text-align: center;
     font-size: .82rem;
@@ -876,222 +909,6 @@ h1, h2, h3 {
 }
 [data-testid="stMetric"]:nth-of-type(4n+4) {
     background: linear-gradient(145deg, rgba(240,253,250,0.96), rgba(204,251,241,0.82)) !important;
-}
-
-
-/* FINAL AI DASHBOARD SIDEBAR OVERRIDE */
-[data-testid="stSidebar"] {
-    width: 230px !important;
-    min-width: 230px !important;
-}
-
-[data-testid="stSidebar"] > div:first-child {
-    width: 230px !important;
-    padding: 1.45rem 0.9rem 7rem 0.9rem !important;
-}
-
-/* Navigation spacing */
-[data-testid="stSidebar"] div[role="radiogroup"] {
-    gap: 0.65rem !important;
-}
-
-/* Navigation cards */
-[data-testid="stSidebar"] div[role="radiogroup"] label {
-    min-height: 42px !important;
-    padding: 0.35rem 0.55rem !important;
-    border-radius: 14px !important;
-    display: flex !important;
-    align-items: center !important;
-}
-
-/* Navigation text */
-[data-testid="stSidebar"] div[role="radiogroup"] label p {
-    font-size: 0.78rem !important;
-    font-weight: 750 !important;
-    white-space: nowrap !important;
-    margin: 0 !important;
-}
-
-/* Selected navigation */
-[data-testid="stSidebar"] div[role="radiogroup"] label:has(input:checked) {
-    background: linear-gradient(135deg,#2563eb,#7c3aed) !important;
-    box-shadow: 0 10px 25px rgba(124,58,237,.35) !important;
-}
-
-/* Hover */
-[data-testid="stSidebar"] div[role="radiogroup"] label:hover {
-    transform: translateX(4px);
-    background: rgba(255,255,255,0.12);
-}
-
-
-
-
-
-
-
-
-/* ===== PREMIUM SIDEBAR V2 ===== */
-
-[data-testid="stSidebar"] {
-    width: 250px !important;
-    min-width: 250px !important;
-}
-
-[data-testid="stSidebar"] > div:first-child {
-    padding: 1.2rem 0.9rem 6.5rem 0.9rem !important;
-}
-
-/* User area */
-.sidebar-user-card {
-    margin-top: 0.8rem;
-    margin-bottom: 1.2rem;
-    padding: 10px 14px;
-    border-radius: 14px;
-    background: rgba(255,255,255,0.08);
-    border: 1px solid rgba(255,255,255,0.12);
-}
-
-.sidebar-user-name {
-    font-size: 0.82rem;
-    font-weight: 750;
-    color: white;
-}
-
-.sidebar-user-role {
-    font-size: 0.68rem;
-    color: #cbd5e1;
-}
-
-/* Navigation */
-[data-testid="stSidebar"] div[role="radiogroup"] {
-    gap: 0.45rem !important;
-}
-
-[data-testid="stSidebar"] div[role="radiogroup"] label {
-    min-height: 40px !important;
-    padding: 0.25rem 0.55rem !important;
-    border-radius: 13px !important;
-}
-
-[data-testid="stSidebar"] div[role="radiogroup"] label p {
-    font-size: 0.76rem !important;
-    font-weight: 750 !important;
-}
-
-/* Logout */
-[data-testid="stSidebar"] button {
-    border-radius: 12px !important;
-    min-height: 46px !important;
-    font-size: 0.75rem !important;
-}
-
-
-
-
-
-
-/* ===== FINAL SIDEBAR CLEAN OVERRIDE ===== */
-
-[data-testid="stSidebar"] {
-    width: 250px !important;
-    min-width: 250px !important;
-}
-
-[data-testid="stSidebar"] > div:first-child {
-    padding: 1.2rem 0.9rem 4.2rem 0.9rem !important;
-}
-
-/* Keep Student AI brand at top */
-[data-testid="stSidebar"] h1 {
-    margin-top: 0 !important;
-    margin-bottom: 1.6rem !important;
-    font-size: 1.55rem !important;
-}
-
-/* Navigation cleaner */
-[data-testid="stSidebar"] div[role="radiogroup"] {
-    gap: 0.35rem !important;
-}
-
-[data-testid="stSidebar"] div[role="radiogroup"] label {
-    min-height: 60px !important;
-    height: 60px !important;
-    padding: 0.15rem 0.5rem !important;
-    border-radius: 12px !important;
-}
-
-[data-testid="stSidebar"] div[role="radiogroup"] label p {
-    font-size: 0.95rem !important;
-    font-weight: 750 !important;
-}
-
-/* Logout size */
-[data-testid="stSidebar"] .stButton button {
-    height: 34px !important;
-    min-height: 34px !important;
-    font-size: 0.75rem !important;
-    border-radius: 12px !important;
-}
-
-
-
-
-
-
-
-/* keep footer away from About button */
-.sidebar-footer {
-    z-index: 0 !important;
-}
-
-
-
-
-
-
-
-
-
-/* FINAL COMPACT SIDEBAR FOOTER */
-.sidebar-footer {
-    position: fixed !important;
-    bottom: 12px !important;
-    left: 12px !important;
-    width: 225px !important;
-    text-align: center !important;
-    white-space: nowrap !important;
-    overflow: hidden !important;
-    font-size: 0.52rem !important;
-    line-height: 1 !important;
-    color: rgba(255,255,255,0.75) !important;
-    z-index: 5 !important;
-}
-
-
-
-/* ===== FIXED SIDEBAR NAVIGATION ===== */
-
-[data-testid="stSidebar"] {
-    position: fixed !important;
-    height: 100vh !important;
-    overflow: hidden !important;
-}
-
-[data-testid="stSidebar"] > div:first-child {
-    height: 100vh !important;
-    overflow: hidden !important;
-}
-
-/* Keep navigation area stable */
-[data-testid="stSidebar"] div[role="radiogroup"] {
-    overflow: hidden !important;
-}
-
-/* Keep footer fixed */
-.sidebar-footer {
-    position: fixed !important;
-    bottom: 12px !important;
 }
 
 </style>
@@ -2622,33 +2439,39 @@ CGPA below 2.50
     )
 
 
-
 df = load_data()
 models = load_models()
 evaluation = pd.read_csv(RESULTS / "evaluation.csv")
 
 st.sidebar.title("🎓 Student AI")
-
-
-# Single user navigation (no login / no role restriction)
-navigation_options = [
-    "🏠 Home",
-    "🎯 Prediction",
-    "📊 Model Results",
-    "🔗 Correlation",
-    "📈 Dataset",
-    "⭐ Feature Analysis",
-    "ℹ️ About"
-]
-
-
+st.sidebar.markdown("### Navigation")
 page = st.sidebar.radio(
-    "Navigation",
-    navigation_options,
+    "Navigation Menu",
+    [
+        "🏠 Home",
+        "🎯 Prediction",
+        "📊 Model Results",
+        "🔗 Correlation",
+        "📈 Dataset",
+        "⭐ Feature Analysis",
+        "ℹ️ About"
+    ],
     label_visibility="collapsed"
 )
 
-
+st.sidebar.markdown(
+    """
+<div class="sidebar-footer">
+    <div class="footer-brand">🎓 Student AI</div>
+    <div class="footer-subtitle">Student Performance Prediction</div>
+    <div class="footer-powered">Powered by KNN • SVM • ANN</div>
+    <div class="footer-version">Version 1.0</div>
+    <div class="footer-group">Developed by RIS Group 5</div>
+    <div class="footer-copyright">© 2026 All Rights Reserved</div>
+</div>
+""",
+    unsafe_allow_html=True,
+)
 
 page = page.split(" ", 1)[1]
 
@@ -2715,7 +2538,8 @@ elif page == "Prediction" and not st.session_state.get("prediction_mode"):
     <h2>Student Performance Prediction System</h2>
     <p>
         Predict student academic performance using KNN, SVM and ANN.
-        Analyse individual student performance and generate AI-based insights.
+        Choose individual analysis or batch processing to identify at-risk
+        students and support faster academic decisions.
     </p>
     <p><b>Select a prediction mode below to begin.</b></p>
 </div>
@@ -2726,10 +2550,10 @@ elif page == "Prediction" and not st.session_state.get("prediction_mode"):
     stat_col1, stat_col2, stat_col3, stat_col4 = st.columns(4, gap="small")
     stat_col1.metric("🏆 Best Model", str(best_row["Model"]))
     stat_col2.metric("🎯 Best Accuracy", f"{best_row['Accuracy']:.1%}")
-    stat_col3.metric("📚 Input Features", "4")
+    stat_col3.metric("📚 Input Features", "5")
     stat_col4.metric("🤖 ML Models", "3")
 
-    card_col1 = st.columns(1)[0]
+    card_col1, card_col2 = st.columns(2, gap="small")
 
     with card_col1:
         st.markdown(
@@ -2757,6 +2581,34 @@ elif page == "Prediction" and not st.session_state.get("prediction_mode"):
             use_container_width=True,
         ):
             st.session_state["prediction_mode"] = "individual"
+            st.rerun()
+
+    with card_col2:
+        st.markdown(
+            """
+<div class="prediction-mode-card">
+    <div class="prediction-mode-icon">📂</div>
+    <div class="prediction-mode-title">Batch Prediction</div>
+    <div class="prediction-mode-desc">
+        Upload an Excel or CSV file to predict multiple students simultaneously,
+        identify at-risk students and export a professional analytical workbook.
+    </div>
+    <div class="prediction-feature-row">
+        <div class="prediction-feature-chip">✓ Excel / CSV</div>
+        <div class="prediction-feature-chip">✓ Dashboard</div>
+        <div class="prediction-feature-chip">✓ At-risk detection</div>
+    </div>
+</div>
+""",
+            unsafe_allow_html=True,
+        )
+        if st.button(
+            "📂 Start Batch Prediction",
+            key="start_batch_prediction",
+            type="primary",
+            use_container_width=True,
+        ):
+            st.session_state["prediction_mode"] = "batch"
             st.rerun()
 
     st.markdown(
@@ -2853,23 +2705,25 @@ elif page == "Prediction" and st.session_state.get("prediction_mode") == "indivi
         # All inputs are outside st.form so that changes refresh immediately.
         name = st.text_input("Student Name", key="student_name")
 
-        name_valid = True
-        if name.strip():
-            name_valid = bool(re.fullmatch(r"[A-Za-z ]+", name.strip()))
-            if not name_valid:
-                st.error("❌ Student Name can only contain English letters.")
-
         student_id = st.text_input(
             "Student ID",
             key="student_id",
             placeholder="Enter 7-digit Student ID"
         )
 
-        id_valid = True
-        if student_id.strip():
-            id_valid = student_id.isdigit() and len(student_id.strip()) == 7
-            if not id_valid:
-                st.error("❌ Student ID must contain exactly 7 digits.")
+# Student ID validation
+if student_id.strip():
+    if not student_id.isdigit():
+        st.error("❌ Student ID must contain numbers only.")
+    elif len(student_id.strip()) != 7:
+        st.error("❌ Student ID must contain exactly 7 digits.")
+
+
+        # Real-time input validation
+        name_valid = bool(re.fullmatch(r"[A-Za-z ]+", name.strip()))
+
+        if student_id.strip() and not id_valid:
+            st.error("❌ Student ID must contain exactly 7 digits.")
 
         number_of_subjects = st.slider(
             "Number of Subjects",
@@ -2879,64 +2733,37 @@ elif page == "Prediction" and st.session_state.get("prediction_mode") == "indivi
             key="number_of_subjects"
         )
 
-        # Subject scores: 0-100 scale
-        # Keep .5 values (81.5 stays 81.5), but normal round other decimals
-        # Example: 44.4 -> 44, 44.5 -> 44.5, 81.6 -> 82
-        def normalize_score(index):
-            key = f"subject_{index}"
-            value = st.session_state.get(key)
-
-            if value is not None:
-                try:
-                    value = float(value)
-                    decimal = value % 1
-
-                    if abs(decimal - 0.5) < 0.001:
-                        converted = value
-                    else:
-                        converted = round(value)
-
-                    converted = max(0, min(100, converted))
-                    st.session_state[key] = converted
-                except:
-                    st.session_state[key] = None
-
         scores = []
         columns = st.columns(2)
 
         for i in range(number_of_subjects):
             with columns[i % 2]:
-                key = f"subject_{i}"
-
                 score = st.number_input(
                     f"Subject {i + 1} Score",
                     min_value=0.0,
                     max_value=100.0,
                     value=None,
-                    placeholder="Enter score (0-100)",
-                    step=0.5,
-                    format="%.1f",
-                    key=key,
-                    on_change=normalize_score,
-                    args=(i,)
+                    placeholder="Enter score",
+                    step=0.1,
+                    key=f"subject_{i}"
                 )
+
+                # Automatically round every entered score to nearest 0.5
+                if score is not None:
+                    score = round(score * 2) / 2
+                    if score < 0.5:
+                        score = 0.0
 
                 scores.append(score)
 
         valid_scores = [s for s in scores if s is not None]
 
         if len(valid_scores) == number_of_subjects:
-            rounded_scores = [
-                s if abs(float(s) % 1 - 0.5) < 0.001 else round(float(s))
-                for s in valid_scores
-            ]
-
-            raw_average = sum(rounded_scores) / len(rounded_scores)
-            average_score = int(math.floor(raw_average + 0.5))
-            st.info(f"Calculated Average Score: {average_score}")
+            average_score = sum(valid_scores) / len(valid_scores)
+            st.info(f"Calculated Average Score: {average_score:.2f}")
         else:
             average_score = None
-            st.warning("⚠️ Please complete all subject scores before prediction.")
+            st.warning("Please enter all subject scores before prediction.")
 
         attendance = st.slider(
             "Attendance Rate (%)",
@@ -2973,7 +2800,6 @@ elif page == "Prediction" and st.session_state.get("prediction_mode") == "indivi
 
         if submit:
 
-
             if not name.strip():
                 st.error("❌ Student Name is required.")
                 st.stop()
@@ -2993,7 +2819,6 @@ elif page == "Prediction" and st.session_state.get("prediction_mode") == "indivi
             if average_score is None:
                 st.error("Please complete all subject scores.")
                 st.stop()
-
 
             input_df = pd.DataFrame([{
                 "Average_Score": average_score,
@@ -3054,6 +2879,322 @@ elif page == "Prediction" and st.session_state.get("prediction_mode") == "indivi
             }
 
             st.rerun()
+
+elif page == "Prediction" and st.session_state.get("prediction_mode") == "batch":
+    st.markdown(
+        """
+<div class="mode-page-hero">
+    <div class="mode-page-eyebrow">Multi-Student Analysis</div>
+    <h2>📂 Batch Prediction</h2>
+    <p>
+        Upload an Excel or CSV file to predict multiple students simultaneously,
+        identify at-risk students and export a professional Excel dashboard.
+    </p>
+</div>
+""",
+        unsafe_allow_html=True,
+    )
+
+    if st.button(
+        "← Back to Prediction Modes",
+        key="back_from_batch",
+        type="secondary",
+    ):
+        st.session_state.pop("prediction_mode", None)
+        st.session_state.pop("batch_prediction_result", None)
+        st.rerun()
+
+    template_col, note_col = st.columns([1, 2])
+    with template_col:
+        st.download_button(
+            "⬇️ Download Excel Template",
+            data=make_template_bytes(),
+            file_name="student_batch_prediction_template.xlsx",
+            mime="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+            use_container_width=True,
+        )
+    with note_col:
+        st.markdown(
+            """
+<div class="batch-help-box">
+    <b>Required columns:</b> Average_Score,
+    Attendance_Pct, Study_Hours_Per_Day and Previous_CGPA.<br>
+    <span style="color:#64748b;">Student_ID and Student_Name are optional.</span>
+</div>
+""",
+            unsafe_allow_html=True,
+        )
+
+    uploaded_file = st.file_uploader(
+        "Upload completed Excel or CSV file",
+        type=["xlsx", "xls", "csv"],
+    )
+
+    if uploaded_file is not None:
+        try:
+            if uploaded_file.name.lower().endswith(".csv"):
+                batch_df = pd.read_csv(uploaded_file)
+            else:
+                batch_df = pd.read_excel(uploaded_file)
+
+            errors = validate_batch_data(batch_df)
+            if errors:
+                st.error("The uploaded file cannot be processed.")
+                for error in errors:
+                    st.write(f"• {error}")
+            else:
+                required = [
+                    "Number_of_Subjects",
+                    "Average_Score",
+                    "Attendance_Pct",
+                    "Study_Hours_Per_Day",
+                    "Previous_CGPA",
+                ]
+                for column in required:
+                    batch_df[column] = pd.to_numeric(batch_df[column])
+
+                st.success(f"{len(batch_df):,} student records loaded successfully.")
+                c1, c2, c3 = st.columns(3)
+                c1.metric("Uploaded Students", f"{len(batch_df):,}")
+                c2.metric("Required Features", "5")
+                c3.metric("Final Model", str(evaluation.iloc[0]["Model"]))
+
+                st.markdown("#### Uploaded Data Preview")
+                st.dataframe(batch_df.head(50), hide_index=True, use_container_width=True)
+
+                if st.button("Predict All Students", type="primary", use_container_width=True):
+                    with st.spinner("Generating batch predictions..."):
+                        st.session_state["batch_prediction_result"] = predict_batch(batch_df)
+                    st.rerun()
+
+        except ImportError:
+            st.error("Excel support is unavailable. Add openpyxl to requirements.txt and redeploy.")
+        except Exception as error:
+            st.error(f"Unable to process the uploaded file: {error}")
+
+    if "batch_prediction_result" in st.session_state:
+        result_df = st.session_state["batch_prediction_result"]
+        st.success(f"Batch prediction completed for {len(result_df):,} students.")
+
+        order = ["At Risk", "Average", "Good", "Excellent"]
+        counts = result_df["Final_Prediction"].value_counts().reindex(order, fill_value=0)
+        summary_cols = st.columns(4)
+        for col, category in zip(summary_cols, order):
+            col.metric(category, int(counts[category]))
+
+        summary_df = counts.rename_axis("Performance Category").reset_index(name="Students")
+        fig = px.bar(
+            summary_df,
+            x="Performance Category",
+            y="Students",
+            text="Students",
+            title="Batch Prediction Distribution",
+            category_orders={"Performance Category": order},
+        )
+        fig.update_traces(textposition="outside")
+        fig.update_layout(
+            title=dict(
+                x=0.5,
+                xanchor="center",
+                y=0.96,
+                yanchor="top",
+            ),
+            height=390,
+            margin=dict(l=20, r=20, t=75, b=20),
+        )
+        st.plotly_chart(fig, use_container_width=True)
+
+        display_df = result_df.copy()
+        for column in ["KNN_Confidence", "SVM_Confidence", "ANN_Confidence", "Final_Confidence"]:
+            display_df[column] = display_df[column].map(lambda value: f"{value:.1%}")
+
+        st.markdown("#### Batch Prediction Insights")
+
+        insight_col1, insight_col2 = st.columns(2)
+
+        with insight_col1:
+            bar_fig = px.bar(
+                summary_df,
+                x="Performance Category",
+                y="Students",
+                text="Students",
+                title="Students by Predicted Category",
+                category_orders={"Performance Category": order},
+            )
+            bar_fig.update_traces(textposition="outside")
+            bar_fig.update_layout(
+                title=dict(
+                    x=0.5,
+                    xanchor="center",
+                    y=0.96,
+                    yanchor="top",
+                ),
+                height=390,
+                margin=dict(l=20, r=20, t=75, b=20),
+            )
+            st.plotly_chart(bar_fig, use_container_width=True)
+
+        with insight_col2:
+            pie_fig = px.pie(
+                summary_df,
+                names="Performance Category",
+                values="Students",
+                title="Prediction Distribution",
+                hole=0.42,
+            )
+            pie_fig.update_layout(
+                title=dict(
+                    x=0.5,
+                    xanchor="center",
+                    y=0.96,
+                    yanchor="top",
+                ),
+                height=390,
+                margin=dict(l=20, r=20, t=75, b=20),
+            )
+            st.plotly_chart(pie_fig, use_container_width=True)
+
+        at_risk_df = result_df[
+            result_df["Final_Prediction"] == "At Risk"
+        ].copy()
+
+        st.markdown("#### ⚠️ At-Risk Student Dashboard")
+
+        risk_col1, risk_col2, risk_col3 = st.columns(3)
+        risk_col1.metric("Students Requiring Intervention", len(at_risk_df))
+        risk_col2.metric(
+            "At-Risk Percentage",
+            f"{(len(at_risk_df) / len(result_df)):.1%}" if len(result_df) else "0.0%",
+        )
+        risk_col3.metric("Recommended Action", "Early Support")
+
+        if at_risk_df.empty:
+            st.success("No students were classified as At Risk in this batch.")
+        else:
+            st.warning(
+                f"{len(at_risk_df):,} student(s) were classified as At Risk. "
+                "Early academic intervention is recommended."
+            )
+
+            risk_columns = [
+                column for column in [
+                    "Student_ID",
+                    "Student_Name",
+                    "Average_Score",
+                    "Attendance_Pct",
+                    "Study_Hours_Per_Day",
+                    "Previous_CGPA",
+                    "Final_Prediction",
+                    "Final_Confidence",
+                ]
+                if column in at_risk_df.columns
+            ]
+
+            at_risk_display = at_risk_df[risk_columns].copy()
+
+            if "Final_Confidence" in at_risk_display.columns:
+                at_risk_display["Final_Confidence"] = (
+                    at_risk_display["Final_Confidence"]
+                    .map(lambda value: f"{value:.1%}")
+                )
+
+            st.dataframe(
+                at_risk_display,
+                hide_index=True,
+                use_container_width=True,
+            )
+
+        st.markdown("#### Complete Prediction Results")
+
+        filter_col1, filter_col2 = st.columns([2, 1])
+
+        with filter_col1:
+            search_text = st.text_input(
+                "Search by Student ID or Student Name",
+                placeholder="Type a student ID or name...",
+                key="batch_result_search",
+            )
+
+        with filter_col2:
+            category_filter = st.selectbox(
+                "Filter by Performance Category",
+                ["All Categories"] + order,
+                key="batch_category_filter",
+            )
+
+        filtered_df = display_df.copy()
+
+        if search_text.strip():
+            searchable_columns = [
+                column for column in ["Student_ID", "Student_Name"]
+                if column in filtered_df.columns
+            ]
+
+            if searchable_columns:
+                search_mask = pd.Series(False, index=filtered_df.index)
+
+                for column in searchable_columns:
+                    search_mask = search_mask | filtered_df[
+                        column
+                    ].astype(str).str.contains(
+                        search_text.strip(),
+                        case=False,
+                        na=False,
+                    )
+
+                filtered_df = filtered_df[search_mask]
+
+        if category_filter != "All Categories":
+            filtered_df = filtered_df[
+                filtered_df["Final_Prediction"] == category_filter
+            ]
+
+        st.caption(
+            f"Showing {len(filtered_df):,} of {len(display_df):,} predicted records."
+        )
+
+        # Keep the report download controls visible above the large results table.
+        # This is especially important for mobile users and batches with thousands
+        # of records, where the table would otherwise push the buttons far below.
+        download_col, clear_col = st.columns(2)
+
+        with download_col:
+            st.download_button(
+                "⬇️ Download Predicted Excel",
+                data=make_batch_excel_bytes(result_df),
+                file_name="student_batch_predictions.xlsx",
+                mime="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+                use_container_width=True,
+                key="download_batch_prediction_excel",
+            )
+
+        with clear_col:
+            if st.button(
+                "↻ Upload Another File",
+                type="secondary",
+                use_container_width=True,
+                key="clear_batch_prediction_result",
+            ):
+                del st.session_state["batch_prediction_result"]
+                st.rerun()
+
+        low_confidence_count = int(
+            (result_df["Final_Confidence"] < 0.60).sum()
+        )
+
+        if low_confidence_count > 0:
+            st.info(
+                f"{low_confidence_count:,} prediction(s) have confidence below 60%. "
+                "These records may require lecturer review."
+            )
+
+        st.dataframe(
+            filtered_df,
+            hide_index=True,
+            use_container_width=True,
+            height=620,
+        )
+
 
 elif page == "Model Results":
     st.subheader("Model Evaluation Dashboard")
@@ -3883,96 +4024,7 @@ elif page == "Dataset":
     )
 
 
-
-elif page == "Feature Analysis":
-
-    st.markdown(
-        """
-<div class="mode-page-hero">
-    <div class="mode-page-eyebrow">
-        Feature Engineering
-    </div>
-    <h2>⭐ Feature Analysis</h2>
-    <p>
-    Understand the key factors selected for student performance prediction.
-    </p>
-</div>
-""",
-        unsafe_allow_html=True
-    )
-
-    st.subheader("🔍 Selected Model Features")
-
-    st.markdown(
-        """
-<div class="about-card about-blue">
-
-<h3>📚 Academic Performance</h3>
-
-<div class="about-list-item">
-<b>Average Score</b><br>
-Overall academic achievement indicator based on student assessment results.
-</div>
-
-<div class="about-list-item">
-<b>Previous CGPA</b><br>
-Represents previous academic performance and learning consistency.
-</div>
-
-<h3>📈 Learning Behaviour</h3>
-
-<div class="about-list-item">
-<b>Attendance Rate</b><br>
-Shows student participation and class engagement level.
-</div>
-
-<div class="about-list-item">
-<b>Study Hours Per Day</b><br>
-Represents student's daily learning effort and study habits.
-</div>
-
-</div>
-""",
-        unsafe_allow_html=True
-    )
-
-    st.subheader("⭐ Feature Importance Overview")
-
-    importance_data = pd.DataFrame({
-        "Feature": [
-            "Previous CGPA",
-            "Average Score",
-            "Study Hours Per Day",
-            "Attendance Rate"
-        ],
-        "Importance": [
-            0.69,
-            0.55,
-            0.33,
-            0.36
-        ]
-    })
-
-    fig = px.bar(
-        importance_data,
-        x="Importance",
-        y="Feature",
-        orientation="h",
-        title="Relative Feature Contribution"
-    )
-
-    fig.update_layout(
-        title=dict(
-            x=0.5,
-            xanchor="center"
-        ),
-        xaxis_title="Importance Score",
-        yaxis_title=""
-    )
-
-    st.plotly_chart(fig, use_container_width=True)
-
-elif page == "About":
+else:
     st.subheader("About This Assignment")
 
     st.markdown(
@@ -4012,10 +4064,11 @@ elif page == "About":
             """
 <div class="about-card about-blue">
     <h4>📋 Input Features</h4>
-    <div class="about-list-item">1. Average Score</div>
-    <div class="about-list-item">2. Attendance Rate</div>
-    <div class="about-list-item">3. Study Hours Per Day</div>
-    <div class="about-list-item">4. Previous CGPA</div>
+    <div class="about-list-item">1. Number of Subjects</div>
+    <div class="about-list-item">2. Average Score</div>
+    <div class="about-list-item">3. Attendance Rate</div>
+    <div class="about-list-item">4. Study Hours Per Day</div>
+    <div class="about-list-item">5. Previous CGPA</div>
 </div>
 """,
             unsafe_allow_html=True
@@ -4118,16 +4171,6 @@ elif page == "About":
             unsafe_allow_html=True
         )
 
-
-
-st.sidebar.markdown(
-    """
-    <div class="sidebar-footer">
-        🎓 Student AI • Version 1.0 • RIS Group 5 • ©2026
-    </div>
-    """,
-    unsafe_allow_html=True
-)
 
 # FINAL ULTIMATE VERSION FEATURES
 # - Prediction page supports single and batch prediction
