@@ -1066,6 +1066,31 @@ h1, h2, h3 {
 }
 
 
+
+/* ===== FIXED SIDEBAR NAVIGATION ===== */
+
+[data-testid="stSidebar"] {
+    position: fixed !important;
+    height: 100vh !important;
+    overflow: hidden !important;
+}
+
+[data-testid="stSidebar"] > div:first-child {
+    height: 100vh !important;
+    overflow: hidden !important;
+}
+
+/* Keep navigation area stable */
+[data-testid="stSidebar"] div[role="radiogroup"] {
+    overflow: hidden !important;
+}
+
+/* Keep footer fixed */
+.sidebar-footer {
+    position: fixed !important;
+    bottom: 12px !important;
+}
+
 </style>
 """, unsafe_allow_html=True)
 
@@ -2619,7 +2644,7 @@ st.sidebar.markdown(
             👤 {st.session_state.get('username','User')}
         </div>
         <div class="sidebar-user-role">
-            {st.session_state.get('role','Lecturer')}
+            {st.session_state.get('role','Educator')}
         </div>
     </div>
     """,
@@ -3388,7 +3413,7 @@ elif page == "Prediction" and st.session_state.get("prediction_mode") == "batch"
         if low_confidence_count > 0:
             st.info(
                 f"{low_confidence_count:,} prediction(s) have confidence below 60%. "
-                "These records may require lecturer review."
+                "These records may require educator review."
             )
 
         st.dataframe(
