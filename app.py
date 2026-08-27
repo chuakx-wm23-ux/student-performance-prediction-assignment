@@ -2898,9 +2898,12 @@ if page == "Prediction" and st.session_state.get("prediction_mode") == "batch":
             for error in errors:
                 st.error(error)
         else:
-            if st.button("🚀 Run Batch Prediction", key="run_batch_prediction"):
+            # Automatically generate batch prediction after valid upload
+            # No manual Run button required
+            if "batch_uploaded_file" not in st.session_state or st.session_state["batch_uploaded_file"] != uploaded_file.name:
                 result = predict_batch(batch_df)
                 st.session_state["batch_result"] = result
+                st.session_state["batch_uploaded_file"] = uploaded_file.name
                 st.success("Batch prediction completed successfully!")
 
     if "batch_result" in st.session_state:
