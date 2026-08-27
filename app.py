@@ -2978,7 +2978,6 @@ if page == "Prediction" and st.session_state.get("prediction_mode") == "batch":
                     names="Performance",
                     title="Prediction Distribution",
                     hole=0.45,
-                    title_position="top center",
                 )
                 fig.update_layout(title_x=0.5)
                 st.plotly_chart(fig, use_container_width=True)
