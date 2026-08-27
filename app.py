@@ -2742,15 +2742,22 @@ elif page == "Prediction" and st.session_state.get("prediction_mode") == "indivi
                     max_value=100.0,
                     value=None,
                     placeholder="Enter score",
-                    step=0.5,
+                    step=0.1,
                     key=f"subject_{i}"
                 )
+
+                # Automatically round every entered score to nearest 0.5
+                if score is not None:
+                    score = round(score * 2) / 2
+                    if score < 0.5:
+                        score = 0.0
+
                 scores.append(score)
 
         valid_scores = [s for s in scores if s is not None]
 
         if len(valid_scores) == number_of_subjects:
-            average_score = sum([math.ceil(s) for s in valid_scores]) / len(valid_scores)
+            average_score = sum(valid_scores) / len(valid_scores)
             st.info(f"Calculated Average Score: {average_score:.2f}")
         else:
             average_score = None
