@@ -2968,8 +2968,7 @@ if page == "Prediction" and st.session_state.get("prediction_mode") == "batch":
                 title_xanchor="center",
                 xaxis_title="Performance Category",
                 yaxis_title="Number of Students",
-                title_x=0.5,
-                title_xanchor="center",
+              
             )
             st.plotly_chart(
                 large_fig,
