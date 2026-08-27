@@ -1059,6 +1059,80 @@ h1, h2, h3 {
     line-height: 1.35 !important;
 }
 
+
+/* ===== SIDEBAR FINAL V3 CLEAN AI DASHBOARD ===== */
+
+/* Keep branding fixed at top */
+[data-testid="stSidebar"] > div:first-child {
+    padding-top: 1rem !important;
+    padding-bottom: 5.5rem !important;
+}
+
+[data-testid="stSidebar"] h1,
+[data-testid="stSidebar"] .stMarkdown:first-child {
+    margin-bottom: 1.2rem !important;
+}
+
+/* User profile compact */
+.sidebar-user-card {
+    margin: 0.5rem 0 0.8rem 0 !important;
+    padding: 8px 12px !important;
+    border-radius: 12px !important;
+}
+
+.sidebar-user-name {
+    font-size: 0.75rem !important;
+}
+
+.sidebar-user-role {
+    font-size: 0.62rem !important;
+}
+
+/* Logout compact */
+[data-testid="stSidebar"] button {
+    min-height: 32px !important;
+    height: 32px !important;
+    padding: 0.1rem 0.5rem !important;
+    font-size: 0.68rem !important;
+    border-radius: 10px !important;
+    margin-bottom: 0.8rem !important;
+}
+
+/* Navigation title */
+[data-testid="stSidebar"] h2 {
+    font-size: 1rem !important;
+    margin-bottom: 0.7rem !important;
+}
+
+/* Smaller professional navigation buttons */
+[data-testid="stSidebar"] div[role="radiogroup"] {
+    gap: 0.35rem !important;
+}
+
+[data-testid="stSidebar"] div[role="radiogroup"] label {
+    min-height: 34px !important;
+    height: 34px !important;
+    padding: 0.15rem 0.45rem !important;
+    border-radius: 11px !important;
+}
+
+[data-testid="stSidebar"] div[role="radiogroup"] label p {
+    font-size: 0.68rem !important;
+    font-weight: 700 !important;
+}
+
+/* Footer safe area */
+.sidebar-footer {
+    bottom: 12px !important;
+    width: 190px !important;
+    left: 20px !important;
+}
+
+.sidebar-footer * {
+    font-size: 0.55rem !important;
+    line-height: 1.25 !important;
+}
+
 </style>
 """, unsafe_allow_html=True)
 
