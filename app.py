@@ -2956,7 +2956,7 @@ if page == "Prediction" and st.session_state.get("prediction_mode") == "batch":
                 st.plotly_chart(fig2, use_container_width=True)
 
             st.markdown("### 📋 Detailed Prediction Results")
-
+result_df = prediction_results.copy()
         st.dataframe(
     result_df,
     hide_index=True,
