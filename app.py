@@ -1140,9 +1140,9 @@ h1, h2, h3 {
 /* Footer one short line FINAL */
 .sidebar-footer {
     position: fixed !important;
-    bottom: 10px !important;
+    bottom: 12px !important;
     left: 8px !important;
-    width: 240px !important;
+    width: 235px !important;
     text-align: center !important;
     white-space: nowrap !important;
     overflow: hidden !important;
@@ -4627,6 +4627,16 @@ elif page == "About":
         )
 
 
+
+st.sidebar.markdown(
+    """
+    <div class="sidebar-footer">
+        <div>🎓 Student AI • Version 1.0 • RIS Group 5 • ©2026</div>
+    </div>
+    """,
+    unsafe_allow_html=True
+)
+
 # FINAL ULTIMATE VERSION FEATURES
 # - Prediction page supports single and batch prediction
 # - Number_of_Subjects retained as profile information
@@ -4652,5 +4662,3 @@ elif page == "About":
 #   Study_Hours_Per_Day
 #   Previous_CGPA
 
-<!-- Compact Footer -->
-<div class="sidebar-footer">🎓 Student AI • Version 1.0 • RIS Group 5 • ©2026</div>
