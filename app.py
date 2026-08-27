@@ -137,9 +137,9 @@ st.markdown("""
     display: flex;
     align-items: center;
 
-    padding: 0.75rem 0.9rem;
+    padding: 0.45rem 0.65rem;
 
-    border-radius: 18px;
+    border-radius: 14px;
     background: rgba(255,255,255,0.06);
     border: 1px solid rgba(255,255,255,0.08);
 
@@ -173,13 +173,13 @@ st.markdown("""
 }
 
 .sidebar-footer .footer-brand {
-    font-size: 0.72rem !important;
+    font-size: 0.60rem !important;
     font-weight: 700 !important;
     margin-bottom: 4px !important;
 }
 
 .sidebar-footer .footer-subtitle {
-    font-size: 0.55rem !important;
+    font-size: 0.48rem !important;
     line-height: 1.2 !important;
 }
 
@@ -187,7 +187,7 @@ st.markdown("""
 .sidebar-footer .footer-version,
 .sidebar-footer .footer-group,
 .sidebar-footer .footer-copyright {
-    font-size: 0.50rem !important;
+    font-size: 0.45rem !important;
     line-height: 1.2 !important;
     opacity: 0.85;
 }
@@ -288,8 +288,8 @@ div[data-testid="stButton"] button[kind="secondary"]:hover {
 [data-testid="stMetric"] {
     background: rgba(255,255,255,0.92);
     border: 1px solid var(--border);
-    border-radius: 18px;
-    padding: 0.75rem 0.9rem;
+    border-radius: 14px;
+    padding: 0.45rem 0.65rem;
     box-shadow: 0 10px 28px rgba(15,23,42,0.05);
 }
 
@@ -331,7 +331,7 @@ h3 {
 [data-testid="stImage"],
 [data-testid="stPlotlyChart"] {
     background: white;
-    border-radius: 18px;
+    border-radius: 14px;
 }
 
 /* CGPA guide */
@@ -389,7 +389,7 @@ h1, h2, h3 {
 .about-hero {
     background: linear-gradient(120deg, #eef2ff, #f5f3ff);
     border: 1px solid #ddd6fe;
-    border-radius: 18px;
+    border-radius: 14px;
     padding: 18px 20px;
     margin-bottom: 14px;
     box-shadow: 0 10px 28px rgba(79, 70, 229, 0.08);
