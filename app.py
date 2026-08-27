@@ -3518,6 +3518,7 @@ elif page == "Correlation":
             with st.expander("View Overall Correlation Values"):
                 st.dataframe(
                     overall_corr,
+                    hide_index=True,
                     use_container_width=True,
                 )
 
