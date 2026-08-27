@@ -2957,8 +2957,11 @@ if page == "Prediction" and st.session_state.get("prediction_mode") == "batch":
 
             st.markdown("### 📋 Detailed Prediction Results")
 
-        st.dataframe(result, use_container_width=True)
-
+        st.dataframe(
+    result_df,
+    hide_index=True,
+    use_container_width=True
+)
         excel = make_batch_excel_bytes(result)
 
         st.download_button(
