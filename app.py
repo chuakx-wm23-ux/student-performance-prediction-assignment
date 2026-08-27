@@ -1109,25 +1109,26 @@ h1, h2, h3 {
     border-radius: 12px !important;
 }
 
-/* Footer 2-3 lines FINAL */
+/* Footer exactly 2 lines FINAL */
 .sidebar-footer {
     position: fixed !important;
-    bottom: 12px !important;
-    left: 15px !important;
-    width: 220px !important;
+    bottom: 14px !important;
+    left: 12px !important;
+    width: 230px !important;
     text-align: center !important;
     white-space: normal !important;
 }
 
 .sidebar-footer > div {
-    display: block !important;
+    display: inline !important;
     font-size: 0.58rem !important;
     line-height: 1.35 !important;
-    margin: 1px 0 !important;
+    margin: 0 !important;
 }
 
 .sidebar-footer > div:not(:last-child)::after {
-    content: "";
+    content: " • ";
+    color: rgba(255,255,255,.55);
 }
 
 </style>
