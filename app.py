@@ -1140,9 +1140,9 @@ h1, h2, h3 {
 /* Footer one short line FINAL */
 .sidebar-footer {
     position: fixed !important;
-    bottom: 12px !important;
+    bottom: 10px !important;
     left: 8px !important;
-    width: 235px !important;
+    width: 240px !important;
     text-align: center !important;
     white-space: nowrap !important;
     overflow: hidden !important;
@@ -4631,7 +4631,7 @@ elif page == "About":
 st.sidebar.markdown(
     """
     <div class="sidebar-footer">
-        <div>🎓 Student AI • Version 1.0 • RIS Group 5 • ©2026</div>
+        🎓 Student AI • Version 1.0 • RIS Group 5 • ©2026
     </div>
     """,
     unsafe_allow_html=True
@@ -4661,4 +4661,3 @@ st.sidebar.markdown(
 #   Attendance_Pct
 #   Study_Hours_Per_Day
 #   Previous_CGPA
-
