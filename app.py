@@ -164,23 +164,32 @@ st.markdown("""
 }
 
 .sidebar-footer {
-    position: absolute !important;
-    bottom: 20px;
-    left: 15px;
-    width: 200px;
-    text-align: center;
+    position: fixed !important;
+    bottom: 18px !important;
+    left: 25px !important;
+    width: 180px !important;
+    text-align: center !important;
+    z-index: 999 !important;
 }
 
 .sidebar-footer .footer-brand {
-    font-size: 1rem;
+    font-size: 0.72rem !important;
+    font-weight: 700 !important;
+    margin-bottom: 4px !important;
 }
 
 .sidebar-footer .footer-subtitle {
-    font-size: .72rem;
+    font-size: 0.55rem !important;
+    line-height: 1.2 !important;
 }
 
-.sidebar-footer .footer-powered {
-    font-size: .68rem;
+.sidebar-footer .footer-powered,
+.sidebar-footer .footer-version,
+.sidebar-footer .footer-group,
+.sidebar-footer .footer-copyright {
+    font-size: 0.50rem !important;
+    line-height: 1.2 !important;
+    opacity: 0.85;
 }
 
 /* Main hero */
