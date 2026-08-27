@@ -1130,7 +1130,7 @@ h1, h2, h3 {
 """, unsafe_allow_html=True)
 
 
-@st.cache_data
+@st.cache_data(show_spinner=False)
 def load_data():
     df = pd.read_csv(DATA)
 
@@ -1144,7 +1144,7 @@ def load_data():
     return df
 
 
-@st.cache_resource
+@st.cache_resource(show_spinner=False)
 def load_models():
     return {
         "KNN": joblib.load(MODELS / "knn_model.joblib"),
@@ -2957,7 +2957,7 @@ if page == "Prediction" and st.session_state.get("prediction_mode") == "batch":
 
             st.markdown("### 📋 Detailed Prediction Results")
 
-        st.dataframe(result, use_container_width=True)
+        st.dataframe(result, hide_index=True, use_container_width=True)
 
         excel = make_batch_excel_bytes(result)
 
