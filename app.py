@@ -4106,7 +4106,7 @@ elif page == "Dataset":
             margin=dict(l=20, r=20, t=75, b=20),
         )
         fig.update_layout(title_x=0.5, title_xanchor="center")
-    st.plotly_chart(fig, use_container_width=True)
+        st.plotly_chart(fig, use_container_width=True)
 
     st.markdown("### Complete Student Dataset")
 
