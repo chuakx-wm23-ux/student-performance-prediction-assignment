@@ -115,33 +115,36 @@ st.markdown("""
 
 [data-testid="stSidebar"] > div:first-child {
     width: 230px !important;
-    padding: 1.5rem 1rem 8rem 1rem !important;
+    padding: 1.3rem 0.85rem 7rem 0.85rem !important;
 }
 
 [data-testid="stSidebar"] * {
     color: white;
 }
 
+/* Brand */
 [data-testid="stSidebar"] h1 {
-    font-size: 1.8rem !important;
+    font-size: 1.55rem !important;
     font-weight: 900 !important;
     text-align: center;
-    margin-bottom: 2rem !important;
+    margin-bottom: 1.5rem !important;
 }
 
+/* Navigation spacing */
 [data-testid="stSidebar"] div[role="radiogroup"] {
-    gap: 0.85rem !important;
+    gap: 0.45rem !important;
 }
 
+/* Navigation buttons */
 [data-testid="stSidebar"] div[role="radiogroup"] label {
     width: 100%;
-    min-height: 55px;
-    display: flex;
-    align-items: center;
+    min-height: 38px !important;
+    display: flex !important;
+    align-items: center !important;
 
-    padding: 0.30rem 0.45rem;
+    padding: 0.2rem 0.55rem !important;
 
-    border-radius: 10px;
+    border-radius: 12px !important;
     background: rgba(255,255,255,0.06);
     border: 1px solid rgba(255,255,255,0.08);
 
@@ -149,49 +152,52 @@ st.markdown("""
 }
 
 [data-testid="stSidebar"] div[role="radiogroup"] label p {
-    font-size: 0.95rem !important;
+    font-size: 0.78rem !important;
     font-weight: 750 !important;
     white-space: nowrap !important;
     margin: 0 !important;
 }
 
 [data-testid="stSidebar"] div[role="radiogroup"] label:hover {
-    transform: translateX(5px);
-    background: rgba(255,255,255,0.13);
+    transform: translateX(4px);
+    background: rgba(255,255,255,0.12);
 }
 
 [data-testid="stSidebar"] div[role="radiogroup"] label:has(input:checked) {
     background: linear-gradient(135deg,#2563eb,#7c3aed);
-    box-shadow: 0 12px 30px rgba(37,99,235,.35);
+    box-shadow: 0 10px 25px rgba(124,58,237,.35);
 }
 
+/* Logout button only */
+[data-testid="stSidebar"] .stButton button {
+    min-height: 34px !important;
+    height: 34px !important;
+    border-radius: 10px !important;
+    font-size: 0.72rem !important;
+    font-weight: 750 !important;
+}
+
+/* Footer */
 .sidebar-footer {
     position: fixed !important;
-    bottom: 18px !important;
-    left: 25px !important;
-    width: 230px !important;
+    bottom: 16px !important;
+    left: 18px !important;
+    width: 210px !important;
     text-align: center !important;
     z-index: 999 !important;
 }
 
 .sidebar-footer .footer-brand {
-    font-size: 0.52rem !important;
-    font-weight: 700 !important;
-    margin-bottom: 4px !important;
+    font-size: 0.62rem !important;
 }
 
-.sidebar-footer .footer-subtitle {
-    font-size: 0.52rem !important;
-    line-height: 1.2 !important;
-}
-
+.sidebar-footer .footer-subtitle,
 .sidebar-footer .footer-powered,
 .sidebar-footer .footer-version,
 .sidebar-footer .footer-group,
 .sidebar-footer .footer-copyright {
-    font-size: 0.48rem !important;
-    line-height: 1.2 !important;
-    opacity: 0.85;
+    font-size: 0.55rem !important;
+    line-height: 1.25 !important;
 }
 
 /* Main hero */
@@ -1057,80 +1063,6 @@ h1, h2, h3 {
 .sidebar-footer * {
     font-size: 0.62rem !important;
     line-height: 1.35 !important;
-}
-
-
-/* ===== SIDEBAR FINAL V3 CLEAN AI DASHBOARD ===== */
-
-/* Keep branding fixed at top */
-[data-testid="stSidebar"] > div:first-child {
-    padding-top: 1rem !important;
-    padding-bottom: 5.5rem !important;
-}
-
-[data-testid="stSidebar"] h1,
-[data-testid="stSidebar"] .stMarkdown:first-child {
-    margin-bottom: 1.2rem !important;
-}
-
-/* User profile compact */
-.sidebar-user-card {
-    margin: 0.5rem 0 0.8rem 0 !important;
-    padding: 8px 12px !important;
-    border-radius: 12px !important;
-}
-
-.sidebar-user-name {
-    font-size: 0.75rem !important;
-}
-
-.sidebar-user-role {
-    font-size: 0.62rem !important;
-}
-
-/* Logout compact */
-[data-testid="stSidebar"] button {
-    min-height: 32px !important;
-    height: 32px !important;
-    padding: 0.1rem 0.5rem !important;
-    font-size: 0.68rem !important;
-    border-radius: 10px !important;
-    margin-bottom: 0.8rem !important;
-}
-
-/* Navigation title */
-[data-testid="stSidebar"] h2 {
-    font-size: 1rem !important;
-    margin-bottom: 0.7rem !important;
-}
-
-/* Smaller professional navigation buttons */
-[data-testid="stSidebar"] div[role="radiogroup"] {
-    gap: 0.35rem !important;
-}
-
-[data-testid="stSidebar"] div[role="radiogroup"] label {
-    min-height: 34px !important;
-    height: 34px !important;
-    padding: 0.15rem 0.45rem !important;
-    border-radius: 11px !important;
-}
-
-[data-testid="stSidebar"] div[role="radiogroup"] label p {
-    font-size: 0.68rem !important;
-    font-weight: 700 !important;
-}
-
-/* Footer safe area */
-.sidebar-footer {
-    bottom: 12px !important;
-    width: 190px !important;
-    left: 20px !important;
-}
-
-.sidebar-footer * {
-    font-size: 0.55rem !important;
-    line-height: 1.25 !important;
 }
 
 </style>
