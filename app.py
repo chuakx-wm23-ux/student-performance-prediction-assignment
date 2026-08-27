@@ -1105,6 +1105,24 @@ h1, h2, h3 {
 .batch-card-added p {
     color:#64748b;
 }
+
+/* FINAL SIZE ALIGNMENT ONLY - Individual & Batch Prediction cards */
+.prediction-mode-card {
+    height: 245px !important;
+    min-height: 245px !important;
+    display: flex !important;
+    flex-direction: column !important;
+    justify-content: flex-start !important;
+}
+
+.prediction-mode-desc {
+    min-height: 52px !important;
+}
+
+.prediction-feature-row {
+    min-height: 32px !important;
+}
+
 </style>
 """, unsafe_allow_html=True)
 
