@@ -2981,7 +2981,7 @@ if page == "Prediction" and st.session_state.get("prediction_mode") == "batch":
                     title_position="top center",
                 )
                 fig.update_layout(title_x=0.5)
-    st.plotly_chart(fig, use_container_width=True)
+                st.plotly_chart(fig, use_container_width=True)
 
             with chart_col2:
                 bar_df = counts.reset_index()
