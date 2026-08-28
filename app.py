@@ -2569,22 +2569,40 @@ def make_template_bytes():
 
 
 def validate_batch_data(batch_df):
-    required = [
-        "Number_of_Subjects",
+    """
+    Validate uploaded batch data without forcing every template row to be filled.
+
+    Rules:
+    - Completely blank Excel rows are ignored.
+    - Student_ID and Student_Name are optional for prediction.
+    - Number_of_Subjects is optional because it is profile information only.
+    - Missing ML input values are allowed and will be filled with training-data medians.
+    - Non-numeric or out-of-range values that are actually entered are still rejected.
+    """
+    required_features = [
         "Average_Score",
         "Attendance_Pct",
         "Study_Hours_Per_Day",
         "Previous_CGPA",
     ]
+
     errors = []
-    missing = [column for column in required if column not in batch_df.columns]
+
+    missing = [
+        column for column in required_features
+        if column not in batch_df.columns
+    ]
     if missing:
         return ["Missing required columns: " + ", ".join(missing)]
-    if batch_df.empty:
+
+    # Ignore completely blank template rows.
+    non_blank_mask = ~batch_df.isna().all(axis=1)
+    if not non_blank_mask.any():
         return ["The uploaded file does not contain any student records."]
 
+    check_df = batch_df.loc[non_blank_mask].copy()
+
     ranges = {
-        "Number_of_Subjects": (1, 12),
         "Average_Score": (0, 100),
         "Attendance_Pct": (0, 100),
         "Study_Hours_Per_Day": (0, 24),
@@ -2592,23 +2610,139 @@ def validate_batch_data(batch_df):
     }
 
     for column, (minimum, maximum) in ranges.items():
-        values = pd.to_numeric(batch_df[column], errors="coerce")
-        if values.isna().any():
-            rows = (values.isna()).to_numpy().nonzero()[0] + 2
-            errors.append(f"{column} contains missing or non-numeric values at Excel row(s): " + ", ".join(map(str, rows[:8])))
-            continue
-        invalid = ~values.between(minimum, maximum, inclusive="both")
-        if invalid.any():
-            rows = invalid.to_numpy().nonzero()[0] + 2
-            errors.append(f"{column} must be between {minimum} and {maximum}. Invalid Excel row(s): " + ", ".join(map(str, rows[:8])))
+        raw_values = check_df[column]
 
-    subjects = pd.to_numeric(batch_df["Number_of_Subjects"], errors="coerce")
-    non_integer = subjects.notna() & (subjects % 1 != 0)
-    if non_integer.any():
-        rows = non_integer.to_numpy().nonzero()[0] + 2
-        errors.append("Number_of_Subjects must contain whole numbers. Invalid Excel row(s): " + ", ".join(map(str, rows[:8])))
+        # Treat empty cells and whitespace-only cells as missing/allowed.
+        cleaned = raw_values.astype("string").str.strip()
+        blank_mask = cleaned.isna() | cleaned.eq("")
+
+        values = pd.to_numeric(
+            cleaned.mask(blank_mask),
+            errors="coerce",
+        )
+
+        # Only reject values that were actually entered but are not numeric.
+        non_numeric = (~blank_mask) & values.isna()
+        if non_numeric.any():
+            rows = check_df.index[non_numeric].to_numpy() + 2
+            errors.append(
+                f"{column} contains non-numeric values at Excel row(s): "
+                + ", ".join(map(str, rows[:8]))
+            )
+            continue
+
+        # Missing values are intentionally allowed and handled before prediction.
+        present_values = values.dropna()
+        invalid = ~present_values.between(
+            minimum,
+            maximum,
+            inclusive="both",
+        )
+        if invalid.any():
+            invalid_index = present_values.index[invalid]
+            rows = invalid_index.to_numpy() + 2
+            errors.append(
+                f"{column} must be between {minimum} and {maximum}. "
+                "Invalid Excel row(s): "
+                + ", ".join(map(str, rows[:8]))
+            )
+
+    # Number_of_Subjects is optional/profile information.
+    # If the column exists and a value is entered, validate it normally.
+    if "Number_of_Subjects" in check_df.columns:
+        raw_subjects = check_df["Number_of_Subjects"]
+        cleaned_subjects = raw_subjects.astype("string").str.strip()
+        blank_subjects = cleaned_subjects.isna() | cleaned_subjects.eq("")
+        subjects = pd.to_numeric(
+            cleaned_subjects.mask(blank_subjects),
+            errors="coerce",
+        )
+
+        non_numeric = (~blank_subjects) & subjects.isna()
+        if non_numeric.any():
+            rows = check_df.index[non_numeric].to_numpy() + 2
+            errors.append(
+                "Number_of_Subjects contains non-numeric values at Excel row(s): "
+                + ", ".join(map(str, rows[:8]))
+            )
+
+        present_subjects = subjects.dropna()
+        invalid_range = ~present_subjects.between(
+            1,
+            12,
+            inclusive="both",
+        )
+        if invalid_range.any():
+            rows = present_subjects.index[invalid_range].to_numpy() + 2
+            errors.append(
+                "Number_of_Subjects must be between 1 and 12. "
+                "Invalid Excel row(s): "
+                + ", ".join(map(str, rows[:8]))
+            )
+
+        non_integer = present_subjects % 1 != 0
+        if non_integer.any():
+            rows = present_subjects.index[non_integer].to_numpy() + 2
+            errors.append(
+                "Number_of_Subjects must contain whole numbers. "
+                "Invalid Excel row(s): "
+                + ", ".join(map(str, rows[:8]))
+            )
+
     return errors
 
+
+def prepare_batch_data(batch_df):
+    """
+    Prepare uploaded data for prediction.
+
+    Completely blank template rows are removed. For partially completed
+    student rows, missing ML features are filled with the corresponding
+    median from the training dataset. This lets users submit a partially
+    completed template while keeping the prediction pipeline numeric.
+    """
+    prepared = batch_df.copy()
+
+    # Remove empty rows that may exist in the downloaded Excel template.
+    prepared = prepared.dropna(how="all").copy()
+
+    model_features = [
+        "Average_Score",
+        "Attendance_Pct",
+        "Study_Hours_Per_Day",
+        "Previous_CGPA",
+    ]
+
+    imputed_features = []
+
+    for column in model_features:
+        values = pd.to_numeric(prepared[column], errors="coerce")
+        missing_count = int(values.isna().sum())
+
+        if missing_count > 0:
+            training_values = pd.to_numeric(
+                df[column],
+                errors="coerce",
+            )
+            median_value = training_values.median()
+
+            values = values.fillna(median_value)
+            imputed_features.append(
+                f"{column} ({missing_count} cell(s))"
+            )
+
+        prepared[column] = values
+
+    # Number_of_Subjects is not used by KNN/SVM/ANN prediction.
+    # Keep it as profile information when supplied, but do not require it.
+    if "Number_of_Subjects" in prepared.columns:
+        subjects = pd.to_numeric(
+            prepared["Number_of_Subjects"],
+            errors="coerce",
+        )
+        prepared["Number_of_Subjects"] = subjects
+
+    return prepared, imputed_features
 
 def predict_batch(batch_df):
     features = [
@@ -2858,6 +2992,7 @@ def create_batch_template():
     template_df = pd.DataFrame({
         "Student_ID": ["1234567"],
         "Student_Name": ["Sample Student"],
+        "Number_of_Subjects": [5],
         "Average_Score": [75.0],
         "Attendance_Pct": [90.0],
         "Study_Hours_Per_Day": [3.0],
@@ -2922,11 +3057,34 @@ if page == "Prediction" and st.session_state.get("prediction_mode") == "batch":
             for error in errors:
                 st.error(error)
         else:
-            if st.button("🚀 Run Batch Prediction", key="run_batch_prediction", use_container_width=True):
-                result = predict_batch(batch_df)
+            st.info(
+                "💡 You do not need to fill every row or every field. "
+                "Completely blank rows are ignored. Missing prediction inputs "
+                "are automatically filled using training-data median values."
+            )
+
+            if st.button(
+                "🚀 Run Batch Prediction",
+                key="run_batch_prediction",
+                use_container_width=True,
+            ):
+                prepared_batch_df, imputed_features = prepare_batch_data(batch_df)
+
+                result = predict_batch(prepared_batch_df)
                 st.session_state["batch_result"] = result
                 st.session_state["batch_uploaded_file"] = uploaded_file.name
-                st.success("Batch prediction completed successfully!")
+
+                if imputed_features:
+                    st.warning(
+                        "Some missing values were automatically filled: "
+                        + ", ".join(imputed_features)
+                        + "."
+                    )
+
+                st.success(
+                    f"Batch prediction completed successfully for "
+                    f"{len(prepared_batch_df):,} student record(s)!"
+                )
 
     if "batch_result" in st.session_state:
         result = st.session_state["batch_result"]
