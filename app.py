@@ -3058,9 +3058,7 @@ if page == "Prediction" and st.session_state.get("prediction_mode") == "batch":
                 st.error(error)
         else:
             st.info(
-                "💡 You do not need to fill every row or every field. "
-                "Completely blank rows are ignored. Missing prediction inputs "
-                "are automatically filled using training-data median values."
+                "💡This is your uploaded information, Please check"
             )
 
             if st.button(
