@@ -4541,28 +4541,3 @@ st.sidebar.markdown(
     """,
     unsafe_allow_html=True
 )
-
-# FINAL ULTIMATE VERSION FEATURES
-# - Prediction page supports single and batch prediction
-# - Number_of_Subjects retained as profile information
-# - Final ML features:
-#   Average_Score
-#   Attendance_Pct
-#   Study_Hours_Per_Day
-#   Previous_CGPA
-# - Feature analysis and model comparison included
-# - Export prediction reports supported
-
-
-# FINAL SUBMISSION VERSION
-# Design goals:
-# - Original UI style preserved
-# - Single student prediction + batch workflow
-# - KNN / SVM / ANN comparison
-# - Feature selection explanation
-# - Number_of_Subjects retained as profile information
-# - Final ML features:
-#   Average_Score
-#   Attendance_Pct
-#   Study_Hours_Per_Day
-#   Previous_CGPA
